@@ -1,0 +1,35 @@
+helio:
+  crud:
+    # JDBC驱动类名，根据数据库类型自行修改
+    db-driver-class: com.mysql.cj.jdbc.Driver
+    # 数据库类型
+    db-type: mysql
+    # 数据库连接主机
+    db-host: 127.0.0.1
+    # 数据库端口
+    db-port: 3306
+    # 数据库登录账号
+    db-username: root
+    # 数据库登录密码
+    db-password: root
+    # 数据库名
+    db-name: helio_boot
+
+spring:
+  redis:
+    # Redis连接主机
+    host: 127.0.0.1
+    # Redis连接端口
+    port: 6379
+    # Redis登录密码
+    password:
+    # Redis数据库序号
+    database: 1
+
+knife4j:
+  # 生产环境务必设为true
+  production: false
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -1,0 +1,199 @@
+package cc.uncarbon.module.sys.service;
+
+import cc.uncarbon.framework.core.constant.HelioConstant;
+import cc.uncarbon.framework.core.exception.BusinessException;
+import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
+import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.constant.SysConstant;
+import cc.uncarbon.module.sys.entity.SysDeptEntity;
+import cc.uncarbon.module.sys.entity.SysUserDeptRelationEntity;
+import cc.uncarbon.module.sys.enums.SysErrorEnum;
+import cc.uncarbon.module.sys.mapper.SysDeptMapper;
+import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDeptDTO;
+import cc.uncarbon.module.sys.model.request.AdminListSysDeptDTO;
+import cc.uncarbon.module.sys.model.response.SysDeptBO;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * 部门
+ * @author Uncarbon
+ */
+@Slf4j
+@Service
+public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptEntity> {
+
+    @Resource
+    private SysUserDeptRelationService sysUserDeptRelationService;
+
+
+    /**
+     * 后台管理-列表
+     */
+    public List<SysDeptBO> adminList(AdminListSysDeptDTO dto) {
+        List<SysDeptEntity> entityList = this.list(
+                new QueryWrapper<SysDeptEntity>()
+                        .lambda()
+                        // 名称
+                        .like(StrUtil.isNotBlank(dto.getTitle()), SysDeptEntity::getTitle, StrUtil.cleanBlank(dto.getTitle()))
+                        // 上级ID
+                        .eq(ObjectUtil.isNotNull(dto.getParentId()), SysDeptEntity::getParentId, dto.getParentId())
+                        // 排序
+                        .orderByAsc(SysDeptEntity::getSort)
+        );
+
+        return this.entityList2BOs(entityList);
+    }
+
+    /**
+     * 通用-详情
+     */
+    public SysDeptBO getOneById(Long entityId) {
+        SysDeptEntity entity = this.getById(entityId);
+        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+
+        return this.entity2BO(entity, false);
+    }
+
+    /**
+     * 后台管理-新增
+     */
+    @SysLog(value = "新增部门")
+    @Transactional(rollbackFor = Exception.class)
+    public Long adminInsert(AdminInsertOrUpdateSysDeptDTO dto) {
+        this.checkExist(dto);
+
+        if (ObjectUtil.isNull(dto.getParentId())) {
+            dto.setParentId(0L);
+        }
+
+        dto.setId(null);
+        SysDeptEntity entity = new SysDeptEntity();
+        BeanUtil.copyProperties(dto, entity);
+
+        this.save(entity);
+
+        return entity.getId();
+    }
+
+    /**
+     * 后台管理-编辑
+     */
+    @SysLog(value = "编辑部门")
+    @Transactional(rollbackFor = Exception.class)
+    public void adminUpdate(AdminInsertOrUpdateSysDeptDTO dto) {
+        this.checkExist(dto);
+
+        if (ObjectUtil.isNull(dto.getParentId())) {
+            dto.setParentId(0L);
+        }
+
+        SysDeptEntity entity = new SysDeptEntity();
+        BeanUtil.copyProperties(dto, entity);
+
+        this.updateById(entity);
+    }
+
+    /**
+     * 后台管理-删除
+     */
+    @SysLog(value = "删除部门")
+    @Transactional(rollbackFor = Exception.class)
+    public void adminDelete(List<Long> ids) {
+        this.removeByIds(ids);
+    }
+
+    /**
+     * 取所属部门简易信息
+     * @param userId 用户ID
+     */
+    public SysDeptBO getPlainDeptByUserId(Long userId) {
+        SysUserDeptRelationEntity relationEntity = sysUserDeptRelationService.getOne(
+                new QueryWrapper<SysUserDeptRelationEntity>()
+                        .lambda()
+                        .eq(SysUserDeptRelationEntity::getUserId, userId)
+                        .last(HelioConstant.CRUD.SQL_LIMIT_1)
+        );
+
+        if (relationEntity == null) {
+            return null;
+        }
+
+        SysDeptEntity entity = this.getById(relationEntity.getDeptId());
+        return this.entity2BO(entity, false);
+    }
+
+    
+    /*
+    私有方法
+    ------------------------------------------------------------------------------------------------
+     */
+
+    private SysDeptBO entity2BO(SysDeptEntity entity, boolean traverseChildren) {
+        if (entity == null) {
+            return null;
+        }
+
+        SysDeptBO bo = new SysDeptBO();
+        BeanUtil.copyProperties(entity, bo);
+
+        // 可以在此处为BO填充字段
+        if (SysConstant.ROOT_PARENT_ID.equals(bo.getParentId())) {
+            bo.setParentId(null);
+        }
+
+        if (traverseChildren) {
+            List<SysDeptBO> children = this.adminList(
+                    AdminListSysDeptDTO.builder()
+                            .parentId(bo.getId())
+                            .build()
+            );
+            if (CollUtil.isEmpty(children)) {
+                children = null;
+            }
+
+            bo.setChildren(children);
+        }
+
+        return bo;
+    }
+
+    private List<SysDeptBO> entityList2BOs(List<SysDeptEntity> entityList) {
+        // 深拷贝
+        List<SysDeptBO> ret = new ArrayList<>(entityList.size());
+        entityList.forEach(
+                entity -> ret.add(this.entity2BO(entity, true))
+        );
+
+        return ret;
+    }
+
+
+    /**
+     * 检查是否已存在同名数据
+     * @param dto DTO
+     */
+    private void checkExist(AdminInsertOrUpdateSysDeptDTO dto) {
+        SysDeptEntity existEntity = this.getOne(
+                new QueryWrapper<SysDeptEntity>()
+                        .lambda()
+                        .eq(SysDeptEntity::getTitle, dto.getTitle())
+                        .last(HelioConstant.CRUD.SQL_LIMIT_1)
+        );
+
+        if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+            throw new BusinessException(400, "已存在相同部门，请重新输入");
+        }
+    }
+}

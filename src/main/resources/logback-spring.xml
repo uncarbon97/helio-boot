@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="false">
+    <!-- 配置-彩色日志渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <!-- 常量-项目名称 -->
+    <property name="APP_NAME" value="helio-boot"/>
+    <!-- 常量-日志文件存储路径 -->
+    <property name="LOG_HOME" value="logs/${APP_NAME}"/>
+    <!-- 常量-日志文件保留天数 -->
+    <property name="LOG_MAX_HISTORY" value="30"/>
+    <!-- 常量-日志文件最大占用 -->
+    <property name="LOG_MAX_SIZE" value="100MB"/>
+    <!-- 常量-文件型日志输出格式 -->
+    <property name="LOG_FILE_OUTPUT_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%10thread] [%X{tid}] %40.40logger{40} [%10method,%line] : %msg%n"/>
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 将DEBUG日志写出到文件 -->
+    <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只记录指定级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>ACCEPT</OnMatch>
+        </filter>
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-debug.log</FileNamePattern>
+            <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_FILE_OUTPUT_PATTERN}</pattern>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>${LOG_MAX_SIZE}</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- 异步处理DEBUG日志 -->
+    <appender name="ASYNC_DEBUG" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 默认如果队列的80%已满，将丢弃TRACE、DEBUG、INFO日志，只保留WARN和ERROR日志。为了保留全部日志，设置为0 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度，该值会影响性能，默认值为256 -->
+        <queueSize>1024</queueSize>
+        <!-- 添加附加的appender，最多只能添加一个 -->
+        <appender-ref ref="DEBUG_FILE"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- 将WARN日志写出到文件 -->
+    <appender name="WARN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只记录指定级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>ACCEPT</OnMatch>
+        </filter>
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-warn.log</FileNamePattern>
+            <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_FILE_OUTPUT_PATTERN}</pattern>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>${LOG_MAX_SIZE}</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- 异步处理WARN日志 -->
+    <appender name="ASYNC_WARN" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 默认如果队列的80%已满，将丢弃TRACE、DEBUG、INFO日志，只保留WARN和ERROR日志。为了保留全部日志，设置为0 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度，该值会影响性能，默认值为256 -->
+        <queueSize>1024</queueSize>
+        <!-- 添加附加的appender，最多只能添加一个 -->
+        <appender-ref ref="WARN_FILE"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- 将INFO日志写出到文件 -->
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只记录指定级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>ACCEPT</OnMatch>
+        </filter>
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-info.log</FileNamePattern>
+            <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_FILE_OUTPUT_PATTERN}</pattern>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>${LOG_MAX_SIZE}</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- 异步处理INFO日志 -->
+    <appender name="ASYNC_INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 默认如果队列的80%已满，将丢弃TRACE、DEBUG、INFO日志，只保留WARN和ERROR日志。为了保留全部日志，设置为0 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度，该值会影响性能，默认值为256 -->
+        <queueSize>1024</queueSize>
+        <!-- 添加附加的appender，最多只能添加一个 -->
+        <appender-ref ref="INFO_FILE"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- 将ERROR日志写出到文件 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只记录指定级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>ACCEPT</OnMatch>
+        </filter>
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-error.log</FileNamePattern>
+            <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_FILE_OUTPUT_PATTERN}</pattern>
+        </encoder>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>${LOG_MAX_SIZE}</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!-- 异步处理ERROR日志 -->
+    <appender name="ASYNC_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 默认如果队列的80%已满，将丢弃TRACE、DEBUG、INFO日志，只保留WARN和ERROR日志。为了保留全部日志，设置为0 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度，该值会影响性能，默认值为256 -->
+        <queueSize>1024</queueSize>
+        <!-- 添加附加的appender，最多只能添加一个 -->
+        <appender-ref ref="ERROR_FILE"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+
+    <logger name="io.undertow" level="WARN"/>
+    <logger name="com.alibaba.nacos" level="INFO"/>
+
+    <!-- 开发环境-未指定包名的日志使用WARN级别 -->
+    <springProfile name="dev">
+        <root level="WARN">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC_DEBUG" />
+            <appender-ref ref="ASYNC_INFO" />
+            <appender-ref ref="ASYNC_WARN" />
+            <appender-ref ref="ASYNC_ERROR" />
+        </root>
+    </springProfile>
+
+    <!-- 测试环境-未指定包名的日志使用WARN级别 -->
+    <springProfile name="test">
+        <root level="WARN">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC_DEBUG" />
+            <appender-ref ref="ASYNC_INFO" />
+            <appender-ref ref="ASYNC_WARN" />
+            <appender-ref ref="ASYNC_ERROR" />
+        </root>
+    </springProfile>
+
+    <!-- 生产环境-未指定包名的日志使用INFO级别 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ASYNC_DEBUG" />
+            <appender-ref ref="ASYNC_INFO" />
+            <appender-ref ref="ASYNC_WARN" />
+            <appender-ref ref="ASYNC_ERROR" />
+        </root>
+    </springProfile>
+</configuration>

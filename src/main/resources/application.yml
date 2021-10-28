@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: helio-boot
+  profiles:
+    # 可通过命令行参数实现多环境切换配置文件
+    active: dev
+  datasource:
+    driver-class-name: ${helio.crud.db-driver-class}
+    username: ${helio.crud.db-username}
+    password: ${helio.crud.db-password}
+    url: jdbc:${helio.crud.db-type}://${helio.crud.db-host}:${helio.crud.db-port}/${helio.crud.db-name}?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+
+helio:
+  crud:
+    id-generator:
+      # 使用雪花算法作为主键ID生成策略
+      strategy: SNOWFLAKE
+      # 雪花ID-数据中心ID
+      datacenter-id: ${DATACENTER_ID:0}
+      # 雪花ID-起始日期-可以选用项目开工的日期-这个一旦确定就不要改动了
+      epoch-date: '2021-07-17'
+    tenant:
+      # 是否开启租户
+      enabled: true
+      ignored-tables:
+        - sys_menu
+        - sys_tenant
+        - sys_role_menu_relation
+        - sys_user_dept_relation
+        - sys_user_role_relation
+    optimistic-lock:
+      # 是否开启乐观锁
+      enabled: false
+  security:
+    exclude-routes:
+      # App-放行接口
+      - /app/api/v1/auth/login
+      - /favicon.ico
+
+knife4j:
+  # 保持true
+  enable: true
+  basic:
+    enable: true
+    username: helio
+    password: helio
+
+server:
+  port: 7003
+  http2:
+    enabled: true
+
+mybatis-plus:
+  # 枚举和XML扫描，支持统配符 * 或者 ; 分割
+  type-enums-package: cc.uncarbon.module.*.enums
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+logging:
+  level:
+    # 分别指定脚手架、业务模块的日志级别
+    cc.uncarbon.framework: DEBUG
+    cc.uncarbon.module: DEBUG
+
+sa-token:
+  # token名称
+  token-name: Authorization
+  # token风格
+  token-style: tik
+  # 是否允许同一账号并发登录
+  is-concurrent: false
+  # 打印banner
+  is-print: false
+  # 是否尝试从请求体里读取token
+  is-read-body: false
+  # 是否尝试从cookie里读取token
+  is-read-cookie: false
