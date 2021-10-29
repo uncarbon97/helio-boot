@@ -187,6 +187,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     private void checkExist(AdminInsertOrUpdateSysDeptDTO dto) {
         SysDeptEntity existEntity = this.getOne(
                 new QueryWrapper<SysDeptEntity>()
+                        .select( " id ")
                         .lambda()
                         .eq(SysDeptEntity::getTitle, dto.getTitle())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
