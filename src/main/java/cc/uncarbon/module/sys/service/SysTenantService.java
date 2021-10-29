@@ -236,6 +236,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     private void checkExist(AdminUpdateSysTenantDTO dto) {
         SysTenantEntity existEntity = this.getOne(
                 new QueryWrapper<SysTenantEntity>()
+                        .select( " id ")
                         .lambda()
                         .eq(SysTenantEntity::getTenantId, dto.getTenantId())
                         .or()

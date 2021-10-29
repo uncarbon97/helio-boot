@@ -145,6 +145,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     private void checkExist(AdminInsertOrUpdateSysDataDictDTO dto) {
         SysDataDictEntity existEntity = this.getOne(
                 new QueryWrapper<SysDataDictEntity>()
+                        .select( " id ")
                         .lambda()
                         .eq(SysDataDictEntity::getCamelCaseKey, dto.getCamelCaseKey())
                         .or()
