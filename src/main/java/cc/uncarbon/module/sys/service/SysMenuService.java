@@ -452,7 +452,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
 
             SysMenuEntity existEntity = this.getOne(
                     new QueryWrapper<SysMenuEntity>()
-                            .select( " id ")
+                            .select(" id ")
                             .lambda()
                             .eq(SysMenuEntity::getPermission, dto.getPermission())
                             .last(HelioConstant.CRUD.SQL_LIMIT_1)

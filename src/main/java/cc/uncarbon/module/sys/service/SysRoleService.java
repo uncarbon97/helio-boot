@@ -182,7 +182,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     private void checkExist(AdminInsertOrUpdateSysRoleDTO dto) {
         SysRoleEntity existEntity = this.getOne(
                 new QueryWrapper<SysRoleEntity>()
-                        .select( " id ")
+                        .select(" id ")
                         .lambda()
                         .eq(SysRoleEntity::getTitle, dto.getTitle())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)

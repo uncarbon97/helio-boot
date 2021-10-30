@@ -176,7 +176,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     private void checkExist(AdminInsertOrUpdateSysParamDTO dto) {
         SysParamEntity existEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
-                        .select( " id ")
+                        .select(" id ")
                         .lambda()
                         .eq(SysParamEntity::getDescription, dto.getDescription())
                         .or()
