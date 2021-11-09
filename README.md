@@ -1,9 +1,11 @@
 # helio-boot
 
 ## 项目介绍
-`helio-boot`基于[JDK15](http://jdk.java.net/archive/) + Spring Boot 2.4.x，是一款预置SaaS、RBAC能力的单体项目脚手架，适合初学者学习、老手接外包干私活、初创企业快速上马项目
+`helio-boot`基于[JDK15](http://jdk.java.net/archive/) (当然 JDK8 或 JDK11 也可以，详见官方文档) + Spring Boot 2.4.x，是一款预置SaaS、RBAC能力的单体项目脚手架，适合初学者学习、老手接外包干私活、初创企业快速上马项目
 
-需要先安装[helio-starters](https://github.com/uncarbon97/helio-starters) ，可参考[官方文档](https://helio.uncarbon.cc/)
+[官方文档](https://helio.uncarbon.cc/)
+
+~~需要先安装helio-starters~~ [helio-starters](https://github.com/uncarbon97/helio-starters) 已推送至Maven中央仓库，加载时会自动拉取
 
 ## 配套后台管理前端模板 && 代码生成器
 | 项目名 | 简介 | Gitee | GitHub
