@@ -65,11 +65,6 @@
             <artifactId>helio-starter-web</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-rocketmq-aliyun</artifactId>
-        </dependency>
-
         <!-- 这里写其他第三方依赖 -->
 
     </dependencies>
