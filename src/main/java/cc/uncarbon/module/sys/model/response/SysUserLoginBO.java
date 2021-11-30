@@ -36,13 +36,16 @@ public class SysUserLoginBO implements Serializable {
     @ApiModelProperty(value = "手机号")
     private String phoneNo;
 
-    @ApiModelProperty(value = "拥有角色")
+    @ApiModelProperty(value = "对应角色ID")
+    private List<Long> roleIds;
+
+    @ApiModelProperty(value = "对应角色")
     private List<String> roles;
 
     @ApiModelProperty(value = "拥有权限")
     private List<String> permissions;
 
-    @ApiModelProperty("所属租户")
+    @ApiModelProperty(value = "所属租户")
     private TenantContext relationalTenant;
 
 }

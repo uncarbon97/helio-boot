@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "后台菜单管理接口", tags = {"后台菜单管理接口"})
-@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.SAAS_API_VERSION_V1 + "/sys/menus")
+@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/sys/menus")
 @RestController
 public class AdminSysMenuController {
 

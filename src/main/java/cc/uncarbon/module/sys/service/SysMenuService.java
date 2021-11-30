@@ -386,9 +386,11 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
             throw new BusinessException(SysErrorEnum.NO_MENU_AVAILABLE_FOR_CURRENT_ROLE);
         }
 
-        // 3. 临时补充上级菜单ID
-        // 这个Ant-Design的Tree组件有个吊诡的地方, 只选一部分子级的话, 父级菜单不算勾选
-        // 只能在代码里补上了
+        /*
+        3. 补充上级菜单ID
+        这个Ant-Design的Tree组件有个吊诡的地方, 只选一部分子级的话, 父级菜单不算勾选
+        只能在代码里补上了
+         */
         List<Long> missingParentIds = this.listMissingParentId(menuIds);
         menuIds.addAll(missingParentIds);
 
