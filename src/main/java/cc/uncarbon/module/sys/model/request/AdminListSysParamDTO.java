@@ -21,8 +21,8 @@ import java.io.Serializable;
 @Data
 public class AdminListSysParamDTO implements Serializable {
 
-    @ApiModelProperty(value = "英文键名")
-    private String key;
+    @ApiModelProperty(value = "键名")
+    private String name;
 
     @ApiModelProperty(value = "描述")
     private String description;

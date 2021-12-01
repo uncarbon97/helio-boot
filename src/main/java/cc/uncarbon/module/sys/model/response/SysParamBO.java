@@ -41,7 +41,7 @@ public class SysParamBO implements Serializable {
     private LocalDateTime updatedAt;
 
     @ApiModelProperty(value = "键名")
-    private String key;
+    private String name;
 
     @ApiModelProperty(value = "键值")
     private String value;

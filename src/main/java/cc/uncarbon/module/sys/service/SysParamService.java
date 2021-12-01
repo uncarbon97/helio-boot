@@ -41,7 +41,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
                 new QueryWrapper<SysParamEntity>()
                         .lambda()
                         // 键名
-                        .like(StrUtil.isNotBlank(dto.getKey()), SysParamEntity::getKey, StrUtil.cleanBlank(dto.getKey()))
+                        .like(StrUtil.isNotBlank(dto.getName()), SysParamEntity::getName, StrUtil.cleanBlank(dto.getName()))
                         // 描述
                         .like(StrUtil.isNotBlank(dto.getDescription()), SysParamEntity::getDescription, StrUtil.cleanBlank(dto.getDescription()))
                         // 排序
@@ -111,7 +111,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
                 new QueryWrapper<SysParamEntity>()
                         .select(" value ")
                         .lambda()
-                        .eq(SysParamEntity::getKey, key)
+                        .eq(SysParamEntity::getName, key)
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
         if (sysParamEntity == null) {
@@ -180,7 +180,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
                         .lambda()
                         .eq(SysParamEntity::getDescription, dto.getDescription())
                         .or()
-                        .eq(SysParamEntity::getKey, dto.getKey())
+                        .eq(SysParamEntity::getName, dto.getName())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
 
