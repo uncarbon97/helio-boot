@@ -67,7 +67,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "新增系统参数")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysParamDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         dto.setId(null);
         SysParamEntity entity = new SysParamEntity();
@@ -84,7 +84,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "编辑系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysParamDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         SysParamEntity entity = new SysParamEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -170,13 +170,14 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     }
 
     /**
-     * 检查是否已存在同名数据
+     * 检查是否已存在相同数据
+     *
      * @param dto DTO
      */
-    private void checkExist(AdminInsertOrUpdateSysParamDTO dto) {
-        SysParamEntity existEntity = this.getOne(
+    private void checkIfItExists(AdminInsertOrUpdateSysParamDTO dto) {
+        SysParamEntity existingEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
-                        .select(" id ")
+                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
                         .eq(SysParamEntity::getDescription, dto.getDescription())
                         .or()
@@ -184,7 +185,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
 
-        if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+        if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同系统参数，请重新输入");
         }
     }

@@ -95,7 +95,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "新增后台用户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysUserDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         dto.setId(null);
         SysUserEntity entity = new SysUserEntity();
@@ -121,7 +121,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "编辑后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysUserDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         SysUserEntity updateEntity = new SysUserEntity();
         BeanUtil.copyProperties(dto, updateEntity);
@@ -327,13 +327,14 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     }
 
     /**
-     * 检查是否已存在同名数据
+     * 检查是否已存在相同数据
+     * 
      * @param dto DTO
      */
-    private void checkExist(AdminInsertOrUpdateSysUserDTO dto) {
-        SysUserEntity existEntity = this.getUserByPin(dto.getUsername());
+    private void checkIfItExists(AdminInsertOrUpdateSysUserDTO dto) {
+        SysUserEntity existingEntity = this.getUserByPin(dto.getUsername());
 
-        if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+        if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同账号，请重新输入");
         }
     }

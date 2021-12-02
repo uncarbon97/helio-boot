@@ -66,7 +66,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "新增数据字典")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDataDictDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         dto.setId(null);
         SysDataDictEntity entity = new SysDataDictEntity();
@@ -83,7 +83,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "编辑数据字典")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDataDictDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         SysDataDictEntity entity = new SysDataDictEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -138,14 +138,14 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     }
 
     /**
-     * 检查是否已存在同名数据
+     * 检查是否已存在相同数据
      *
      * @param dto DTO
      */
-    private void checkExist(AdminInsertOrUpdateSysDataDictDTO dto) {
-        SysDataDictEntity existEntity = this.getOne(
+    private void checkIfItExists(AdminInsertOrUpdateSysDataDictDTO dto) {
+        SysDataDictEntity existingEntity = this.getOne(
                 new QueryWrapper<SysDataDictEntity>()
-                        .select(" id ")
+                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
                         .eq(SysDataDictEntity::getCamelCaseKey, dto.getCamelCaseKey())
                         .or()
@@ -155,7 +155,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
 
-        if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+        if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同数据字典，请重新输入");
         }
     }

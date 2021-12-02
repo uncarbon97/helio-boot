@@ -72,7 +72,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "新增部门")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDeptDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -93,7 +93,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "编辑部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDeptDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -181,19 +181,20 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
 
 
     /**
-     * 检查是否已存在同名数据
+     * 检查是否已存在相同数据
+     * 
      * @param dto DTO
      */
-    private void checkExist(AdminInsertOrUpdateSysDeptDTO dto) {
-        SysDeptEntity existEntity = this.getOne(
+    private void checkIfItExists(AdminInsertOrUpdateSysDeptDTO dto) {
+        SysDeptEntity existingEntity = this.getOne(
                 new QueryWrapper<SysDeptEntity>()
-                        .select(" id ")
+                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
                         .eq(SysDeptEntity::getTitle, dto.getTitle())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
 
-        if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+        if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同部门，请重新输入");
         }
     }

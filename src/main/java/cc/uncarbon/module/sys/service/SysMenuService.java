@@ -91,7 +91,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @SysLog(value = "新增后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysMenuDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -113,7 +113,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @SysLog(value = "编辑后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysMenuDTO dto) {
-        this.checkExist(dto);
+        this.checkIfItExists(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -214,7 +214,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
          */
         List<Long> disabledMenuIds = this.list(
                 new QueryWrapper<SysMenuEntity>()
-                        .select(" id ")
+                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
                         .eq(SysMenuEntity::getStatus, GenericStatusEnum.DISABLED)
         ).stream().map(SysMenuEntity::getId).collect(Collectors.toList());
@@ -226,7 +226,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
          */
         return this.list(
                 new QueryWrapper<SysMenuEntity>()
-                        .select(" id ")
+                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
                         .and(
                                 wrapper -> wrapper
@@ -375,7 +375,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         if (roleIds.contains(SysConstant.SUPER_ADMIN_ROLE_ID)) {
             return this.list(
                     new QueryWrapper<SysMenuEntity>()
-                            .select(" id ")
+                            .select(HelioConstant.CRUD.SQL_COLUMN_ID)
             ).stream().map(SysMenuEntity::getId).collect(Collectors.toList());
         }
 
@@ -445,22 +445,23 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     }
 
     /**
-     * 检查是否已存在同名数据
+     * 检查是否已存在相同数据
+     * 
      * @param dto DTO
      */
-    private void checkExist(AdminInsertOrUpdateSysMenuDTO dto) {
+    private void checkIfItExists(AdminInsertOrUpdateSysMenuDTO dto) {
         if (StrUtil.isNotBlank(dto.getPermission())) {
             dto.setPermission(StrUtil.cleanBlank(dto.getPermission()));
 
-            SysMenuEntity existEntity = this.getOne(
+            SysMenuEntity existingEntity = this.getOne(
                     new QueryWrapper<SysMenuEntity>()
-                            .select(" id ")
+                            .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                             .lambda()
                             .eq(SysMenuEntity::getPermission, dto.getPermission())
                             .last(HelioConstant.CRUD.SQL_LIMIT_1)
             );
 
-            if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+            if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
                 throw new BusinessException(400, "已存在相同权限标识，请重新输入");
             }
         }
