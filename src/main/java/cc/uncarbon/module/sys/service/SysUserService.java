@@ -95,7 +95,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "新增后台用户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysUserDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         dto.setId(null);
         SysUserEntity entity = new SysUserEntity();
@@ -121,7 +121,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "编辑后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysUserDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         SysUserEntity updateEntity = new SysUserEntity();
         BeanUtil.copyProperties(dto, updateEntity);
@@ -331,7 +331,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 
      * @param dto DTO
      */
-    private void checkIfItExists(AdminInsertOrUpdateSysUserDTO dto) {
+    private void checkExistence(AdminInsertOrUpdateSysUserDTO dto) {
         SysUserEntity existingEntity = this.getUserByPin(dto.getUsername());
 
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {

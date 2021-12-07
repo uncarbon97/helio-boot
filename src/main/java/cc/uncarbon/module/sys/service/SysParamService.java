@@ -67,7 +67,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "新增系统参数")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysParamDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         dto.setId(null);
         SysParamEntity entity = new SysParamEntity();
@@ -84,7 +84,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "编辑系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysParamDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         SysParamEntity entity = new SysParamEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -174,7 +174,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
      *
      * @param dto DTO
      */
-    private void checkIfItExists(AdminInsertOrUpdateSysParamDTO dto) {
+    private void checkExistence(AdminInsertOrUpdateSysParamDTO dto) {
         SysParamEntity existingEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
                         .select(HelioConstant.CRUD.SQL_COLUMN_ID)

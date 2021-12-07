@@ -72,7 +72,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "新增部门")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDeptDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -93,7 +93,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "编辑部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDeptDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -185,7 +185,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
      * 
      * @param dto DTO
      */
-    private void checkIfItExists(AdminInsertOrUpdateSysDeptDTO dto) {
+    private void checkExistence(AdminInsertOrUpdateSysDeptDTO dto) {
         SysDeptEntity existingEntity = this.getOne(
                 new QueryWrapper<SysDeptEntity>()
                         .select(HelioConstant.CRUD.SQL_COLUMN_ID)

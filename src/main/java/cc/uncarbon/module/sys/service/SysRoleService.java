@@ -80,7 +80,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "新增后台角色")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysRoleDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         dto.setId(null);
         SysRoleEntity entity = new SysRoleEntity();
@@ -99,7 +99,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "编辑后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysRoleDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         SysRoleEntity entity = new SysRoleEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -180,7 +180,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      * 
      * @param dto DTO
      */
-    private void checkIfItExists(AdminInsertOrUpdateSysRoleDTO dto) {
+    private void checkExistence(AdminInsertOrUpdateSysRoleDTO dto) {
         SysRoleEntity existingEntity = this.getOne(
                 new QueryWrapper<SysRoleEntity>()
                         .select(HelioConstant.CRUD.SQL_COLUMN_ID)

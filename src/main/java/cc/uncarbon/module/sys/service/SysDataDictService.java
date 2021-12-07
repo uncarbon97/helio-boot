@@ -66,7 +66,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "新增数据字典")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDataDictDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         dto.setId(null);
         SysDataDictEntity entity = new SysDataDictEntity();
@@ -83,7 +83,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "编辑数据字典")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDataDictDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         SysDataDictEntity entity = new SysDataDictEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -142,7 +142,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
      *
      * @param dto DTO
      */
-    private void checkIfItExists(AdminInsertOrUpdateSysDataDictDTO dto) {
+    private void checkExistence(AdminInsertOrUpdateSysDataDictDTO dto) {
         SysDataDictEntity existingEntity = this.getOne(
                 new QueryWrapper<SysDataDictEntity>()
                         .select(HelioConstant.CRUD.SQL_COLUMN_ID)

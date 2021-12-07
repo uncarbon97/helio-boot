@@ -91,7 +91,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @SysLog(value = "新增后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysMenuDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -113,7 +113,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @SysLog(value = "编辑后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysMenuDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
             dto.setParentId(0L);
@@ -449,7 +449,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      * 
      * @param dto DTO
      */
-    private void checkIfItExists(AdminInsertOrUpdateSysMenuDTO dto) {
+    private void checkExistence(AdminInsertOrUpdateSysMenuDTO dto) {
         if (StrUtil.isNotBlank(dto.getPermission())) {
             dto.setPermission(StrUtil.cleanBlank(dto.getPermission()));
 

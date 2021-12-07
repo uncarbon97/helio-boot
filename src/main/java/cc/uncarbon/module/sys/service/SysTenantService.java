@@ -85,7 +85,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @SysLog(value = "新增系统租户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertSysTenantDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         // 1. 加入一个新租户(tenant)
         //    这里是直接顺带创建管理员账号了, 你可以根据业务需要决定是否创建
@@ -152,7 +152,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @SysLog(value = "编辑系统租户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminUpdateSysTenantDTO dto) {
-        this.checkIfItExists(dto);
+        this.checkExistence(dto);
 
         SysTenantEntity entity = new SysTenantEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -234,7 +234,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      * 
      * @param dto DTO
      */
-    private void checkIfItExists(AdminUpdateSysTenantDTO dto) {
+    private void checkExistence(AdminUpdateSysTenantDTO dto) {
         SysTenantEntity existingEntity = this.getOne(
                 new QueryWrapper<SysTenantEntity>()
                         .select(HelioConstant.CRUD.SQL_COLUMN_ID)
