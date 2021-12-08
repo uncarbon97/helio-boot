@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @Aspect
 @Component
 @Slf4j
-@Data
 public class SysLogAspect {
 
     @Resource

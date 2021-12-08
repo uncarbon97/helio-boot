@@ -80,7 +80,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "新增后台角色")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysRoleDTO dto) {
-        this.checkExist(dto);
+        this.checkExistence(dto);
 
         dto.setId(null);
         SysRoleEntity entity = new SysRoleEntity();
@@ -99,7 +99,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "编辑后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysRoleDTO dto) {
-        this.checkExist(dto);
+        this.checkExistence(dto);
 
         SysRoleEntity entity = new SysRoleEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -176,19 +176,20 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     }
 
     /**
-     * 检查是否已存在同名数据
+     * 检查是否已存在相同数据
+     * 
      * @param dto DTO
      */
-    private void checkExist(AdminInsertOrUpdateSysRoleDTO dto) {
-        SysRoleEntity existEntity = this.getOne(
+    private void checkExistence(AdminInsertOrUpdateSysRoleDTO dto) {
+        SysRoleEntity existingEntity = this.getOne(
                 new QueryWrapper<SysRoleEntity>()
-                        .select(" id ")
+                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
                         .eq(SysRoleEntity::getTitle, dto.getTitle())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
 
-        if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+        if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同后台角色，请重新输入");
         }
     }

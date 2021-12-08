@@ -30,10 +30,10 @@ public class AdminInsertOrUpdateSysParamDTO implements Serializable {
 
     @ApiModelProperty(value = "键名", required = true)
     @NotBlank(message = "键名不能为空")
-    private String key;
+    private String name;
 
-    @ApiModelProperty(value = "值", required = true)
-    @NotBlank(message = "值不能为空")
+    @ApiModelProperty(value = "键值", required = true)
+    @NotBlank(message = "键值不能为空")
     private String value;
 
     @ApiModelProperty(value = "描述", required = true)

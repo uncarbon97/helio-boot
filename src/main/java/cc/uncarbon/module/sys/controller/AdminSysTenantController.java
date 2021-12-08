@@ -30,7 +30,7 @@ import javax.validation.Valid;
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "系统租户管理接口", tags = {"系统租户管理接口"})
-@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.SAAS_API_VERSION_V1 + "/sys/tenants")
+@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/sys/tenants")
 @RestController
 public class AdminSysTenantController {
 

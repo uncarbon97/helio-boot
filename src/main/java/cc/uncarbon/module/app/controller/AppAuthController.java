@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Slf4j
 @Api(value = "APP鉴权接口", tags = {"APP鉴权接口"})
-@RequestMapping(AppConstant.APP_MODULE_CONTEXT_PATH + HelioConstant.Version.APP_API_VERSION_V1 + "/auth")
+@RequestMapping(AppConstant.APP_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/auth")
 @RestController
 public class AppAuthController {
 
@@ -33,34 +33,10 @@ public class AppAuthController {
     @PostMapping("/login")
     public ApiResult<?> login() {
         /*
-        鉴权方法请参考AdminAuthController.login，自行根据业务实现
+        编码时请参考AdminAuthController#login
          */
 
-        // 构造用户上下文
-        UserContext userContext = UserContext.builder()
-                .userId(1L)
-                .userName("App测试登录")
-                .userPhoneNo("12345678910")
-                .userType(UserTypeEnum.APP_USER_INDIVIDUAL)
-                .extraData(null)
-                .roles(CollUtil.newArrayList())
-                .permissions(CollUtil.newArrayList())
-                .relationalTenant(null)
-                .build();
-
-        // 注册到SA-Token
-        StpUtil.login(userContext.getUserId());
-        StpUtil.getSession().set("userContext", userContext);
-
-
-        // 返回登录token
-        Map<String, Object> tokenInfo = new HashMap<>(16);
-        tokenInfo.put("tokenName", StpUtil.getTokenName());
-        tokenInfo.put("tokenValue", StpUtil.getTokenValue());
-        tokenInfo.put("roles", userContext.getRoles());
-        tokenInfo.put("permissions", userContext.getPermissions());
-
-        return ApiResult.data("登录成功", tokenInfo);
+        return ApiResult.success();
     }
 
 }

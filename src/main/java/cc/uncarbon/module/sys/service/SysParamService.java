@@ -41,7 +41,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
                 new QueryWrapper<SysParamEntity>()
                         .lambda()
                         // 键名
-                        .like(StrUtil.isNotBlank(dto.getKey()), SysParamEntity::getKey, StrUtil.cleanBlank(dto.getKey()))
+                        .like(StrUtil.isNotBlank(dto.getName()), SysParamEntity::getName, StrUtil.cleanBlank(dto.getName()))
                         // 描述
                         .like(StrUtil.isNotBlank(dto.getDescription()), SysParamEntity::getDescription, StrUtil.cleanBlank(dto.getDescription()))
                         // 排序
@@ -67,7 +67,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "新增系统参数")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysParamDTO dto) {
-        this.checkExist(dto);
+        this.checkExistence(dto);
 
         dto.setId(null);
         SysParamEntity entity = new SysParamEntity();
@@ -84,7 +84,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "编辑系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysParamDTO dto) {
-        this.checkExist(dto);
+        this.checkExistence(dto);
 
         SysParamEntity entity = new SysParamEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -111,7 +111,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
                 new QueryWrapper<SysParamEntity>()
                         .select(" value ")
                         .lambda()
-                        .eq(SysParamEntity::getKey, key)
+                        .eq(SysParamEntity::getName, key)
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
         if (sysParamEntity == null) {
@@ -170,21 +170,22 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     }
 
     /**
-     * 检查是否已存在同名数据
+     * 检查是否已存在相同数据
+     *
      * @param dto DTO
      */
-    private void checkExist(AdminInsertOrUpdateSysParamDTO dto) {
-        SysParamEntity existEntity = this.getOne(
+    private void checkExistence(AdminInsertOrUpdateSysParamDTO dto) {
+        SysParamEntity existingEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
-                        .select(" id ")
+                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
                         .eq(SysParamEntity::getDescription, dto.getDescription())
                         .or()
-                        .eq(SysParamEntity::getKey, dto.getKey())
+                        .eq(SysParamEntity::getName, dto.getName())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
 
-        if (existEntity != null && !existEntity.getId().equals(dto.getId())) {
+        if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同系统参数，请重新输入");
         }
     }
