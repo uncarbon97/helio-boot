@@ -37,9 +37,14 @@ helio:
       enabled: false
   security:
     exclude-routes:
+      # 图标
+      - /favicon.ico
+      # Swagger API文档接口
+      - /v2/api-docs
+      - /v3/api-docs
       # App-放行接口
       - /app/api/v1/auth/login
-      - /favicon.ico
+
 
 knife4j:
   # 保持true
