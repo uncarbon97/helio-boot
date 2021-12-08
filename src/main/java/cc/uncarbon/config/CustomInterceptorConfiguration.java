@@ -2,7 +2,6 @@ package cc.uncarbon.config;
 
 import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.satoken.interceptor.DefaultSaTokenParseInterceptor;
-import cc.uncarbon.framework.web.interceptor.DefaultTenantParseInterceptor;
 import cc.uncarbon.interceptor.AdminSaTokenParseInterceptor;
 import cc.uncarbon.interceptor.AppSaTokenRouteInterceptor;
 import cc.uncarbon.module.app.constant.AppConstant;
@@ -47,7 +46,7 @@ public class CustomInterceptorConfiguration implements WebMvcConfigurer {
 
         注：若使用该拦截器，cc.uncarbon.module.sys.service.SysUserService#adminLogin 处的“主动清空用户上下文”代码需要删除
          */
-       /* registry
+        /* registry
                 .addInterceptor(new DefaultTenantParseInterceptor())
                 .addPathPatterns("/**");*/
 
