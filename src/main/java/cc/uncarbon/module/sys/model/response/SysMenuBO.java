@@ -49,7 +49,7 @@ public class SysMenuBO implements Serializable {
     @ApiModelProperty(value = "上级菜单ID")
     private Long parentId;
 
-    @ApiModelProperty(value = "菜单类型(参考MenuTypeEnum)")
+    @ApiModelProperty(value = "菜单类型")
     private SysMenuTypeEnum type;
 
     @ApiModelProperty(value = "权限标识")

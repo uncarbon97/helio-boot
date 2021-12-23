@@ -30,7 +30,7 @@ public class SysTenantEntity extends HelioBaseEntity<Long> {
     @TableField(value = "tenant_name")
     private String tenantName;
 
-    @ApiModelProperty(value = "状态(0=禁用 1=启用)")
+    @ApiModelProperty(value = "状态")
     @TableField(value = "status")
     private GenericStatusEnum status;
 
