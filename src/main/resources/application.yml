@@ -34,7 +34,7 @@ helio:
         - sys_user_role_relation
     optimistic-lock:
       # 是否开启乐观锁
-      enabled: false
+      enabled: true
   security:
     exclude-routes:
       # 图标
