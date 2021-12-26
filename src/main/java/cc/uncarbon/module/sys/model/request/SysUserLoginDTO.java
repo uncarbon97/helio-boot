@@ -25,12 +25,12 @@ import java.io.Serializable;
 public class SysUserLoginDTO implements Serializable {
 
     @ApiModelProperty(value = "账号", required = true)
-    @Size(min = 5, max = 16, message = "账号须为5-16位")
+    @Size(min = 5, max = 16, message = "【账号】长度须在 5 至 16 位之间")
     @NotBlank(message = "账号不能为空")
     private String username;
 
     @ApiModelProperty(value = "密码", required = true)
-    @Size(min = 5, max = 64, message = "密码须为5-64位")
+    @Size(min = 5, max = 64, message = "【密码】长度须在 5 至 16 位之间")
     @NotBlank(message = "密码不能为空")
     private String password;
 

@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * 系统参数
+ *
  * @author Uncarbon
  */
 @Slf4j
@@ -103,15 +104,16 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
 
     /**
      * 根据键名取值
-     * @param key 键名
-     * @return 成功返回值, 失败返回null
+     *
+     * @param name 键名
+     * @return 成功返回键值，失败返回null
      */
-    public String getParamValueByKey(String key) {
+    public String getParamValueByName(String name) {
         SysParamEntity sysParamEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
-                        .select(" value ")
                         .lambda()
-                        .eq(SysParamEntity::getName, key)
+                        .select(SysParamEntity::getValue)
+                        .eq(SysParamEntity::getName, name)
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
         if (sysParamEntity == null) {
@@ -124,12 +126,12 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     /**
      * 根据键名取值
      *
-     * @param key          键名
+     * @param name         键名
      * @param defaultValue 默认值
-     * @return 成功返回值, 失败返回defaultValue
+     * @return 成功返回键值，失败返回defaultValue
      */
-    public String getParamValueByKey(String key, String defaultValue) {
-        String value = this.getParamValueByKey(key);
+    public String getParamValueByName(String name, String defaultValue) {
+        String value = this.getParamValueByName(name);
         if (value == null) {
             return defaultValue;
         }
