@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  */
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -47,7 +47,7 @@ public class SysUserEntity extends HelioBaseEntity<Long> {
 	@TableField(value = "nickname")
 	private String nickname;
 
-	@ApiModelProperty(value = "状态(0=正常 -1=封禁)")
+	@ApiModelProperty(value = "状态")
 	@TableField(value = "status")
 	private SysUserStatusEnum status;
 
