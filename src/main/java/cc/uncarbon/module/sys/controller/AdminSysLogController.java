@@ -34,7 +34,7 @@ import javax.annotation.Resource;
 public class AdminSysLogController {
 
     private static final String PERMISSION_PREFIX = "SysLog:";
-    
+
     @Resource
     private SysLogService sysLogService;
 
@@ -50,7 +50,7 @@ public class AdminSysLogController {
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public ApiResult<SysLogBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysLogService.getOneById(id));
+        return ApiResult.data(sysLogService.getOneById(id, true));
     }
 
 }

@@ -1,5 +1,6 @@
 package cc.uncarbon.module.sys.service;
 
+import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
@@ -53,14 +54,29 @@ public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEnti
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysLogBO getOneById(Long entityId) {
+    @Deprecated
+    public SysLogBO getOneById(Long entityId) throws BusinessException {
+       return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出错误
+     * @return BO
+     */
+    public SysLogBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysLogEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity);
     }
-
 
 
 
