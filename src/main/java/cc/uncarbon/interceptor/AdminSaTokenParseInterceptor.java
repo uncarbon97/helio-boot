@@ -30,7 +30,7 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
 
         // 从请求头解析用户上下文
         if (AdminStpUtil.isLogin()) {
-            UserContext currentUser = (UserContext) AdminStpUtil.getSession().get("userContext");
+            UserContext currentUser = (UserContext) AdminStpUtil.getSession().get(UserContext.CAMEL_NAME);
             log.debug("[SA-Token][Admin] 从请求头解析出用户上下文 >> {}", currentUser);
 
             currentUser
