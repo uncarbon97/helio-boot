@@ -65,8 +65,11 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysRoleBO getOneById(Long entityId) {
+    @Deprecated
+    public SysRoleBO getOneById(Long entityId) throws BusinessException {
         SysRoleEntity entity = this.getById(entityId);
         SysErrorEnum.INVALID_ID.assertNotNull(entity);
 

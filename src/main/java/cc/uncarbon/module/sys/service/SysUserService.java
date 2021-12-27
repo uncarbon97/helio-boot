@@ -80,8 +80,11 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysUserBO getOneById(Long entityId) {
+    @Deprecated
+    public SysUserBO getOneById(Long entityId) throws BusinessException {
         SysUserEntity entity = this.getById(entityId);
         SysErrorEnum.INVALID_ID.assertNotNull(entity);
 

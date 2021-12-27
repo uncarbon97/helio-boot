@@ -58,8 +58,11 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysDeptBO getOneById(Long entityId) {
+    @Deprecated
+    public SysDeptBO getOneById(Long entityId) throws BusinessException {
         SysDeptEntity entity = this.getById(entityId);
         SysErrorEnum.INVALID_ID.assertNotNull(entity);
 

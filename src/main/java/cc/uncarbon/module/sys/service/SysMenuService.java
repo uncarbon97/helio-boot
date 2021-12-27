@@ -76,8 +76,11 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysMenuBO getOneById(Long entityId) {
+    @Deprecated
+    public SysMenuBO getOneById(Long entityId) throws BusinessException {
         SysMenuEntity entity = this.getById(entityId);
         SysErrorEnum.INVALID_ID.assertNotNull(entity);
 

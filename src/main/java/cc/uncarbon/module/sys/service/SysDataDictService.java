@@ -7,11 +7,13 @@ import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysDataDictEntity;
+import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDataDictMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDataDictDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysDataDictDTO;
 import cc.uncarbon.module.sys.model.response.SysDataDictBO;
+import cc.uncarbon.module.sys.model.response.SysLogBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -52,10 +54,29 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysDataDictBO getOneById(Long entityId) {
+    @Deprecated
+    public SysDataDictBO getOneById(Long entityId) throws BusinessException {
         SysDataDictEntity entity = this.getById(entityId);
         SysErrorEnum.INVALID_ID.assertNotNull(entity);
+
+        return this.entity2BO(entity);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysDataDictBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
+        SysDataDictEntity entity = this.getById(entityId);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity);
     }

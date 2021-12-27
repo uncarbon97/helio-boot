@@ -71,10 +71,29 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysTenantBO getOneById(Long entityId) {
+    @Deprecated
+    public SysTenantBO getOneById(Long entityId) throws BusinessException {
         SysTenantEntity entity = this.getById(entityId);
         SysErrorEnum.INVALID_ID.assertNotNull(entity);
+
+        return this.entity2BO(entity);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysTenantBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
+        SysTenantEntity entity = this.getById(entityId);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity);
     }
@@ -231,7 +250,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
     /**
      * 检查是否已存在相同数据
-     * 
+     *
      * @param dto DTO
      */
     private void checkExistence(AdminUpdateSysTenantDTO dto) {

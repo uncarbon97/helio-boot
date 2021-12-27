@@ -54,8 +54,11 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysParamBO getOneById(Long entityId) {
+    @Deprecated
+    public SysParamBO getOneById(Long entityId) throws BusinessException {
         SysParamEntity entity = this.getById(entityId);
         SysErrorEnum.INVALID_ID.assertNotNull(entity);
 
