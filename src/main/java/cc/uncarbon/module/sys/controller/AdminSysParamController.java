@@ -33,7 +33,7 @@ import javax.validation.Valid;
 public class AdminSysParamController {
 
     private static final String PERMISSION_PREFIX = "SysParam:";
-    
+
     @Resource
     private SysParamService sysParamService;
 
@@ -49,7 +49,7 @@ public class AdminSysParamController {
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public ApiResult<SysParamBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysParamService.getOneById(id));
+        return ApiResult.data(sysParamService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)

@@ -59,10 +59,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
      */
     @Deprecated
     public SysDataDictBO getOneById(Long entityId) throws BusinessException {
-        SysDataDictEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
-
-        return this.entity2BO(entity);
+       return this.getOneById(entityId, true);
     }
 
     /**

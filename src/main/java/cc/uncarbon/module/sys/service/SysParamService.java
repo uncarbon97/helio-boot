@@ -6,11 +6,13 @@ import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.entity.SysMenuEntity;
 import cc.uncarbon.module.sys.entity.SysParamEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysParamMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysParamDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysParamDTO;
+import cc.uncarbon.module.sys.model.response.SysMenuBO;
 import cc.uncarbon.module.sys.model.response.SysParamBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
@@ -59,8 +61,21 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
      */
     @Deprecated
     public SysParamBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysParamBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysParamEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity);
     }

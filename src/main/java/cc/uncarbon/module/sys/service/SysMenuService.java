@@ -6,6 +6,7 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
+import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.entity.SysMenuEntity;
 import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
@@ -13,6 +14,7 @@ import cc.uncarbon.module.sys.enums.SysMenuTypeEnum;
 import cc.uncarbon.module.sys.mapper.SysMenuMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysMenuDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysMenuDTO;
+import cc.uncarbon.module.sys.model.response.SysLogBO;
 import cc.uncarbon.module.sys.model.response.SysMenuBO;
 import cc.uncarbon.module.sys.model.response.VbenAdminMenuMetaBO;
 import cn.hutool.core.bean.BeanUtil;
@@ -81,8 +83,21 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      */
     @Deprecated
     public SysMenuBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysMenuBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysMenuEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity, false, null);
     }

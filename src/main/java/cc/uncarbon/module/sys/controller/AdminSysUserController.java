@@ -9,6 +9,7 @@ import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.*;
 import cc.uncarbon.module.sys.model.response.SysUserBO;
+import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoBO;
 import cc.uncarbon.module.sys.service.SysUserService;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -35,7 +36,7 @@ import javax.validation.Valid;
 public class AdminSysUserController {
 
     private static final String PERMISSION_PREFIX = "SysUser:";
-    
+
     @Resource
     private SysUserService sysUserService;
 
@@ -51,7 +52,7 @@ public class AdminSysUserController {
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public ApiResult<SysUserBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysUserService.getOneById(id));
+        return ApiResult.data(sysUserService.getOneById(id, true, false));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
@@ -84,7 +85,7 @@ public class AdminSysUserController {
 
     @ApiOperation(value = "取当前用户信息", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/info")
-    public ApiResult<?> getCurrentUserInfo() {
+    public ApiResult<VbenAdminUserInfoBO> getCurrentUserInfo() {
         return ApiResult.data(sysUserService.adminGetCurrentUserInfo());
     }
 

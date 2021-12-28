@@ -61,7 +61,7 @@ public class AdminSysMenuController {
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public ApiResult<SysMenuBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysMenuService.getOneById(id));
+        return ApiResult.data(sysMenuService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)

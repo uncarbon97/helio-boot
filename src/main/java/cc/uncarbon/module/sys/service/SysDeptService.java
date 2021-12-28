@@ -5,12 +5,14 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
+import cc.uncarbon.module.sys.entity.SysDataDictEntity;
 import cc.uncarbon.module.sys.entity.SysDeptEntity;
 import cc.uncarbon.module.sys.entity.SysUserDeptRelationEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDeptMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDeptDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysDeptDTO;
+import cc.uncarbon.module.sys.model.response.SysDataDictBO;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -63,8 +65,21 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
      */
     @Deprecated
     public SysDeptBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysDeptBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysDeptEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity, false);
     }
@@ -137,7 +152,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         return this.entity2BO(entity, false);
     }
 
-    
+
     /*
     私有方法
     ------------------------------------------------------------------------------------------------
@@ -185,7 +200,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
 
     /**
      * 检查是否已存在相同数据
-     * 
+     *
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysDeptDTO dto) {

@@ -76,10 +76,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      */
     @Deprecated
     public SysTenantBO getOneById(Long entityId) throws BusinessException {
-        SysTenantEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
-
-        return this.entity2BO(entity);
+        return this.getOneById(entityId, true);
     }
 
     /**
