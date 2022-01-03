@@ -38,4 +38,8 @@ public class SysTenantEntity extends HelioBaseEntity<Long> {
     @TableField(value = "tenant_admin_user_id")
     private Long tenantAdminUserId;
 
+    @ApiModelProperty(value = "备注")
+    @TableField(value = "remark")
+    private String remark;
+
 }
