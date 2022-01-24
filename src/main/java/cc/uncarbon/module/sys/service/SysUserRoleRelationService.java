@@ -55,8 +55,8 @@ public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRole
 
         return this.list(
                 new QueryWrapper<SysUserRoleRelationEntity>()
-                        .select(" user_id ")
                         .lambda()
+                        .select(SysUserRoleRelationEntity::getUserId)
                         .in(SysUserRoleRelationEntity::getRoleId, roleIds)
         ).stream().map(SysUserRoleRelationEntity::getUserId).collect(Collectors.toList());
     }
@@ -73,8 +73,8 @@ public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRole
 
         return this.list(
                 new QueryWrapper<SysUserRoleRelationEntity>()
-                        .select(" role_id ")
                         .lambda()
+                        .select(SysUserRoleRelationEntity::getRoleId)
                         .eq(SysUserRoleRelationEntity::getUserId, userId)
         ).stream().map(SysUserRoleRelationEntity::getRoleId).collect(Collectors.toList());
     }

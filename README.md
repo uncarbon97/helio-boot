@@ -7,7 +7,7 @@ JDK compatibility: 1.8 - 17
 
 [官方文档](https://helio.uncarbon.cc/)
 
-需要先安装 `MySQL`/`PostgreSQL`、`Redis` 等必需中间件
+需要先安装 `MySQL`、`Redis` 等必需中间件
 
 基础支撑构件 [helio-starters](https://github.com/uncarbon97/helio-starters) 已推送至Maven中央仓库，加载时会自动拉取
 
