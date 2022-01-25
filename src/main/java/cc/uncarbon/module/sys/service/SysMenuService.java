@@ -6,6 +6,7 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
+import cc.uncarbon.module.sys.entity.SysDeptEntity;
 import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.entity.SysMenuEntity;
 import cc.uncarbon.module.sys.enums.GenericStatusEnum;
@@ -472,8 +473,10 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
 
             SysMenuEntity existingEntity = this.getOne(
                     new QueryWrapper<SysMenuEntity>()
-                            .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                             .lambda()
+                            // 仅取主键ID
+                            .select(SysMenuEntity::getId)
+                            // 权限标识相同
                             .eq(SysMenuEntity::getPermission, dto.getPermission())
                             .last(HelioConstant.CRUD.SQL_LIMIT_1)
             );

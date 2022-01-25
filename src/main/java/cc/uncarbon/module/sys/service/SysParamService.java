@@ -6,24 +6,21 @@ import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
-import cc.uncarbon.module.sys.entity.SysMenuEntity;
 import cc.uncarbon.module.sys.entity.SysParamEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysParamMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysParamDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysParamDTO;
-import cc.uncarbon.module.sys.model.response.SysMenuBO;
 import cc.uncarbon.module.sys.model.response.SysParamBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -197,10 +194,13 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     private void checkExistence(AdminInsertOrUpdateSysParamDTO dto) {
         SysParamEntity existingEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
-                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
+                        // 仅取主键ID
+                        .select(SysParamEntity::getId)
+                        // 描述相同
                         .eq(SysParamEntity::getDescription, dto.getDescription())
                         .or()
+                        // 或键名相同
                         .eq(SysParamEntity::getName, dto.getName())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );

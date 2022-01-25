@@ -5,31 +5,29 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
-import cc.uncarbon.module.sys.entity.SysDataDictEntity;
 import cc.uncarbon.module.sys.entity.SysDeptEntity;
 import cc.uncarbon.module.sys.entity.SysUserDeptRelationEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDeptMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDeptDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysDeptDTO;
-import cc.uncarbon.module.sys.model.response.SysDataDictBO;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * 部门
+ *
  * @author Uncarbon
  */
 @Slf4j
@@ -48,7 +46,8 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
                 new QueryWrapper<SysDeptEntity>()
                         .lambda()
                         // 名称
-                        .like(StrUtil.isNotBlank(dto.getTitle()), SysDeptEntity::getTitle, StrUtil.cleanBlank(dto.getTitle()))
+                        .like(StrUtil.isNotBlank(dto.getTitle()), SysDeptEntity::getTitle,
+                                StrUtil.cleanBlank(dto.getTitle()))
                         // 上级ID
                         .eq(ObjectUtil.isNotNull(dto.getParentId()), SysDeptEntity::getParentId, dto.getParentId())
                         // 排序
@@ -71,7 +70,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     /**
      * 通用-详情
      *
-     * @param entityId 实体类主键ID
+     * @param entityId         实体类主键ID
      * @param throwIfInvalidId 是否在 ID 无效时抛出异常
      * @return null or BO
      */
@@ -134,6 +133,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
 
     /**
      * 取所属部门简易信息
+     *
      * @param userId 用户ID
      */
     public SysDeptBO getPlainDeptByUserId(Long userId) {
@@ -206,8 +206,10 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     private void checkExistence(AdminInsertOrUpdateSysDeptDTO dto) {
         SysDeptEntity existingEntity = this.getOne(
                 new QueryWrapper<SysDeptEntity>()
-                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
+                        // 仅取主键ID
+                        .select(SysDeptEntity::getId)
+                        // 名称相同
                         .eq(SysDeptEntity::getTitle, dto.getTitle())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );

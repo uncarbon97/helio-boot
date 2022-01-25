@@ -7,23 +7,20 @@ import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysDataDictEntity;
-import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDataDictMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDataDictDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysDataDictDTO;
 import cc.uncarbon.module.sys.model.response.SysDataDictBO;
-import cc.uncarbon.module.sys.model.response.SysLogBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -36,7 +33,7 @@ import java.util.List;
 public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, SysDataDictEntity> {
 
     /**
-     * 后台管理-分页列表
+     * 后台管理-分页列表数据字典
      */
     public PageResult<SysDataDictBO> adminList(PageParam pageParam, AdminListSysDataDictDTO dto) {
         Page<SysDataDictEntity> entityPage = this.page(
@@ -79,11 +76,12 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     }
 
     /**
-     * 后台管理-新增
+     * 后台管理-新增数据字典
      */
     @SysLog(value = "新增数据字典")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDataDictDTO dto) {
+        log.info("[后台管理-新增数据字典]");
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -163,12 +161,16 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     private void checkExistence(AdminInsertOrUpdateSysDataDictDTO dto) {
         SysDataDictEntity existingEntity = this.getOne(
                 new QueryWrapper<SysDataDictEntity>()
-                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
+                        // 仅取主键ID
+                        .select(SysDataDictEntity::getId)
+                        // 驼峰式键名相同
                         .eq(SysDataDictEntity::getCamelCaseKey, dto.getCamelCaseKey())
                         .or()
+                        // 或帕斯卡式键名相同
                         .eq(SysDataDictEntity::getPascalCaseKey, dto.getPascalCaseKey())
                         .or()
+                        // 或下划线式键名相同
                         .eq(SysDataDictEntity::getUnderCaseKey, dto.getUnderCaseKey())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
