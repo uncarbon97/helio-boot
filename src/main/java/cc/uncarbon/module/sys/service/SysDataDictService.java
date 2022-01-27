@@ -17,6 +17,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, SysDataDictEntity> {
 
     /**
-     * 后台管理-分页列表数据字典
+     * 后台管理-分页列表
      */
     public PageResult<SysDataDictBO> adminList(PageParam pageParam, AdminListSysDataDictDTO dto) {
         Page<SysDataDictEntity> entityPage = this.page(
@@ -76,12 +77,12 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     }
 
     /**
-     * 后台管理-新增数据字典
+     * 后台管理-新增
      */
     @SysLog(value = "新增数据字典")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDataDictDTO dto) {
-        log.info("[后台管理-新增数据字典]");
+        log.info("[后台管理-新增数据字典] >> DTO={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -99,6 +100,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "编辑数据字典")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDataDictDTO dto) {
+        log.info("[后台管理-编辑数据字典] >> DTO={}", dto);
         this.checkExistence(dto);
 
         SysDataDictEntity entity = new SysDataDictEntity();
@@ -112,7 +114,8 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
      */
     @SysLog(value = "删除数据字典")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除数据字典] >> ids={}", ids);
         this.removeByIds(ids);
     }
 

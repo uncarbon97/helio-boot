@@ -19,6 +19,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +96,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "新增后台角色")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysRoleDTO dto) {
+        log.info("[后台管理-新增后台角色] >> DTO={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -114,6 +116,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "编辑后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysRoleDTO dto) {
+        log.info("[后台管理-编辑后台角色] >> DTO={}", dto);
         this.checkExistence(dto);
 
         SysRoleEntity entity = new SysRoleEntity();
@@ -129,7 +132,8 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      */
     @SysLog(value = "删除后台角色")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除后台角色] >> ids={}", ids);
         this.removeByIds(ids);
     }
 

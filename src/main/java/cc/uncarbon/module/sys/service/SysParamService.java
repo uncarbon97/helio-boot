@@ -17,6 +17,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "新增系统参数")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysParamDTO dto) {
+        log.info("[后台管理-新增系统参数] >> DTO={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -100,6 +102,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "编辑系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysParamDTO dto) {
+        log.info("[后台管理-编辑系统参数] >> DTO={}", dto);
         this.checkExistence(dto);
 
         SysParamEntity entity = new SysParamEntity();
@@ -113,7 +116,8 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
      */
     @SysLog(value = "删除系统参数")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除系统参数] >> ids={}", ids);
         this.removeByIds(ids);
     }
 
