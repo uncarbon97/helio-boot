@@ -4,9 +4,9 @@
     <!-- 配置-彩色日志渲染类 -->
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
     <conversionRule conversionWord="wex"
-                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+            converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <conversionRule conversionWord="wEx"
-                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+            converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
 
     <!-- 常量-项目名称 -->
     <property name="APP_NAME" value="helio-boot"/>
@@ -18,7 +18,7 @@
     <property name="LOG_MAX_SIZE" value="100MB"/>
     <!-- 常量-文件型日志输出格式 -->
     <property name="LOG_FILE_OUTPUT_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%10thread] [%X{tid}] %40.40logger{40} [%10method,%line] : %msg%n"/>
+            value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%10thread] [%X{tid}] %40.40logger{40} [%10method,%line] : %msg%n"/>
 
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -35,9 +35,11 @@
             <OnMismatch>DENY</OnMismatch>
             <OnMatch>ACCEPT</OnMatch>
         </filter>
+        <!-- 今日日志 -->
+        <File>${LOG_HOME}/${APP_NAME}.today-debug.log</File>
         <!-- 日志滚动策略 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 日志文件输出的文件名 -->
+            <!-- 历史日志输出文件名 -->
             <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-debug.log</FileNamePattern>
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
@@ -68,9 +70,11 @@
             <OnMismatch>DENY</OnMismatch>
             <OnMatch>ACCEPT</OnMatch>
         </filter>
+        <!-- 今日日志 -->
+        <File>${LOG_HOME}/${APP_NAME}.today-warn.log</File>
         <!-- 日志滚动策略 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 日志文件输出的文件名 -->
+            <!-- 历史日志输出文件名 -->
             <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-warn.log</FileNamePattern>
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
@@ -101,9 +105,11 @@
             <OnMismatch>DENY</OnMismatch>
             <OnMatch>ACCEPT</OnMatch>
         </filter>
+        <!-- 今日日志 -->
+        <File>${LOG_HOME}/${APP_NAME}.today-info.log</File>
         <!-- 日志滚动策略 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 日志文件输出的文件名 -->
+            <!-- 历史日志输出文件名 -->
             <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-info.log</FileNamePattern>
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
@@ -134,9 +140,11 @@
             <OnMismatch>DENY</OnMismatch>
             <OnMatch>ACCEPT</OnMatch>
         </filter>
+        <!-- 今日日志 -->
+        <File>${LOG_HOME}/${APP_NAME}.today-error.log</File>
         <!-- 日志滚动策略 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 日志文件输出的文件名 -->
+            <!-- 历史日志输出文件名 -->
             <FileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-error.log</FileNamePattern>
             <MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
         </rollingPolicy>
@@ -163,37 +171,14 @@
 
     <logger name="io.undertow" level="WARN"/>
     <logger name="com.alibaba.nacos" level="INFO"/>
+    <logger name="org.apache.dubbo.common.Version" level="off"/>
 
-    <!-- 开发环境-未指定包名的日志使用WARN级别 -->
-    <springProfile name="dev">
-        <root level="WARN">
-            <appender-ref ref="STDOUT"/>
-            <appender-ref ref="ASYNC_DEBUG" />
-            <appender-ref ref="ASYNC_INFO" />
-            <appender-ref ref="ASYNC_WARN" />
-            <appender-ref ref="ASYNC_ERROR" />
-        </root>
-    </springProfile>
-
-    <!-- 测试环境-未指定包名的日志使用WARN级别 -->
-    <springProfile name="test">
-        <root level="WARN">
-            <appender-ref ref="STDOUT"/>
-            <appender-ref ref="ASYNC_DEBUG" />
-            <appender-ref ref="ASYNC_INFO" />
-            <appender-ref ref="ASYNC_WARN" />
-            <appender-ref ref="ASYNC_ERROR" />
-        </root>
-    </springProfile>
-
-    <!-- 生产环境-未指定包名的日志使用INFO级别 -->
-    <springProfile name="prod">
-        <root level="INFO">
-            <appender-ref ref="STDOUT"/>
-            <appender-ref ref="ASYNC_DEBUG" />
-            <appender-ref ref="ASYNC_INFO" />
-            <appender-ref ref="ASYNC_WARN" />
-            <appender-ref ref="ASYNC_ERROR" />
-        </root>
-    </springProfile>
+    <!-- 默认日志输出级别 -->
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ASYNC_DEBUG"/>
+        <appender-ref ref="ASYNC_WARN"/>
+        <appender-ref ref="ASYNC_INFO"/>
+        <appender-ref ref="ASYNC_ERROR"/>
+    </root>
 </configuration>
