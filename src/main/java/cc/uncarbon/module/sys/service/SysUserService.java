@@ -13,8 +13,19 @@ import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
-import cc.uncarbon.module.sys.model.request.*;
-import cc.uncarbon.module.sys.model.response.*;
+import cc.uncarbon.module.sys.model.request.AdminBindUserRoleRelationDTO;
+import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
+import cc.uncarbon.module.sys.model.request.AdminListSysUserDTO;
+import cc.uncarbon.module.sys.model.request.AdminResetSysUserPasswordDTO;
+import cc.uncarbon.module.sys.model.request.AdminUpdateCurrentSysUserPasswordDTO;
+import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
+import cc.uncarbon.module.sys.model.response.SysDeptBO;
+import cc.uncarbon.module.sys.model.response.SysRoleBO;
+import cc.uncarbon.module.sys.model.response.SysTenantBO;
+import cc.uncarbon.module.sys.model.response.SysUserBO;
+import cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO;
+import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
+import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoBO;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
@@ -23,15 +34,14 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 /**
@@ -80,12 +90,29 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean, boolean) 替代
      */
-    public SysUserBO getOneById(Long entityId) {
-        SysUserEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+    @Deprecated
+    public SysUserBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true, false);
+    }
 
-        return this.entity2BO(entity, true);
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @param joinFullRolesAndPermissions 是否显示完整角色和权限信息
+     * @return null or BO
+     */
+    public SysUserBO getOneById(Long entityId, boolean throwIfInvalidId, boolean joinFullRolesAndPermissions) throws BusinessException {
+        SysUserEntity entity = this.getById(entityId);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity, joinFullRolesAndPermissions);
     }
 
     /**
@@ -95,6 +122,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "新增后台用户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysUserDTO dto) {
+        log.info("[后台管理-新增后台用户] >> DTO={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -121,6 +149,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "编辑后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysUserDTO dto) {
+        log.info("[后台管理-编辑后台用户] >> DTO={}", dto);
         this.checkExistence(dto);
 
         SysUserEntity updateEntity = new SysUserEntity();
@@ -136,7 +165,8 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      */
     @SysLog(value = "删除后台用户")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除后台用户] >> ids={}", ids);
         this.removeByIds(ids);
     }
 
@@ -191,7 +221,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
 
         // 取账号完整BO
-        SysUserBO sysUserBO = this.getOneById(sysUserEntity.getId());
+        SysUserBO sysUserBO = this.getOneById(sysUserEntity.getId(), true, true);
 
         SysUserLoginBO ret = new SysUserLoginBO();
         BeanUtil.copyProperties(sysUserBO, ret);
@@ -211,10 +241,11 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 后台管理-取当前用户信息
      */
     public VbenAdminUserInfoBO adminGetCurrentUserInfo() {
-        SysUserBO sysUserBO = getOneById(UserContextHolder.getUserId());
+        SysUserBO sysUserBO = this.getOneById(UserContextHolder.getUserId(), true, false);
         return VbenAdminUserInfoBO.builder()
                 .username(sysUserBO.getUsername())
                 .nickname(sysUserBO.getNickname())
+                .lastLoginAt(sysUserBO.getLastLoginAt())
                 .build();
     }
 
@@ -328,7 +359,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
     /**
      * 检查是否已存在相同数据
-     * 
+     *
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysUserDTO dto) {

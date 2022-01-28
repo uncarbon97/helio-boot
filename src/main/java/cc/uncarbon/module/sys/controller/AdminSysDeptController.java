@@ -33,7 +33,7 @@ import java.util.List;
 public class AdminSysDeptController {
 
     private static final String PERMISSION_PREFIX = "SysDept:";
-    
+
     @Resource
     private SysDeptService sysDeptService;
 
@@ -49,7 +49,7 @@ public class AdminSysDeptController {
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public ApiResult<SysDeptBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysDeptService.getOneById(id));
+        return ApiResult.data(sysDeptService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)

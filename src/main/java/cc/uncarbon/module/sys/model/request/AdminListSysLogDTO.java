@@ -35,12 +35,12 @@ public class AdminListSysLogDTO implements Serializable {
     @ApiModelProperty(value = "状态")
     private SysLogStatusEnum status;
 
-    @ApiModelProperty(value = "开始时间区间")
+    @ApiModelProperty(value = "时间区间起")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT, timezone = HelioConstant.Jackson.TIME_ZONE)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime beginAt;
 
-    @ApiModelProperty(value = "结束时间区间")
+    @ApiModelProperty(value = "时间区间止")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT, timezone = HelioConstant.Jackson.TIME_ZONE)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime endAt;

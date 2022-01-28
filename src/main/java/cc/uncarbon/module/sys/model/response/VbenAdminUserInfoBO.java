@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 /**
@@ -28,5 +29,8 @@ public class VbenAdminUserInfoBO implements Serializable {
 
     @ApiModelProperty(value = "昵称")
     private String nickname;
+
+    @ApiModelProperty(value = "最后登录时刻")
+    private LocalDateTime lastLoginAt;
 
 }

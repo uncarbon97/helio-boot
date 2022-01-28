@@ -42,7 +42,7 @@ public class SysLogBO implements Serializable {
     @ApiModelProperty(value = "IP地址")
     private String ip;
 
-    @ApiModelProperty(value = "状态(0=未执行 1=成功)")
+    @ApiModelProperty(value = "状态")
     private SysLogStatusEnum status;
 
 }

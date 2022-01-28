@@ -54,7 +54,7 @@ public class AdminInsertOrUpdateSysMenuDTO implements Serializable {
     @ApiModelProperty(value = "排序")
     private Integer sort;
 
-    @ApiModelProperty(value = "状态(0=禁用 1=启用)")
+    @ApiModelProperty(value = "状态")
     private GenericStatusEnum status;
 
     @ApiModelProperty(value = "外链地址")

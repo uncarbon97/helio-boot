@@ -18,13 +18,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -65,10 +65,26 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysRoleBO getOneById(Long entityId) {
+    @Deprecated
+    public SysRoleBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysRoleBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysRoleEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity);
     }
@@ -80,6 +96,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "新增后台角色")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysRoleDTO dto) {
+        log.info("[后台管理-新增后台角色] >> DTO={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -99,6 +116,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "编辑后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysRoleDTO dto) {
+        log.info("[后台管理-编辑后台角色] >> DTO={}", dto);
         this.checkExistence(dto);
 
         SysRoleEntity entity = new SysRoleEntity();
@@ -114,7 +132,8 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      */
     @SysLog(value = "删除后台角色")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除后台角色] >> ids={}", ids);
         this.removeByIds(ids);
     }
 
@@ -177,14 +196,16 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     /**
      * 检查是否已存在相同数据
-     * 
+     *
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysRoleDTO dto) {
         SysRoleEntity existingEntity = this.getOne(
                 new QueryWrapper<SysRoleEntity>()
-                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
+                        // 仅取主键ID
+                        .select(SysRoleEntity::getId)
+                        // 名称相同
                         .eq(SysRoleEntity::getTitle, dto.getTitle())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );

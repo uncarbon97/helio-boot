@@ -11,21 +11,25 @@ import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserRoleRelationEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysTenantMapper;
-import cc.uncarbon.module.sys.model.request.*;
+import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
+import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
+import cc.uncarbon.module.sys.model.request.AdminInsertSysTenantDTO;
+import cc.uncarbon.module.sys.model.request.AdminListSysTenantDTO;
+import cc.uncarbon.module.sys.model.request.AdminUpdateSysTenantDTO;
 import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -71,10 +75,26 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysTenantBO getOneById(Long entityId) {
+    @Deprecated
+    public SysTenantBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysTenantBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysTenantEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity);
     }
@@ -85,6 +105,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @SysLog(value = "新增系统租户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertSysTenantDTO dto) {
+        log.info("[后台管理-新增系统租户] >> DTO={}", dto);
         this.checkExistence(dto);
 
         // 1. 加入一个新租户(tenant)
@@ -152,6 +173,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @SysLog(value = "编辑系统租户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminUpdateSysTenantDTO dto) {
+        log.info("[后台管理-编辑系统租户] >> DTO={}", dto);
         this.checkExistence(dto);
 
         SysTenantEntity entity = new SysTenantEntity();
@@ -165,7 +187,8 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      */
     @SysLog(value = "删除系统租户")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除系统租户] >> ids={}", ids);
         this.removeByIds(ids);
     }
 
@@ -231,16 +254,19 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
     /**
      * 检查是否已存在相同数据
-     * 
+     *
      * @param dto DTO
      */
     private void checkExistence(AdminUpdateSysTenantDTO dto) {
         SysTenantEntity existingEntity = this.getOne(
                 new QueryWrapper<SysTenantEntity>()
-                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
+                        // 仅取主键ID
+                        .select(SysTenantEntity::getId)
+                        // 租户ID相同
                         .eq(SysTenantEntity::getTenantId, dto.getTenantId())
                         .or()
+                        // 或租户名相同
                         .eq(SysTenantEntity::getTenantName, dto.getTenantName())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );

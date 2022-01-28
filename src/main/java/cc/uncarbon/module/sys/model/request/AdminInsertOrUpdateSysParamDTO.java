@@ -25,9 +25,6 @@ public class AdminInsertOrUpdateSysParamDTO implements Serializable {
     @ApiModelProperty(value = "主键ID", hidden = true, notes = "仅更新时使用")
     private Long id;
 
-    @ApiModelProperty(value = "所属租户ID", hidden = true, notes = "仅新增时使用")
-    private Long tenantId;
-
     @ApiModelProperty(value = "键名", required = true)
     @NotBlank(message = "键名不能为空")
     private String name;

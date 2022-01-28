@@ -17,17 +17,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * 部门
+ *
  * @author Uncarbon
  */
 @Slf4j
@@ -46,7 +47,8 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
                 new QueryWrapper<SysDeptEntity>()
                         .lambda()
                         // 名称
-                        .like(StrUtil.isNotBlank(dto.getTitle()), SysDeptEntity::getTitle, StrUtil.cleanBlank(dto.getTitle()))
+                        .like(StrUtil.isNotBlank(dto.getTitle()), SysDeptEntity::getTitle,
+                                StrUtil.cleanBlank(dto.getTitle()))
                         // 上级ID
                         .eq(ObjectUtil.isNotNull(dto.getParentId()), SysDeptEntity::getParentId, dto.getParentId())
                         // 排序
@@ -58,10 +60,26 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysDeptBO getOneById(Long entityId) {
+    @Deprecated
+    public SysDeptBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId         实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysDeptBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysDeptEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity, false);
     }
@@ -72,6 +90,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "新增部门")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDeptDTO dto) {
+        log.info("[后台管理-新增部门] >> DTO={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -93,6 +112,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "编辑部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDeptDTO dto) {
+        log.info("[后台管理-编辑部门] >> DTO={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -110,12 +130,14 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
      */
     @SysLog(value = "删除部门")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除部门] >> ids={}", ids);
         this.removeByIds(ids);
     }
 
     /**
      * 取所属部门简易信息
+     *
      * @param userId 用户ID
      */
     public SysDeptBO getPlainDeptByUserId(Long userId) {
@@ -134,7 +156,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         return this.entity2BO(entity, false);
     }
 
-    
+
     /*
     私有方法
     ------------------------------------------------------------------------------------------------
@@ -182,14 +204,16 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
 
     /**
      * 检查是否已存在相同数据
-     * 
+     *
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysDeptDTO dto) {
         SysDeptEntity existingEntity = this.getOne(
                 new QueryWrapper<SysDeptEntity>()
-                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
+                        // 仅取主键ID
+                        .select(SysDeptEntity::getId)
+                        // 名称相同
                         .eq(SysDeptEntity::getTitle, dto.getTitle())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );

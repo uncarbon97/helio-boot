@@ -44,11 +44,11 @@ public class AdminInsertOrUpdateSysUserDTO implements Serializable {
     @NotBlank(message = "昵称不能为空")
     private String nickname;
 
-    @ApiModelProperty(value = "状态", dataType = "Integer", required = true)
+    @ApiModelProperty(value = "状态", required = true)
     @NotNull(message = "状态不能为空")
     private SysUserStatusEnum status;
 
-    @ApiModelProperty(value = "性别", dataType = "Integer", required = true)
+    @ApiModelProperty(value = "性别", required = true)
     @NotNull(message = "性别不能为空")
     private GenderEnum gender;
 

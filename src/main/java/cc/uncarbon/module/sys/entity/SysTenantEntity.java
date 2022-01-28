@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
  */
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -30,12 +30,16 @@ public class SysTenantEntity extends HelioBaseEntity<Long> {
     @TableField(value = "tenant_name")
     private String tenantName;
 
-    @ApiModelProperty(value = "状态(0=禁用 1=启用)")
+    @ApiModelProperty(value = "状态")
     @TableField(value = "status")
     private GenericStatusEnum status;
 
     @ApiModelProperty(value = "租户管理员用户ID")
     @TableField(value = "tenant_admin_user_id")
     private Long tenantAdminUserId;
+
+    @ApiModelProperty(value = "备注")
+    @TableField(value = "remark")
+    private String remark;
 
 }

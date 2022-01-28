@@ -16,16 +16,17 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * 系统参数
+ *
  * @author Uncarbon
  */
 @Slf4j
@@ -53,10 +54,26 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
 
     /**
      * 通用-详情
+     *
+     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
      */
-    public SysParamBO getOneById(Long entityId) {
+    @Deprecated
+    public SysParamBO getOneById(Long entityId) throws BusinessException {
+        return this.getOneById(entityId, true);
+    }
+
+    /**
+     * 通用-详情
+     *
+     * @param entityId 实体类主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysParamBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
         SysParamEntity entity = this.getById(entityId);
-        SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
 
         return this.entity2BO(entity);
     }
@@ -67,6 +84,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "新增系统参数")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysParamDTO dto) {
+        log.info("[后台管理-新增系统参数] >> DTO={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -84,6 +102,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "编辑系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysParamDTO dto) {
+        log.info("[后台管理-编辑系统参数] >> DTO={}", dto);
         this.checkExistence(dto);
 
         SysParamEntity entity = new SysParamEntity();
@@ -97,21 +116,23 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
      */
     @SysLog(value = "删除系统参数")
     @Transactional(rollbackFor = Exception.class)
-    public void adminDelete(List<Long> ids) {
+    public void adminDelete(Collection<Long> ids) {
+        log.info("[后台管理-删除系统参数] >> ids={}", ids);
         this.removeByIds(ids);
     }
 
     /**
      * 根据键名取值
-     * @param key 键名
-     * @return 成功返回值, 失败返回null
+     *
+     * @param name 键名
+     * @return 成功返回键值，失败返回null
      */
-    public String getParamValueByKey(String key) {
+    public String getParamValueByName(String name) {
         SysParamEntity sysParamEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
-                        .select(" value ")
                         .lambda()
-                        .eq(SysParamEntity::getName, key)
+                        .select(SysParamEntity::getValue)
+                        .eq(SysParamEntity::getName, name)
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
         if (sysParamEntity == null) {
@@ -124,12 +145,12 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     /**
      * 根据键名取值
      *
-     * @param key          键名
+     * @param name         键名
      * @param defaultValue 默认值
-     * @return 成功返回值, 失败返回defaultValue
+     * @return 成功返回键值，失败返回defaultValue
      */
-    public String getParamValueByKey(String key, String defaultValue) {
-        String value = this.getParamValueByKey(key);
+    public String getParamValueByName(String name, String defaultValue) {
+        String value = this.getParamValueByName(name);
         if (value == null) {
             return defaultValue;
         }
@@ -177,10 +198,13 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     private void checkExistence(AdminInsertOrUpdateSysParamDTO dto) {
         SysParamEntity existingEntity = this.getOne(
                 new QueryWrapper<SysParamEntity>()
-                        .select(HelioConstant.CRUD.SQL_COLUMN_ID)
                         .lambda()
+                        // 仅取主键ID
+                        .select(SysParamEntity::getId)
+                        // 描述相同
                         .eq(SysParamEntity::getDescription, dto.getDescription())
                         .or()
+                        // 或键名相同
                         .eq(SysParamEntity::getName, dto.getName())
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );

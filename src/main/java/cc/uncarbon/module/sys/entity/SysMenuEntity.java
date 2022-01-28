@@ -20,7 +20,7 @@ import lombok.experimental.SuperBuilder;
  */
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -35,7 +35,7 @@ public class SysMenuEntity extends HelioBaseEntity<Long> {
 	@TableField(value = "parent_id")
 	private Long parentId;
 
-	@ApiModelProperty(value = "菜单类型(参考MenuTypeEnum)")
+	@ApiModelProperty(value = "菜单类型")
 	@TableField(value = "type")
 	private SysMenuTypeEnum type;
 
@@ -51,11 +51,11 @@ public class SysMenuEntity extends HelioBaseEntity<Long> {
 	@TableField(value = "sort")
 	private Integer sort;
 
-	@ApiModelProperty(value = "状态(0=禁用 1=启用)")
+	@ApiModelProperty(value = "状态")
 	@TableField(value = "status")
 	private GenericStatusEnum status;
 
-	@ApiModelProperty(value = "组件", notes = "Vue项目中`/@/views/`的子路径; `LAYOUT`为空页面")
+	@ApiModelProperty(value = "组件(Vue项目中`/@/views/`后的路径部分; 填`LAYOUT`为空页面)")
 	@TableField(value = "component")
 	private String component;
 

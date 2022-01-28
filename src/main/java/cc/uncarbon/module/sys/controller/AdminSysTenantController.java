@@ -35,7 +35,7 @@ import javax.validation.Valid;
 public class AdminSysTenantController {
 
     private static final String PERMISSION_PREFIX = "SysTenant:";
-    
+
     @Resource
     private SysTenantService sysTenantService;
 
@@ -51,7 +51,7 @@ public class AdminSysTenantController {
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public ApiResult<SysTenantBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysTenantService.getOneById(id));
+        return ApiResult.data(sysTenantService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
