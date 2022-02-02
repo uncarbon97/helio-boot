@@ -16,12 +16,12 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.json.JSONUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "后台菜单管理接口", tags = {"后台菜单管理接口"})
@@ -40,14 +41,11 @@ public class AdminSysMenuController {
 
     private static final String PERMISSION_PREFIX = "SysMenu:";
 
-    @Resource
-    private SysMenuService sysMenuService;
+    private final SysMenuService sysMenuService;
 
-    @Resource
-    private SysParamService sysParamService;
+    private final SysParamService sysParamService;
 
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
@@ -103,6 +101,7 @@ public class AdminSysMenuController {
 
         if (redisValue == null) {
             redisValue = sysMenuService.adminListSideMenu();
+
             // 记录到缓存
             String sysMenuCacheDuration = sysParamService.getParamValueByName(SysConstant.PARAM_KEY_CACHE_MENU_DURATION, "30");
             stringRedisTemplate.opsForValue().set(redisKey, JSONUtil.toJsonStr(redisValue), Integer.parseInt(sysMenuCacheDuration), TimeUnit.MINUTES);
@@ -121,6 +120,7 @@ public class AdminSysMenuController {
 
         if (redisValue == null) {
             redisValue = sysMenuService.adminListVisibleMenu();
+
             // 记录到缓存
             String sysMenuCacheDuration = sysParamService.getParamValueByName(SysConstant.PARAM_KEY_CACHE_MENU_DURATION, "30");
             stringRedisTemplate.opsForValue().set(redisKey, JSONUtil.toJsonStr(redisValue), Integer.parseInt(sysMenuCacheDuration), TimeUnit.MINUTES);

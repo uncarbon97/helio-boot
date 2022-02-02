@@ -9,8 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -23,29 +24,25 @@ import java.util.stream.Collectors;
 @Service
 public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenuRelationMapper, SysRoleMenuRelationEntity> {
 
-    @Resource
-    private SysMenuService sysMenuService;
-
 
     /**
      * 根据角色Ids取菜单Ids
+     * 因为多种角色容易出现交集，所以干脆用 Set
      *
      * @param roleIds 角色Ids
      * @return 菜单Ids
      */
-    public List<Long> listMenuIdByRoleIds(List<Long> roleIds) throws IllegalArgumentException {
+    public Set<Long> listMenuIdByRoleIds(Collection<Long> roleIds) throws IllegalArgumentException {
         if (CollUtil.isEmpty(roleIds)) {
             throw new IllegalArgumentException("roleIds不能为空");
         }
 
-        List<Long> menuIds = this.list(
+        return this.list(
                 new QueryWrapper<SysRoleMenuRelationEntity>()
-                        .select(" DISTINCT menu_id ")
                         .lambda()
+                        .select(SysRoleMenuRelationEntity::getMenuId)
                         .in(SysRoleMenuRelationEntity::getRoleId, roleIds)
-        ).stream().map(SysRoleMenuRelationEntity::getMenuId).collect(Collectors.toList());
-
-        return sysMenuService.filterDisabledIds(menuIds);
+        ).stream().map(SysRoleMenuRelationEntity::getMenuId).collect(Collectors.toSet());
     }
 
     /**

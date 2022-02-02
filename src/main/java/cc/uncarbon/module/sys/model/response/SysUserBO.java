@@ -15,7 +15,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -64,14 +65,14 @@ public class SysUserBO implements Serializable {
     @ApiModelProperty(value = "最后登录时刻")
     private LocalDateTime lastLoginAt;
 
-    @ApiModelProperty(value = "拥有角色")
-    private List<SysRoleBO> roles;
+    @ApiModelProperty(value = "拥有角色", hidden = true)
+    private Map<Long, String> roleMap;
 
     @ApiModelProperty(value = "拥有角色Ids")
-    private List<Long> roleIds;
+    private Collection<Long> roleIds;
 
     @ApiModelProperty(value = "拥有权限")
-    private List<String> permissions;
+    private Collection<String> permissions;
 
     @ApiModelProperty(value = "所属部门ID")
     private Long deptId;

@@ -17,12 +17,12 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.collection.CollUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -30,6 +30,7 @@ import java.util.List;
 /**
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "后台角色管理接口", tags = {"后台角色管理接口"})
@@ -39,14 +40,11 @@ public class AdminSysRoleController {
 
     private static final String PERMISSION_PREFIX = "SysRole:";
 
-    @Resource
-    private SysRoleService sysRoleService;
+    private final SysRoleService sysRoleService;
 
-    @Resource
-    private SysUserRoleRelationService sysUserRoleRelationService;
+    private final SysUserRoleRelationService sysUserRoleRelationService;
 
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)

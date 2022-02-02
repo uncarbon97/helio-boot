@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Collection;
 
 
 /**
@@ -37,13 +37,13 @@ public class SysUserLoginBO implements Serializable {
     private String phoneNo;
 
     @ApiModelProperty(value = "对应角色ID")
-    private List<Long> roleIds;
+    private Collection<Long> roleIds;
 
     @ApiModelProperty(value = "对应角色")
-    private List<String> roles;
+    private Collection<String> roles;
 
     @ApiModelProperty(value = "拥有权限")
-    private List<String> permissions;
+    private Collection<String> permissions;
 
     @ApiModelProperty(value = "所属租户")
     private TenantContext relationalTenant;

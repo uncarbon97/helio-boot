@@ -15,6 +15,7 @@ import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,17 +32,16 @@ import java.util.Map;
 /**
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @Slf4j
 @Api(value = "SaaS后台管理鉴权接口", tags = {"SaaS后台管理鉴权接口"})
 @RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/auth")
 @RestController
 public class AdminAuthController {
 
-    @Resource
-    private SysUserService sysUserService;
+    private final SysUserService sysUserService;
 
-    @Resource
-    private SysMenuService sysMenuService;
+    private final SysMenuService sysMenuService;
 
 
     @ApiOperation(value = "登录", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,9 +57,9 @@ public class AdminAuthController {
                 .userPhoneNo(userInfo.getPhoneNo())
                 .userType(UserTypeEnum.ADMIN_USER)
                 .extraData(null)
-                .rolesIds(userInfo.getRoleIds())
-                .roles(userInfo.getRoles())
-                .permissions(userInfo.getPermissions())
+                .rolesIds(new ArrayList<>(userInfo.getRoleIds()))
+                .roles(new ArrayList<>(userInfo.getRoles()))
+                .permissions(new ArrayList<>(userInfo.getPermissions()))
                 .relationalTenant(userInfo.getRelationalTenant())
                 .build();
 

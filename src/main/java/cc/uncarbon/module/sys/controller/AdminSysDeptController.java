@@ -14,17 +14,18 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
 /**
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "部门管理接口", tags = {"部门管理接口"})
@@ -34,8 +35,7 @@ public class AdminSysDeptController {
 
     private static final String PERMISSION_PREFIX = "SysDept:";
 
-    @Resource
-    private SysDeptService sysDeptService;
+    private final SysDeptService sysDeptService;
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)

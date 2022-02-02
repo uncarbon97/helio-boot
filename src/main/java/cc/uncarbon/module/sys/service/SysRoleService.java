@@ -18,17 +18,19 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
+
 
 /**
  * 后台角色
+ *
  * @author Uncarbon
  */
 @Slf4j
@@ -40,7 +42,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     @Resource
     private SysRoleMenuRelationService sysRoleMenuRelationService;
-
 
     /**
      * 后台管理-分页列表
@@ -76,7 +77,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     /**
      * 通用-详情
      *
-     * @param entityId 实体类主键ID
+     * @param entityId         实体类主键ID
      * @param throwIfInvalidId 是否在 ID 无效时抛出异常
      * @return null or BO
      */
@@ -91,6 +92,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     /**
      * 后台管理-新增
+     *
      * @return 主键ID
      */
     @SysLog(value = "新增后台角色")
@@ -137,29 +139,33 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         this.removeByIds(ids);
     }
 
-    /**
-     * 取拥有角色列表
-     * @param userId 用户ID
-     * @return 失败返回空列表
-     */
-    public List<SysRoleBO> listRoleByUserId(Long userId) {
-        List<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(userId);
-
-        if (CollUtil.isEmpty(roleIds)) {
-            return CollUtil.newArrayList();
-        }
-
-        // 根据角色Ids取BO
-        List<SysRoleEntity> entityList = this.listByIds(roleIds);
-
-        return this.entityList2BOs(entityList);
-    }
-
 
     /*
     私有方法
     ------------------------------------------------------------------------------------------------
      */
+
+    /**
+     * 取用户ID拥有角色对应的 角色ID-角色名 map
+     *
+     * @param userId 用户ID
+     * @return 失败返回空 map
+     */
+    public Map<Long, String> getRoleMapByUserId(Long userId) {
+        List<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(userId);
+
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptyMap();
+        }
+
+        // 根据角色Ids取 map
+        return this.list(
+                new QueryWrapper<SysRoleEntity>()
+                        .lambda()
+                        .select(SysRoleEntity::getId, SysRoleEntity::getValue)
+                        .in(SysRoleEntity::getId, roleIds)
+        ).stream().collect(Collectors.toMap(SysRoleEntity::getId, SysRoleEntity::getValue, this.ignoredThrowingMerger()));
+    }
 
     private SysRoleBO entity2BO(SysRoleEntity entity) {
         if (entity == null) {
@@ -170,9 +176,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        bo.setMenuIds(sysRoleMenuRelationService.listMenuIdByRoleIds(
-           CollUtil.newArrayList(bo.getId())
-        ));
+        bo.setMenuIds(sysRoleMenuRelationService.listMenuIdByRoleIds(CollUtil.newHashSet(bo.getId())));
         return bo;
     }
 
@@ -213,5 +217,14 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同后台角色，请重新输入");
         }
+    }
+
+    /**
+     * 主动忽略 map key 重复错误，不然 key 重复的话，转换成 map 的过程会抛异常
+     * @param <T>
+     * @return
+     */
+    private <T> BinaryOperator<T> ignoredThrowingMerger() {
+        return (u, v) -> u;
     }
 }

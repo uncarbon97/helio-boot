@@ -11,43 +11,39 @@ import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserRoleRelationEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysTenantMapper;
-import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
-import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
-import cc.uncarbon.module.sys.model.request.AdminInsertSysTenantDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysTenantDTO;
-import cc.uncarbon.module.sys.model.request.AdminUpdateSysTenantDTO;
+import cc.uncarbon.module.sys.model.request.*;
 import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /**
  * 系统租户
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysTenantEntity> {
 
-    @Resource
-    private SysRoleService sysRoleService;
+    private final SysRoleService sysRoleService;
 
-    @Resource
-    private SysUserService sysUserService;
+    private final SysUserRoleRelationService sysUserRoleRelationService;
 
-    @Resource
-    private SysUserRoleRelationService sysUserRoleRelationService;
+    private final ApplicationContext applicationContext;
 
 
     /**
@@ -129,6 +125,9 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
                         .value("Admin")
                         .build()
         );
+
+        // 从 Spring 容器中获取 bean，避免循环依赖
+        SysUserService sysUserService = applicationContext.getBean(SysUserService.class);
 
         // 3. 创建一个新用户
         Long newUserId = sysUserService.adminInsert(
@@ -226,6 +225,9 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
         // 可以在此处为BO填充字段
         if (ObjectUtil.isNotNull(entity.getTenantAdminUserId())) {
+            // 从 Spring 容器中获取 bean，避免循环依赖
+            SysUserService sysUserService = applicationContext.getBean(SysUserService.class);
+
             bo
                     .setTenantAdminUser(sysUserService.getBaseInfoById(entity.getTenantAdminUserId()))
             ;

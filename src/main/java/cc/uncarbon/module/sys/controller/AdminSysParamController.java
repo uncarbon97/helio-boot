@@ -15,16 +15,17 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 
 /**
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "系统参数管理接口", tags = {"系统参数管理接口"})
@@ -34,8 +35,7 @@ public class AdminSysParamController {
 
     private static final String PERMISSION_PREFIX = "SysParam:";
 
-    @Resource
-    private SysParamService sysParamService;
+    private final SysParamService sysParamService;
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)

@@ -13,7 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
 
 
 /**
@@ -40,14 +40,14 @@ public class SysRoleBO implements Serializable {
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT, timezone = HelioConstant.Jackson.TIME_ZONE)
     private LocalDateTime updatedAt;
-        
+
     @ApiModelProperty(value = "名称")
     private String title;
-        
+
     @ApiModelProperty(value = "值")
     private String value;
 
     @ApiModelProperty(value = "可见菜单Ids")
-    private List<Long> menuIds;
-    
+    private Collection<Long> menuIds;
+
 }

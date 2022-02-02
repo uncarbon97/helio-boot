@@ -13,62 +13,47 @@ import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
-import cc.uncarbon.module.sys.model.request.AdminBindUserRoleRelationDTO;
-import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysUserDTO;
-import cc.uncarbon.module.sys.model.request.AdminResetSysUserPasswordDTO;
-import cc.uncarbon.module.sys.model.request.AdminUpdateCurrentSysUserPasswordDTO;
-import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
-import cc.uncarbon.module.sys.model.response.SysDeptBO;
-import cc.uncarbon.module.sys.model.response.SysRoleBO;
-import cc.uncarbon.module.sys.model.response.SysTenantBO;
-import cc.uncarbon.module.sys.model.response.SysUserBO;
-import cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO;
-import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
-import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoBO;
+import cc.uncarbon.module.sys.model.request.*;
+import cc.uncarbon.module.sys.model.response.*;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * 后台用户
+ *
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserEntity> {
 
-    @Resource
-    private SysRoleService sysRoleService;
+    private final SysRoleService sysRoleService;
 
-    @Resource
-    private SysDeptService sysDeptService;
+    private final SysDeptService sysDeptService;
 
-    @Resource
-    private SysMenuService sysMenuService;
+    private final SysMenuService sysMenuService;
 
-    @Resource
-    private SysTenantService sysTenantService;
+    private final SysTenantService sysTenantService;
 
-    @Resource
-    private SysUserDeptRelationService sysUserDeptRelationService;
+    private final SysUserDeptRelationService sysUserDeptRelationService;
 
-    @Resource
-    private SysUserRoleRelationService sysUserRoleRelationService;
+    private final SysUserRoleRelationService sysUserRoleRelationService;
 
 
     /**
@@ -101,8 +86,8 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 通用-详情
      *
-     * @param entityId 实体类主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @param entityId                    实体类主键ID
+     * @param throwIfInvalidId            是否在 ID 无效时抛出异常
      * @param joinFullRolesAndPermissions 是否显示完整角色和权限信息
      * @return null or BO
      */
@@ -117,6 +102,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
     /**
      * 后台管理-新增
+     *
      * @return 主键ID
      */
     @SysLog(value = "新增后台用户")
@@ -228,8 +214,8 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
         // 因字段类型不一致, 单独转换
         ret
-                .setRoleIds(sysUserBO.getRoles().stream().map(SysRoleBO::getId).filter(ObjectUtil::isNotNull).sorted().collect(Collectors.toList()))
-                .setRoles(sysUserBO.getRoles().stream().map(SysRoleBO::getValue).filter(StrUtil::isNotBlank).collect(Collectors.toList()))
+                .setRoleIds(sysUserBO.getRoleMap().keySet())
+                .setRoles(sysUserBO.getRoleMap().values())
                 .setPermissions(sysUserBO.getPermissions())
                 .setRelationalTenant(currentTenantContext)
         ;
@@ -260,7 +246,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         templateEntity
                 .setPwd(PwdUtil.encrypt(dto.getRandomPassword(), sysUserEntity.getSalt()))
                 .setId(dto.getUserId())
-                ;
+        ;
 
         this.updateById(templateEntity);
     }
@@ -314,7 +300,13 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     ------------------------------------------------------------------------------------------------
      */
 
-    private SysUserBO entity2BO(SysUserEntity entity, boolean joinFullRolesAndPermissions) {
+    /**
+     * 实体转 BO
+     * @param entity 实体对象
+     * @param joinPermissions 追加权限字符串
+     * @return
+     */
+    private SysUserBO entity2BO(SysUserEntity entity, boolean joinPermissions) {
         if (entity == null) {
             return null;
         }
@@ -323,7 +315,10 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        bo.setRoleIds(sysUserRoleRelationService.listRoleIdByUserId(bo.getId()));
+        Map<Long, String> roleMap = sysRoleService.getRoleMapByUserId(bo.getId());
+        bo
+                .setRoleMap(roleMap)
+                .setRoleIds(roleMap.keySet());
 
         SysDeptBO dept = sysDeptService.getPlainDeptByUserId(bo.getId());
         if (dept != null) {
@@ -333,12 +328,8 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             ;
         }
 
-        if (joinFullRolesAndPermissions) {
-            List<SysRoleBO> roleBOs = sysRoleService.listRoleByUserId(bo.getId());
-            bo
-                    .setRoles(roleBOs)
-                    .setPermissions(sysMenuService.adminListPermissionByRoleIds(roleBOs.stream().map(SysRoleBO::getId).collect(Collectors.toList())))
-            ;
+        if (joinPermissions) {
+            bo.setPermissions(sysMenuService.listPermissionByRoleIds(roleMap.keySet()));
         }
 
         return bo;

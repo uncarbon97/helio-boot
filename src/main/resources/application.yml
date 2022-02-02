@@ -13,6 +13,10 @@ spring:
     type: redis
     redis:
       cache-null-values: true
+  mvc:
+    pathmatch:
+      # Boot 2.6+ 默认的
+      matching-strategy: ant_path_matcher
 
 helio:
   crud:
