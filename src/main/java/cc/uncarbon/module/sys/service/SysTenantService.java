@@ -18,9 +18,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +33,6 @@ import java.util.List;
  * 系统租户
  * @author Uncarbon
  */
-@RequiredArgsConstructor
 @Slf4j
 @Service
 public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysTenantEntity> {
@@ -43,8 +41,14 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
     private final SysUserRoleRelationService sysUserRoleRelationService;
 
-    private final ApplicationContext applicationContext;
+    private final SysUserService sysUserService;
 
+    public SysTenantService(SysRoleService sysRoleService, SysUserRoleRelationService sysUserRoleRelationService,
+                            @Lazy SysUserService sysUserService) {
+        this.sysRoleService = sysRoleService;
+        this.sysUserRoleRelationService = sysUserRoleRelationService;
+        this.sysUserService = sysUserService;
+    }
 
     /**
      * 后台管理-分页列表
@@ -125,9 +129,6 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
                         .value("Admin")
                         .build()
         );
-
-        // 从 Spring 容器中获取 bean，避免循环依赖
-        SysUserService sysUserService = applicationContext.getBean(SysUserService.class);
 
         // 3. 创建一个新用户
         Long newUserId = sysUserService.adminInsert(
@@ -225,9 +226,6 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
         // 可以在此处为BO填充字段
         if (ObjectUtil.isNotNull(entity.getTenantAdminUserId())) {
-            // 从 Spring 容器中获取 bean，避免循环依赖
-            SysUserService sysUserService = applicationContext.getBean(SysUserService.class);
-
             bo
                     .setTenantAdminUser(sysUserService.getBaseInfoById(entity.getTenantAdminUserId()))
             ;
