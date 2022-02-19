@@ -2,16 +2,17 @@ package cc.uncarbon.config;
 
 import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.satoken.interceptor.DefaultSaTokenParseInterceptor;
+import cc.uncarbon.framework.tenant.resolver.TenantHeaderResolver;
 import cc.uncarbon.interceptor.AdminSaTokenParseInterceptor;
 import cc.uncarbon.interceptor.AppSaTokenRouteInterceptor;
+import cc.uncarbon.interceptor.TenantHeaderResolveInterceptor;
 import cc.uncarbon.module.app.constant.AppConstant;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -20,10 +21,12 @@ import javax.annotation.Resource;
  * @author Uncarbon
  */
 @Configuration
+@RequiredArgsConstructor
 public class CustomInterceptorConfiguration implements WebMvcConfigurer {
 
-    @Resource
-    private HelioProperties helioProperties;
+    private final HelioProperties helioProperties;
+
+    private final TenantHeaderResolver tenantHeaderResolver;
 
 
     @Override
@@ -46,9 +49,11 @@ public class CustomInterceptorConfiguration implements WebMvcConfigurer {
 
         注：若使用该拦截器，cc.uncarbon.module.sys.service.SysUserService#adminLogin 处的“主动清空用户上下文”代码需要删除
          */
-        /* registry
-                .addInterceptor(new DefaultTenantParseInterceptor())
-                .addPathPatterns("/**");*/
+        if (Boolean.TRUE.equals(helioProperties.getTenant().getEnabled())) {
+            registry
+                    .addInterceptor(new TenantHeaderResolveInterceptor(helioProperties, tenantHeaderResolver))
+                    .addPathPatterns("/**");
+        }
 
         /*
         2. App-路由拦截器, 使几乎所有接口都需要登录

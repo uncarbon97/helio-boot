@@ -4,6 +4,7 @@ import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.web.util.IPUtil;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
@@ -21,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
 
         if (handler instanceof ResourceHttpRequestHandler) {
             // 直接放行静态资源

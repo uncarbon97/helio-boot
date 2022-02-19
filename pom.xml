@@ -17,7 +17,7 @@
     </properties>
 
     <dependencies>
-        <!-- 脚手架starter -->
+        <!-- 脚手架 starters -->
         <dependency>
             <groupId>cc.uncarbon.framework</groupId>
             <artifactId>helio-core</artifactId>
@@ -58,6 +58,12 @@
             <groupId>cc.uncarbon.framework</groupId>
             <artifactId>helio-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- 多租户支持 -->
+        <dependency>
+            <groupId>cc.uncarbon.framework</groupId>
+            <artifactId>helio-starter-tenant</artifactId>
         </dependency>
 
         <dependency>
