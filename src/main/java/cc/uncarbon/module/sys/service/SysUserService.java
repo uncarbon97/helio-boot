@@ -2,6 +2,7 @@ package cc.uncarbon.module.sys.service;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.context.TenantContext;
+import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
@@ -192,12 +193,13 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         ---------------------------------------------------
          */
 
-        // 将所属租户写入到用户上下文，使得 Mybatis-Plus 多租户拦截器可以正确执行到对应租户ID
-        TenantContext currentTenantContext = TenantContext.builder()
-                .tenantId(tenantInfo.getTenantId())
-                .tenantName(tenantInfo.getTenantName())
-                .build();
-        UserContextHolder.setRelationalTenant(currentTenantContext);
+        // 将所属租户写入租户上下文，使得多租户可以正确执行
+        TenantContextHolder.setTenantContext(
+                TenantContext.builder()
+                        .tenantId(tenantInfo.getTenantId())
+                        .tenantName(tenantInfo.getTenantName())
+                        .build()
+        );
 
         try {
             this.getBaseMapper().updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
@@ -217,7 +219,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
                 .setRoleIds(sysUserBO.getRoleMap().keySet())
                 .setRoles(sysUserBO.getRoleMap().values())
                 .setPermissions(sysUserBO.getPermissions())
-                .setRelationalTenant(currentTenantContext)
         ;
 
         return ret;

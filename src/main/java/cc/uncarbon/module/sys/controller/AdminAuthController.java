@@ -15,6 +15,10 @@ import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -22,11 +26,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -60,7 +59,6 @@ public class AdminAuthController {
                 .rolesIds(new ArrayList<>(userInfo.getRoleIds()))
                 .roles(new ArrayList<>(userInfo.getRoles()))
                 .permissions(new ArrayList<>(userInfo.getPermissions()))
-                .relationalTenant(userInfo.getRelationalTenant())
                 .build();
 
         // 注册到SA-Token
@@ -86,6 +84,7 @@ public class AdminAuthController {
 
         AdminStpUtil.logout();
         UserContextHolder.setUserContext(null);
+        // TODO tenantcontextholder
 
         return ApiResult.success();
     }
