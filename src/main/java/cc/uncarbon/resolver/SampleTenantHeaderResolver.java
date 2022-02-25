@@ -4,10 +4,7 @@ import cc.uncarbon.framework.core.context.TenantContext;
 import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.props.HelioProperties;
-import cc.uncarbon.framework.tenant.resolver.TenantHeaderResolver;
 import cn.hutool.core.util.StrUtil;
-import org.springframework.stereotype.Component;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,10 +14,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Uncarbon
  */
-@Component
-public class SampleTenantHeaderResolver implements TenantHeaderResolver {
+public class SampleTenantHeaderResolver {
 
-    @Override
     public void resolve(HttpServletRequest request, HttpServletResponse response, Object handler, HelioProperties helioProperties) {
         /*
         只有未登录的情况下，才从请求头的 X-TenantId 和 X-TenantName 字段读取租户信息

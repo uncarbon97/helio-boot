@@ -7,6 +7,7 @@ import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
+import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
@@ -20,6 +21,7 @@ import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -55,6 +57,8 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     private final SysUserDeptRelationService sysUserDeptRelationService;
 
     private final SysUserRoleRelationService sysUserRoleRelationService;
+
+    private final HelioProperties helioProperties;
 
 
     /**
@@ -162,8 +166,18 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      */
     @SysLog(value = "登录后台用户")
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
-        // 主动清空用户上下文，避免残留租户ID导致的尴尬
+        // 主动清空用户上下文，避免尴尬
         UserContextHolder.setUserContext(null);
+
+        if (helioProperties.getTenant().getEnabled()
+            && ObjectUtil.isNotNull(dto.getTenantId())) {
+            TenantContextHolder.setTenantContext(
+                    TenantContext.builder()
+                            .tenantId(dto.getTenantId())
+                            .build()
+            );
+        }
+
 
         SysUserEntity sysUserEntity = this.getUserByPin(dto.getUsername());
         if (sysUserEntity == null) {

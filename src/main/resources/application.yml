@@ -27,9 +27,12 @@ helio:
       datacenter-id: ${DATACENTER_ID:0}
       # 雪花ID-起始日期-可以选用项目开工的日期-这个一旦确定就不要改动了
       epoch-date: '2021-07-17'
-    tenant:
-      # 是否开启租户
+    optimistic-lock:
+      # 是否开启乐观锁
       enabled: true
+    tenant:
+      # 是否开启多租户
+      enabled: false
       ignored-tables:
         # 以下表不参与租户隔离
         - sys_menu
@@ -37,9 +40,6 @@ helio:
         - sys_role_menu_relation
         - sys_user_dept_relation
         - sys_user_role_relation
-    optimistic-lock:
-      # 是否开启乐观锁
-      enabled: true
   security:
     exclude-routes:
       # 放行路由, 不进行登录校验
@@ -50,7 +50,16 @@ helio:
       - /v3/api-docs
       # C端登录接口
       - /app/api/v1/auth/login
-
+  tenant:
+    # 是否开启多租户
+    enabled: false
+    ignored-tables:
+      # 以下表不参与租户隔离
+      - sys_menu
+      - sys_tenant
+      - sys_role_menu_relation
+      - sys_user_dept_relation
+      - sys_user_role_relation
 
 knife4j:
   # 保持true

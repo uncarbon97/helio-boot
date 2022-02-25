@@ -38,6 +38,8 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
                     .setClientIP(IPUtil.getClientIPAddress(request))
             ;
             UserContextHolder.setUserContext(currentUser);
+
+            // TODO 租户信息
         } else {
             UserContextHolder.setUserContext(null);
         }

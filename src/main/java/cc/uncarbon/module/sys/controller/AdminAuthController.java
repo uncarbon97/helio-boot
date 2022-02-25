@@ -64,7 +64,8 @@ public class AdminAuthController {
         // 注册到SA-Token
         AdminStpUtil.login(userInfo.getId(), dto.getRememberMe());
         AdminStpUtil.getSession().set(UserContext.CAMEL_NAME, userContext);
-
+        // TODO tenantContext
+//        AdminStpUtil.getSession().set(TenantContext.CAMEL_NAME, tenantContext);
 
         // 返回登录token
         Map<String, Object> tokenInfo = new HashMap<>(16);

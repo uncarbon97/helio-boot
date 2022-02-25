@@ -38,4 +38,7 @@ public class SysUserLoginDTO implements Serializable {
     @NotNull(message = "记住我不能为空")
     private Boolean rememberMe;
 
+    @ApiModelProperty(value = "租户ID(可选，启用多租户功能并前端传值的情况下，会设置当前租户上下文)")
+    private Long tenantId;
+
 }

@@ -44,6 +44,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     private final SysUserService sysUserService;
 
     public SysTenantService(SysRoleService sysRoleService, SysUserRoleRelationService sysUserRoleRelationService,
+                            // TODO 需要改造
                             @Lazy SysUserService sysUserService) {
         this.sysRoleService = sysRoleService;
         this.sysUserRoleRelationService = sysUserRoleRelationService;

@@ -6,7 +6,9 @@ import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysLogStatusEnum;
 import cc.uncarbon.module.sys.service.SysLogService;
 import cn.hutool.json.JSONUtil;
-import lombok.Data;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,10 +18,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 /**
  * SysLog切面实现类
  * @author Uncarbon
@@ -27,10 +25,10 @@ import java.util.stream.Collectors;
 @Aspect
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class SysLogAspect {
 
-    @Resource
-    private SysLogService sysLogService;
+    private final SysLogService sysLogService;
 
 
     @Pointcut("@annotation(cc.uncarbon.module.sys.annotation.SysLog)")
