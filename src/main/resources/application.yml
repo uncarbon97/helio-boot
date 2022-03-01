@@ -30,16 +30,6 @@ helio:
     optimistic-lock:
       # 是否开启乐观锁
       enabled: true
-    tenant:
-      # 是否开启多租户
-      enabled: false
-      ignored-tables:
-        # 以下表不参与租户隔离
-        - sys_menu
-        - sys_tenant
-        - sys_role_menu_relation
-        - sys_user_dept_relation
-        - sys_user_role_relation
   security:
     exclude-routes:
       # 放行路由, 不进行登录校验
@@ -60,6 +50,8 @@ helio:
       - sys_role_menu_relation
       - sys_user_dept_relation
       - sys_user_role_relation
+  web-logging:
+    enabled-request-log: true
 
 knife4j:
   # 保持true
@@ -81,10 +73,8 @@ mybatis-plus:
 
 logging:
   level:
-    # 分别指定脚手架、业务模块、单元测试的日志级别
-    cc.uncarbon.framework: DEBUG
-    cc.uncarbon.module: DEBUG
-    cc.uncarbon.test: DEBUG
+    # 指定日志级别
+    cc.uncarbon: DEBUG
 
 sa-token:
   # token名称

@@ -60,7 +60,7 @@ public class SysLogAspect {
         sysLogEntity.setParams(Arrays.stream(point.getArgs()).map(JSONUtil::toJsonStr).collect(Collectors.joining(",")));
 
         // IP地址
-        sysLogEntity.setIp(UserContextHolder.getUserContext().getClientIP());
+        sysLogEntity.setIp(UserContextHolder.getClientIP());
 
         // 状态
         sysLogEntity.setStatus(SysLogStatusEnum.SUCCESS);
