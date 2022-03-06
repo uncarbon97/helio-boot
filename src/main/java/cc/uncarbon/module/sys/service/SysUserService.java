@@ -7,7 +7,6 @@ import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
-import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
@@ -57,8 +56,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     private final SysUserDeptRelationService sysUserDeptRelationService;
 
     private final SysUserRoleRelationService sysUserRoleRelationService;
-
-    private final HelioProperties helioProperties;
 
 
     /**
@@ -169,15 +166,31 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         // 主动清空用户上下文，避免尴尬
         UserContextHolder.setUserContext(null);
 
-        if (helioProperties.getTenant().getEnabled()
+        /*
+        这里是实际启用了多租户功能，并允许前端主动传欲登录的租户ID
+        实际生产应用时，可以根据业务需要加密等，然后在这里解密
+         */
+        if (TenantContextHolder.isTenantEnabled()
             && ObjectUtil.isNotNull(dto.getTenantId())) {
+
+            // 查询所属租户是否仍有效，这里是直接查库，并发高的情况下可以改造为从缓存读取
+            SysTenantBO tenantInfo = sysTenantService.getTenantByTenantId(dto.getTenantId());
+            if (tenantInfo == null) {
+                throw new BusinessException(SysErrorEnum.INVALID_TENANT);
+            }
+
+            if (GenericStatusEnum.DISABLED.equals(tenantInfo.getStatus())) {
+                throw new BusinessException(SysErrorEnum.DISABLED_TENANT);
+            }
+
+            // 验证通过，将所属租户写入租户上下文，使得多租户可以正确执行
             TenantContextHolder.setTenantContext(
                     TenantContext.builder()
-                            .tenantId(dto.getTenantId())
+                            .tenantId(tenantInfo.getTenantId())
+                            .tenantName(tenantInfo.getTenantName())
                             .build()
             );
         }
-
 
         SysUserEntity sysUserEntity = this.getUserByPin(dto.getUsername());
         if (sysUserEntity == null) {
@@ -192,28 +205,10 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             throw new BusinessException(SysErrorEnum.BANNED_USER);
         }
 
-        // 查询所属租户是否有效
-        SysTenantBO tenantInfo = sysTenantService.getTenantByTenantId(sysUserEntity.getTenantId());
-        if (tenantInfo == null) {
-            throw new BusinessException(SysErrorEnum.INVALID_TENANT);
-        }
-
-        if (GenericStatusEnum.DISABLED.equals(tenantInfo.getStatus())) {
-            throw new BusinessException(SysErrorEnum.DISABLED_TENANT);
-        }
-
         /*
         以上为有效性校验, 进入实际业务逻辑
         ---------------------------------------------------
          */
-
-        // 将所属租户写入租户上下文，使得多租户可以正确执行
-        TenantContextHolder.setTenantContext(
-                TenantContext.builder()
-                        .tenantId(tenantInfo.getTenantId())
-                        .tenantName(tenantInfo.getTenantName())
-                        .build()
-        );
 
         try {
             this.getBaseMapper().updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());

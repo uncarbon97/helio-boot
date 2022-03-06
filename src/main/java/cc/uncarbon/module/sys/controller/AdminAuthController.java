@@ -15,10 +15,6 @@ import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -26,6 +22,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -64,9 +65,11 @@ public class AdminAuthController {
         // 注册到SA-Token
         AdminStpUtil.login(userInfo.getId(), dto.getRememberMe());
         AdminStpUtil.getSession().set(UserContext.CAMEL_NAME, userContext);
+
         // TODO tenantContext
 //        AdminStpUtil.getSession().set(TenantContext.CAMEL_NAME, tenantContext);
 
+        // TODO 封装VO
         // 返回登录token
         Map<String, Object> tokenInfo = new HashMap<>(16);
         tokenInfo.put("tokenName", AdminStpUtil.getTokenName());

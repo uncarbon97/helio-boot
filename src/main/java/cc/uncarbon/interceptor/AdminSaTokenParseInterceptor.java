@@ -1,5 +1,7 @@
 package cc.uncarbon.interceptor;
 
+import cc.uncarbon.framework.core.context.TenantContext;
+import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.web.util.IPUtil;
@@ -39,9 +41,16 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
             ;
             UserContextHolder.setUserContext(currentUser);
 
-            // TODO 租户信息
+            // 赋值对应租户上下文
+            if (TenantContextHolder.isTenantEnabled()) {
+                // 启用了多租户的前提下，才获取
+                TenantContext tenantContext = (TenantContext) AdminStpUtil.getSession().get(TenantContext.CAMEL_NAME);
+                TenantContextHolder.setTenantContext(tenantContext);
+            }
+
         } else {
             UserContextHolder.setUserContext(null);
+            TenantContextHolder.setTenantContext(null);
         }
 
         return true;
