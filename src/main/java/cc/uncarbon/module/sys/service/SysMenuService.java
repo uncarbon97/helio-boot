@@ -328,6 +328,10 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     }
 
     private List<SysMenuBO> entityList2BOs(List<SysMenuEntity> entityList, Boolean traverseChildren) {
+        if (CollUtil.isEmpty(entityList)) {
+            return Collections.emptyList();
+        }
+
         // 深拷贝
         List<SysMenuBO> ret = new ArrayList<>(entityList.size());
         entityList.forEach(
@@ -343,7 +347,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      */
     private Set<Long> listCurrentUserVisibleMenuId() {
         // 1. 取当前账号拥有角色Ids
-        List<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(UserContextHolder.getUserId());
+        Set<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(UserContextHolder.getUserId());
         log.debug("[后台管理][取当前账号可见菜单Ids] 当前账号拥有角色Ids >> {}", roleIds);
         if (CollUtil.isEmpty(roleIds)) {
             throw new BusinessException(SysErrorEnum.NO_ROLE_AVAILABLE_FOR_CURRENT_USER);

@@ -18,14 +18,18 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.stream.Collectors;
 
 
 /**
@@ -62,32 +66,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         );
 
         return this.entityPage2BOPage(entityPage);
-    }
-
-    /**
-     * 通用-详情
-     *
-     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
-     */
-    @Deprecated
-    public SysRoleBO getOneById(Long entityId) throws BusinessException {
-        return this.getOneById(entityId, true);
-    }
-
-    /**
-     * 通用-详情
-     *
-     * @param entityId         实体类主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @return null or BO
-     */
-    public SysRoleBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
-        SysRoleEntity entity = this.getById(entityId);
-        if (throwIfInvalidId) {
-            SysErrorEnum.INVALID_ID.assertNotNull(entity);
-        }
-
-        return this.entity2BO(entity);
     }
 
     /**
@@ -139,34 +117,45 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         this.removeByIds(ids);
     }
 
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @return null or BO
+     */
+    public SysRoleBO getOneById(Long id) {
+        return this.getOneById(id, false);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysRoleBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysRoleEntity entity = this.getById(id);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity);
+    }
+
 
     /*
-    私有方法
-    ------------------------------------------------------------------------------------------------
+    ----------------------------------------------------------------
+                        私有方法 private methods
+    ----------------------------------------------------------------
      */
 
     /**
-     * 取用户ID拥有角色对应的 角色ID-角色名 map
+     * 实体转 BO
      *
-     * @param userId 用户ID
-     * @return 失败返回空 map
+     * @param entity 实体
+     * @return BO
      */
-    public Map<Long, String> getRoleMapByUserId(Long userId) {
-        List<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(userId);
-
-        if (CollUtil.isEmpty(roleIds)) {
-            return Collections.emptyMap();
-        }
-
-        // 根据角色Ids取 map
-        return this.list(
-                new QueryWrapper<SysRoleEntity>()
-                        .lambda()
-                        .select(SysRoleEntity::getId, SysRoleEntity::getValue)
-                        .in(SysRoleEntity::getId, roleIds)
-        ).stream().collect(Collectors.toMap(SysRoleEntity::getId, SysRoleEntity::getValue, this.ignoredThrowingMerger()));
-    }
-
     private SysRoleBO entity2BO(SysRoleEntity entity) {
         if (entity == null) {
             return null;
@@ -180,6 +169,12 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         return bo;
     }
 
+    /**
+     * 实体 List 转 BO List
+     *
+     * @param entityList 实体 List
+     * @return BO List
+     */
     private List<SysRoleBO> entityList2BOs(List<SysRoleEntity> entityList) {
         // 深拷贝
         List<SysRoleBO> ret = new ArrayList<>(entityList.size());
@@ -190,6 +185,12 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         return ret;
     }
 
+    /**
+     * 实体分页转 BO 分页
+     *
+     * @param entityPage 实体分页
+     * @return BO 分页
+     */
     private PageResult<SysRoleBO> entityPage2BOPage(Page<SysRoleEntity> entityPage) {
         PageResult<SysRoleBO> ret = new PageResult<>();
         BeanUtil.copyProperties(entityPage, ret);
@@ -217,6 +218,28 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同后台角色，请重新输入");
         }
+    }
+
+    /**
+     * 取用户ID拥有角色对应的 角色ID-角色名 map
+     *
+     * @param userId 用户ID
+     * @return 失败返回空 map
+     */
+    public Map<Long, String> getRoleMapByUserId(Long userId) {
+        Set<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(userId);
+
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptyMap();
+        }
+
+        // 根据角色Ids取 map
+        return this.list(
+                new QueryWrapper<SysRoleEntity>()
+                        .lambda()
+                        .select(SysRoleEntity::getId, SysRoleEntity::getValue)
+                        .in(SysRoleEntity::getId, roleIds)
+        ).stream().collect(Collectors.toMap(SysRoleEntity::getId, SysRoleEntity::getValue, this.ignoredThrowingMerger()));
     }
 
     /**

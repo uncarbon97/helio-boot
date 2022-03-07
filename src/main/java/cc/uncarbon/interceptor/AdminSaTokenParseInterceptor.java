@@ -31,19 +31,17 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
             return true;
         }
 
-        // 从请求头解析用户上下文
+        // SA-Token 会自动从请求头中解析 token，所以这里可以直接拿到对应 session，从而取出业务字段
         if (AdminStpUtil.isLogin()) {
-            UserContext currentUser = (UserContext) AdminStpUtil.getSession().get(UserContext.CAMEL_NAME);
-            log.debug("[SA-Token][Admin] 从请求头解析出用户上下文 >> {}", currentUser);
+            UserContext userContext = (UserContext) AdminStpUtil.getSession().get(UserContext.CAMEL_NAME);
+            log.debug("[SA-Token][Admin] 从请求头解析出用户上下文 >> {}", userContext);
 
-            currentUser
-                    .setClientIP(IPUtil.getClientIPAddress(request))
-            ;
-            UserContextHolder.setUserContext(currentUser);
+            // 获取用户公网IP
+            userContext.setClientIP(IPUtil.getClientIPAddress(request));
+            UserContextHolder.setUserContext(userContext);
 
-            // 赋值对应租户上下文
             if (TenantContextHolder.isTenantEnabled()) {
-                // 启用了多租户的前提下，才获取
+                // 实际启用了多租户，赋值租户上下文
                 TenantContext tenantContext = (TenantContext) AdminStpUtil.getSession().get(TenantContext.CAMEL_NAME);
                 TenantContextHolder.setTenantContext(tenantContext);
             }

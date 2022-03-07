@@ -5,14 +5,12 @@ import cc.uncarbon.module.sys.entity.SysRoleMenuRelationEntity;
 import cc.uncarbon.module.sys.mapper.SysRoleMenuRelationMapper;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
@@ -49,7 +47,7 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
      * 先清理角色ID所有关联关系, 再绑定角色ID与菜单ID
      */
     @Transactional(rollbackFor = Exception.class)
-    public void cleanAndBind(Long roleId, List<Long> menuIds) {
+    public void cleanAndBind(Long roleId, Collection<Long> menuIds) {
         this.remove(
                 new QueryWrapper<SysRoleMenuRelationEntity>()
                         .lambda()
