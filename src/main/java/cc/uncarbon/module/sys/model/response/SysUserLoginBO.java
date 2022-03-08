@@ -4,6 +4,7 @@ import cc.uncarbon.framework.core.context.TenantContext;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,7 +40,7 @@ public class SysUserLoginBO implements Serializable {
     private Collection<Long> roleIds;
 
     @ApiModelProperty(value = "对应角色")
-    private Collection<String> roles;
+    private List<String> roles;
 
     @ApiModelProperty(value = "拥有权限")
     private Collection<String> permissions;

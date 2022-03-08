@@ -225,6 +225,8 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
             return Collections.emptySet();
         }
 
+
+
         // 超级管理员直接允许所有权限
         if (roleIds.contains(SysConstant.SUPER_ADMIN_ROLE_ID)) {
             return this.list().stream().map(SysMenuEntity::getPermission).filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
@@ -347,7 +349,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      */
     private Set<Long> listCurrentUserVisibleMenuId() {
         // 1. 取当前账号拥有角色Ids
-        Set<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(UserContextHolder.getUserId());
+        Collection<Long> roleIds = UserContextHolder.getUserContext().getRolesIds();
         log.debug("[后台管理][取当前账号可见菜单Ids] 当前账号拥有角色Ids >> {}", roleIds);
         if (CollUtil.isEmpty(roleIds)) {
             throw new BusinessException(SysErrorEnum.NO_ROLE_AVAILABLE_FOR_CURRENT_USER);

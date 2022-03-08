@@ -2,11 +2,9 @@ package cc.uncarbon.config;
 
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cn.dev33.satoken.stp.StpInterface;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -23,7 +21,8 @@ public class AdminSaTokenExtendConfiguration implements StpInterface {
      */
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        return UserContextHolder.getUserContext().getPermissions();
+//        return UserContextHolder.getUserContext().getPermissions();
+        return Collections.singletonList("*");
     }
 
     /**

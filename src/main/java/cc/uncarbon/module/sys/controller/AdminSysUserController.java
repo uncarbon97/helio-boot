@@ -52,7 +52,7 @@ public class AdminSysUserController {
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
     public ApiResult<SysUserBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysUserService.getOneById(id, true, false));
+        return ApiResult.data(sysUserService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)

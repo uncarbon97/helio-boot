@@ -197,7 +197,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         // 因字段类型不一致, 单独转换
         ret
                 .setRoleIds(sysUserBO.getRoleMap().keySet())
-                .setRoles(sysUserBO.getRoleMap().values())
+                .setRoles(new ArrayList<>(sysUserBO.getRoleMap().values()))
                 .setPermissions(sysMenuService.listPermissionByRoleIds(sysUserBO.getRoleMap().keySet()))
                 .setTenantContext(tenantContext)
         ;
