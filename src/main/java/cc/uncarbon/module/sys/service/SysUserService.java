@@ -14,18 +14,8 @@ import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
-import cc.uncarbon.module.sys.model.request.AdminBindUserRoleRelationDTO;
-import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysUserDTO;
-import cc.uncarbon.module.sys.model.request.AdminResetSysUserPasswordDTO;
-import cc.uncarbon.module.sys.model.request.AdminUpdateCurrentSysUserPasswordDTO;
-import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
-import cc.uncarbon.module.sys.model.response.SysDeptBO;
-import cc.uncarbon.module.sys.model.response.SysTenantBO;
-import cc.uncarbon.module.sys.model.response.SysUserBO;
-import cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO;
-import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
-import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
+import cc.uncarbon.module.sys.model.request.*;
+import cc.uncarbon.module.sys.model.response.*;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -35,16 +25,12 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 
 /**
@@ -194,14 +180,17 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         // 取账号完整BO
         SysUserBO sysUserBO = this.entity2BO(sysUserEntity);
 
+        // TODO 根据角色ID缓存权限；变更时删除缓存
+        Set<String> permissions = sysMenuService.listPermissionByRoleIds(sysUserBO.getRoleMap().keySet());
+
+        // 包装返回体；有的字段类型不一致, 单独转换
         SysUserLoginBO ret = new SysUserLoginBO();
         BeanUtil.copyProperties(sysUserBO, ret);
 
-        // 因字段类型不一致, 单独转换
         ret
                 .setRoleIds(new HashSet<>(sysUserBO.getRoleMap().keySet()))
                 .setRoles(new ArrayList<>(sysUserBO.getRoleMap().values()))
-                .setPermissions(sysMenuService.listPermissionByRoleIds(sysUserBO.getRoleMap().keySet()))
+                .setPermissions(permissions)
                 .setTenantContext(tenantContext)
         ;
 
