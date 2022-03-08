@@ -12,7 +12,6 @@ import cc.uncarbon.module.sys.enums.UserTypeEnum;
 import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginVO;
-import cc.uncarbon.module.sys.service.SysMenuService;
 import cc.uncarbon.module.sys.service.SysUserService;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -40,8 +39,6 @@ public class AdminAuthController {
 
     private final SysUserService sysUserService;
 
-    private final SysMenuService sysMenuService;
-
 
     @ApiOperation(value = "登录", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/login")
@@ -62,10 +59,8 @@ public class AdminAuthController {
 
         // 将用户ID注册到 SA-Token ，并附加一些业务字段
         AdminStpUtil.login(userInfo.getId(), dto.getRememberMe());
-        AdminStpUtil.getSession()
-                .set(UserContext.CAMEL_NAME, userContext)
-                .set(TenantContext.CAMEL_NAME, userInfo.getTenantContext())
-        ;
+        AdminStpUtil.getSession().set(UserContext.CAMEL_NAME, userContext);
+        AdminStpUtil.getSession().set(TenantContext.CAMEL_NAME, userInfo.getTenantContext());
 
         // 返回登录token
         SysUserLoginVO tokenInfo = SysUserLoginVO.builder()
@@ -82,8 +77,6 @@ public class AdminAuthController {
     @ApiOperation(value = "登出", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/logout")
     public ApiResult<?> logout() {
-        sysMenuService.cleanMenuCacheInRedis(UserContextHolder.getUserId());
-
         AdminStpUtil.logout();
         UserContextHolder.setUserContext(null);
         TenantContextHolder.setTenantContext(null);

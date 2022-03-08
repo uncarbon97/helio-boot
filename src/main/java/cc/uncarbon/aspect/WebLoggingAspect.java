@@ -1,6 +1,5 @@
 package cc.uncarbon.aspect;
 
-import cc.uncarbon.framework.core.props.HelioProperties;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +11,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -28,13 +28,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Aspect
 @Slf4j
 @Component
+@ConditionalOnProperty(value = "helio.webLogging.enabledRequestLog")
 public class WebLoggingAspect {
-
-    private final boolean enabledRequestLog;
-
-    public WebLoggingAspect(HelioProperties helioProperties) {
-        this.enabledRequestLog = helioProperties.getWebLogging().getEnabledRequestLog();
-    }
 
     /**
      * Pointcut that matches all repositories, services and Web REST endpoints.
@@ -62,11 +57,6 @@ public class WebLoggingAspect {
      */
     @Around("restControllerPointcut() && applicationPackagePointcut()")
     public Object restControllerAround(ProceedingJoinPoint point) throws Throwable {
-        if (!enabledRequestLog) {
-            // 未启用，则不打印任何日志
-            return point.proceed();
-        }
-
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         assert requestAttributes != null;
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();

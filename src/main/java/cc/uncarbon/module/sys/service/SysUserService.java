@@ -25,7 +25,7 @@ import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cc.uncarbon.module.sys.model.response.SysUserBO;
 import cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
-import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoBO;
+import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -38,6 +38,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -151,7 +152,9 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         这里是实际启用了多租户功能，并信任前端主动传欲登录的租户ID
         实际生产应用时，推荐前端传值加密，后端在此解密
          */
-        TenantContext tenantContext = null;
+
+        // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
+        TenantContext tenantContext = new TenantContext();
         if (TenantContextHolder.isTenantEnabled() && ObjectUtil.isNotNull(dto.getTenantId())) {
             // 验证通过，将所属租户写入租户上下文，使得 SQL 拦截器可以正确执行
             tenantContext = this.checkAndGetTenantContext(dto.getTenantId());
@@ -196,7 +199,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
         // 因字段类型不一致, 单独转换
         ret
-                .setRoleIds(sysUserBO.getRoleMap().keySet())
+                .setRoleIds(new HashSet<>(sysUserBO.getRoleMap().keySet()))
                 .setRoles(new ArrayList<>(sysUserBO.getRoleMap().values()))
                 .setPermissions(sysMenuService.listPermissionByRoleIds(sysUserBO.getRoleMap().keySet()))
                 .setTenantContext(tenantContext)
@@ -208,9 +211,9 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-取当前用户信息
      */
-    public VbenAdminUserInfoBO adminGetCurrentUserInfo() {
+    public VbenAdminUserInfoVO adminGetCurrentUserInfo() {
         SysUserBO sysUserBO = this.getOneById(UserContextHolder.getUserId(), true);
-        return VbenAdminUserInfoBO.builder()
+        return VbenAdminUserInfoVO.builder()
                 .username(sysUserBO.getUsername())
                 .nickname(sysUserBO.getNickname())
                 .lastLoginAt(sysUserBO.getLastLoginAt())

@@ -6,16 +6,14 @@ import cc.uncarbon.module.sys.enums.SysMenuTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
 
 /**
@@ -70,9 +68,6 @@ public class SysMenuBO implements Serializable {
     @ApiModelProperty(value = "外链地址")
     private String externalLink;
 
-    @ApiModelProperty(value = "子项数据")
-    private List<SysMenuBO> children;
-
     @ApiModelProperty(value = "【用于Vben Admin】路由地址", hidden = true)
     private String path;
 
@@ -80,7 +75,7 @@ public class SysMenuBO implements Serializable {
     private String name;
 
     @ApiModelProperty(value = "【用于Vben Admin】菜单详情", hidden = true)
-    private VbenAdminMenuMetaBO meta;
+    private VbenAdminMenuMetaVO meta;
 
     @ApiModelProperty(value = "【用于Vben Admin树状菜单】菜单主键ID字符串", hidden = true)
     private String idStr;

@@ -51,7 +51,7 @@ helio:
       - sys_user_dept_relation
       - sys_user_role_relation
   web-logging:
-    enabled-request-log: true
+    enabled-request-log: false
 
 knife4j:
   # 保持true
