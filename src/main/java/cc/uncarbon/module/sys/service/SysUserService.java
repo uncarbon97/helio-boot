@@ -7,6 +7,7 @@ import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
+import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
@@ -14,8 +15,18 @@ import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
-import cc.uncarbon.module.sys.model.request.*;
-import cc.uncarbon.module.sys.model.response.*;
+import cc.uncarbon.module.sys.model.request.AdminBindUserRoleRelationDTO;
+import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
+import cc.uncarbon.module.sys.model.request.AdminListSysUserDTO;
+import cc.uncarbon.module.sys.model.request.AdminResetSysUserPasswordDTO;
+import cc.uncarbon.module.sys.model.request.AdminUpdateCurrentSysUserPasswordDTO;
+import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
+import cc.uncarbon.module.sys.model.response.SysDeptBO;
+import cc.uncarbon.module.sys.model.response.SysTenantBO;
+import cc.uncarbon.module.sys.model.response.SysUserBO;
+import cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO;
+import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
+import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -25,12 +36,16 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 
 /**
@@ -38,7 +53,6 @@ import java.util.*;
  *
  * @author Uncarbon
  */
-@RequiredArgsConstructor
 @Slf4j
 @Service
 public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserEntity> {
@@ -55,6 +69,22 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
     private final SysUserRoleRelationService sysUserRoleRelationService;
 
+    private final boolean isTenantEnabled;
+
+    public SysUserService(SysRoleService sysRoleService, SysDeptService sysDeptService,
+            SysMenuService sysMenuService, SysTenantService sysTenantService,
+            SysUserDeptRelationService sysUserDeptRelationService,
+            SysUserRoleRelationService sysUserRoleRelationService,
+            HelioProperties helioProperties) {
+        this.sysRoleService = sysRoleService;
+        this.sysDeptService = sysDeptService;
+        this.sysMenuService = sysMenuService;
+        this.sysTenantService = sysTenantService;
+        this.sysUserDeptRelationService = sysUserDeptRelationService;
+        this.sysUserRoleRelationService = sysUserRoleRelationService;
+
+        this.isTenantEnabled = helioProperties.getTenant().getEnabled();
+    }
 
     /**
      * 后台管理-分页列表
@@ -141,7 +171,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
         // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
         TenantContext tenantContext = new TenantContext();
-        if (TenantContextHolder.isTenantEnabled() && ObjectUtil.isNotNull(dto.getTenantId())) {
+        if (isTenantEnabled && ObjectUtil.isNotNull(dto.getTenantId())) {
             // 验证通过，将所属租户写入租户上下文，使得 SQL 拦截器可以正确执行
             tenantContext = this.checkAndGetTenantContext(dto.getTenantId());
             TenantContextHolder.setTenantContext(tenantContext);
@@ -165,7 +195,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         ---------------------------------------------------
          */
 
-        if (TenantContextHolder.isTenantEnabled() && ObjectUtil.isNotNull(sysUserEntity.getTenantId())) {
+        if (isTenantEnabled && ObjectUtil.isNotNull(sysUserEntity.getTenantId())) {
             // 二次赋值，以防万一（也许前端没有传租户ID，上方的 if 块并没有执行）
             tenantContext = this.checkAndGetTenantContext(sysUserEntity.getTenantId());
             TenantContextHolder.setTenantContext(tenantContext);

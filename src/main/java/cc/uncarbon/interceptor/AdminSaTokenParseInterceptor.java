@@ -6,13 +6,12 @@ import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.web.util.IPUtil;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -40,11 +39,9 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
             userContext.setClientIP(IPUtil.getClientIPAddress(request));
             UserContextHolder.setUserContext(userContext);
 
-            if (TenantContextHolder.isTenantEnabled()) {
-                // 实际启用了多租户，赋值租户上下文
-                TenantContext tenantContext = (TenantContext) AdminStpUtil.getSession().get(TenantContext.CAMEL_NAME);
-                TenantContextHolder.setTenantContext(tenantContext);
-            }
+            // 赋值租户上下文
+            TenantContext tenantContext = (TenantContext) AdminStpUtil.getSession().get(TenantContext.CAMEL_NAME);
+            TenantContextHolder.setTenantContext(tenantContext);
 
         } else {
             UserContextHolder.setUserContext(null);

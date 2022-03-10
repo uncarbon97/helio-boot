@@ -79,27 +79,5 @@ public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRole
                         .select(SysUserRoleRelationEntity::getRoleId)
                         .eq(SysUserRoleRelationEntity::getUserId, userId)
         ).stream().map(SysUserRoleRelationEntity::getRoleId).collect(Collectors.toSet());
-
-        // TODO 要不要去掉
-        /*// 尝试从缓存中读取
-        String cacheKey = String.format(SysConstant.REDIS_KEY_USER_OWNED_ROLE_IDS, userId);
-        Set<Long> ret = longSetRedisTemplate.opsForSet().members(cacheKey);
-        if (CollUtil.isNotEmpty(ret)) {
-            return ret;
-        }
-
-        ret = this.list(
-                new QueryWrapper<SysUserRoleRelationEntity>()
-                        .lambda()
-                        .select(SysUserRoleRelationEntity::getRoleId)
-                        .eq(SysUserRoleRelationEntity::getUserId, userId)
-        ).stream().map(SysUserRoleRelationEntity::getRoleId).collect(Collectors.toSet());
-
-        // 写入缓存
-        Long[] arr = new Long[ret.size()];
-        longSetRedisTemplate.opsForSet().add(cacheKey, ret.toArray(arr));
-        longSetRedisTemplate.expire(cacheKey, SysConstant.ONE_DAY_SECONDS, TimeUnit.SECONDS);
-
-        return ret;*/
     }
 }

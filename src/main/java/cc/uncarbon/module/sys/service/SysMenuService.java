@@ -186,7 +186,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     }
 
     /**
-     * TODO 需要优化
      * 根据角色Ids取权限串List
      */
     public Set<String> listPermissionByRoleIds(Collection<Long> roleIds) {

@@ -39,7 +39,7 @@ public class SysUserLoginBO implements Serializable {
     @ApiModelProperty(value = "对应角色ID")
     private Set<Long> roleIds;
 
-    @ApiModelProperty(value = "对应角色")
+    @ApiModelProperty(value = "对应角色名")
     private List<String> roles;
 
     @ApiModelProperty(value = "拥有权限")
