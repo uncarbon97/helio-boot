@@ -7,6 +7,7 @@ import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.enums.UserTypeEnum;
 import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
@@ -39,6 +40,8 @@ public class AdminAuthController {
 
     private final SysUserService sysUserService;
 
+    private final RolePermissionCacheHelper rolePermissionCacheHelper;
+
 
     @ApiOperation(value = "登录", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/login")
@@ -61,6 +64,9 @@ public class AdminAuthController {
         AdminStpUtil.login(userInfo.getId(), dto.getRememberMe());
         AdminStpUtil.getSession().set(UserContext.CAMEL_NAME, userContext);
         AdminStpUtil.getSession().set(TenantContext.CAMEL_NAME, userInfo.getTenantContext());
+
+        // 更新角色-权限缓存
+        rolePermissionCacheHelper.putCache(userInfo.getRoleIdPermissionMap());
 
         // 返回登录token
         SysUserLoginVO tokenInfo = SysUserLoginVO.builder()

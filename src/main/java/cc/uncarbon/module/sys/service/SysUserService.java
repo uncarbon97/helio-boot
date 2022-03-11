@@ -111,7 +111,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "新增后台用户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysUserDTO dto) {
-        log.info("[后台管理-新增后台用户] >> DTO={}", dto);
+        log.info("[后台管理-新增后台用户] >> 入参={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -138,7 +138,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "编辑后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysUserDTO dto) {
-        log.info("[后台管理-编辑后台用户] >> DTO={}", dto);
+        log.info("[后台管理-编辑后台用户] >> 入参={}", dto);
         this.checkExistence(dto);
 
         SysUserEntity updateEntity = new SysUserEntity();
@@ -155,8 +155,34 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "删除后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除后台用户] >> ids={}", ids);
+        log.info("[后台管理-删除后台用户] >> 入参={}", ids);
         this.removeByIds(ids);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @return null or BO
+     */
+    public SysUserBO getOneById(Long id) {
+        return this.getOneById(id, false);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysUserBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysUserEntity entity = this.getById(id);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity);
     }
 
     /**
@@ -210,17 +236,22 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         // 取账号完整BO
         SysUserBO sysUserBO = this.entity2BO(sysUserEntity);
 
-        // TODO 根据角色ID缓存权限；变更时删除缓存
-        Set<String> permissions = sysMenuService.listPermissionByRoleIds(sysUserBO.getRoleMap().keySet());
+        Map<Long, Set<String>> roleIdPermissionMap = sysMenuService.getRoleIdPermissionMap(
+                sysUserBO.getRoleMap().keySet());
 
         // 包装返回体；有的字段类型不一致, 单独转换
         SysUserLoginBO ret = new SysUserLoginBO();
         BeanUtil.copyProperties(sysUserBO, ret);
 
+        // 使用并行流提升效率
+        HashSet<String> permissions = new HashSet<>(roleIdPermissionMap.size() * 32);
+        roleIdPermissionMap.values().parallelStream().forEach(permissions::addAll);
+
         ret
                 .setRoleIds(new HashSet<>(sysUserBO.getRoleMap().keySet()))
                 .setRoles(new ArrayList<>(sysUserBO.getRoleMap().values()))
                 .setPermissions(permissions)
+                .setRoleIdPermissionMap(roleIdPermissionMap)
                 .setTenantContext(tenantContext)
         ;
 
@@ -278,32 +309,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      */
     public void adminBindRoles(AdminBindUserRoleRelationDTO dto) {
         sysUserRoleRelationService.cleanAndBind(dto.getUserId(), dto.getRoleIds());
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @return null or BO
-     */
-    public SysUserBO getOneById(Long id) {
-        return this.getOneById(id, false);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @return null or BO
-     */
-    public SysUserBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysUserEntity entity = this.getById(id);
-        if (throwIfInvalidId) {
-            SysErrorEnum.INVALID_ID.assertNotNull(entity);
-        }
-
-        return this.entity2BO(entity);
     }
 
     /**

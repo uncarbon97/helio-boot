@@ -65,7 +65,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "新增部门")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDeptDTO dto) {
-        log.info("[后台管理-新增部门] >> DTO={}", dto);
+        log.info("[后台管理-新增部门] >> 入参={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -87,7 +87,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "编辑部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDeptDTO dto) {
-        log.info("[后台管理-编辑部门] >> DTO={}", dto);
+        log.info("[后台管理-编辑部门] >> 入参={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -106,7 +106,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "删除部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除部门] >> ids={}", ids);
+        log.info("[后台管理-删除部门] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 

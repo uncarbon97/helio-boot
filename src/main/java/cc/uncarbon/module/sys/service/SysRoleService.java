@@ -9,6 +9,7 @@ import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysRoleEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysRoleMapper;
+import cc.uncarbon.module.sys.model.request.AdminBindRoleMenuRelationDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
 import cc.uncarbon.module.sys.model.response.SysRoleBO;
@@ -26,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,13 +40,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleEntity> {
 
-    @Resource
-    private SysUserRoleRelationService sysUserRoleRelationService;
+    private final SysUserRoleRelationService sysUserRoleRelationService;
 
-    @Resource
-    private SysRoleMenuRelationService sysRoleMenuRelationService;
+    private final SysRoleMenuRelationService sysRoleMenuRelationService;
 
     /**
      * 后台管理-分页列表
@@ -76,7 +76,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "新增后台角色")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysRoleDTO dto) {
-        log.info("[后台管理-新增后台角色] >> DTO={}", dto);
+        log.info("[后台管理-新增后台角色] >> 入参={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -84,8 +84,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         BeanUtil.copyProperties(dto, entity);
 
         this.save(entity);
-
-        sysRoleMenuRelationService.cleanAndBind(entity.getId(), dto.getMenuIds());
 
         return entity.getId();
     }
@@ -96,13 +94,11 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "编辑后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysRoleDTO dto) {
-        log.info("[后台管理-编辑后台角色] >> DTO={}", dto);
+        log.info("[后台管理-编辑后台角色] >> 入参={}", dto);
         this.checkExistence(dto);
 
         SysRoleEntity entity = new SysRoleEntity();
         BeanUtil.copyProperties(dto, entity);
-
-        sysRoleMenuRelationService.cleanAndBind(dto.getId(), dto.getMenuIds());
 
         this.updateById(entity);
     }
@@ -113,7 +109,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "删除后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除后台角色] >> ids={}", ids);
+        log.info("[后台管理-删除后台角色] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 
@@ -141,6 +137,13 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         }
 
         return this.entity2BO(entity);
+    }
+
+    /**
+     * 后台管理-绑定用户与角色关联关系
+     */
+    public void adminBindMenus(AdminBindRoleMenuRelationDTO dto) {
+        sysRoleMenuRelationService.cleanAndBind(dto.getRoleId(), dto.getMenuIds());
     }
 
 

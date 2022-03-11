@@ -4,6 +4,7 @@ import cc.uncarbon.framework.core.context.TenantContext;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,8 +43,11 @@ public class SysUserLoginBO implements Serializable {
     @ApiModelProperty(value = "对应角色名")
     private List<String> roles;
 
-    @ApiModelProperty(value = "拥有权限")
+    @ApiModelProperty(value = "所有拥有权限名")
     private Set<String> permissions;
+
+    @ApiModelProperty(value = "角色ID-对应权限名 Map")
+    private Map<Long, Set<String>> roleIdPermissionMap;
 
     @ApiModelProperty(value = "关联租户上下文")
     private TenantContext tenantContext;

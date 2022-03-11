@@ -58,7 +58,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "新增数据字典")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDataDictDTO dto) {
-        log.info("[后台管理-新增数据字典] >> DTO={}", dto);
+        log.info("[后台管理-新增数据字典] >> 入参={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -76,7 +76,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "编辑数据字典")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDataDictDTO dto) {
-        log.info("[后台管理-编辑数据字典] >> DTO={}", dto);
+        log.info("[后台管理-编辑数据字典] >> 入参={}", dto);
         this.checkExistence(dto);
 
         SysDataDictEntity entity = new SysDataDictEntity();
@@ -91,7 +91,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @SysLog(value = "删除数据字典")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除数据字典] >> ids={}", ids);
+        log.info("[后台管理-删除数据字典] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 

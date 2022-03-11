@@ -5,23 +5,21 @@ import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.sys.constant.SysConstant;
+import cc.uncarbon.module.sys.model.request.AdminBindRoleMenuRelationDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
 import cc.uncarbon.module.sys.model.response.SysRoleBO;
 import cc.uncarbon.module.sys.service.SysRoleService;
-import cc.uncarbon.module.sys.service.SysUserRoleRelationService;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.collection.CollUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.Set;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,9 +46,7 @@ public class AdminSysRoleController {
 
     private final SysRoleService sysRoleService;
 
-    private final SysUserRoleRelationService sysUserRoleRelationService;
-
-    private final StringRedisTemplate stringRedisTemplate;
+    private final RolePermissionCacheHelper rolePermissionCacheHelper;
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
@@ -83,22 +79,6 @@ public class AdminSysRoleController {
         dto.setId(id);
         sysRoleService.adminUpdate(dto);
 
-        /*
-        清除该角色下所有用户, 菜单相关的缓存
-         */
-        Set<Long> userIds = sysUserRoleRelationService.listUserIdByRoleIds(CollUtil.newArrayList(dto.getId()));
-        userIds.forEach(
-                userId -> {
-                    String redisKey;
-
-                    redisKey = String.format(SysConstant.REDIS_KEY_SIDE_MENU_BY_USERID, userId);
-                    stringRedisTemplate.delete(redisKey);
-
-                    redisKey = String.format(SysConstant.REDIS_KEY_VISIBLE_MENU_BY_USERID, userId);
-                    stringRedisTemplate.delete(redisKey);
-                }
-        );
-
         return ApiResult.success();
     }
 
@@ -107,6 +87,17 @@ public class AdminSysRoleController {
     @DeleteMapping
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysRoleService.adminDelete(dto.getIds());
+
+        return ApiResult.success();
+    }
+
+    @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "bindMenus")
+    @ApiOperation(value = "绑定角色与菜单关联关系", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/bindMenus")
+    public ApiResult<?> bindMenus(@RequestBody @Valid AdminBindRoleMenuRelationDTO dto) {
+        sysRoleService.adminBindMenus(dto);
+
+        // TODO 更新缓存
 
         return ApiResult.success();
     }

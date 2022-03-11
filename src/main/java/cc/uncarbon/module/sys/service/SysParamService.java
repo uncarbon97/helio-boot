@@ -60,7 +60,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "新增系统参数")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysParamDTO dto) {
-        log.info("[后台管理-新增系统参数] >> DTO={}", dto);
+        log.info("[后台管理-新增系统参数] >> 入参={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -78,7 +78,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "编辑系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysParamDTO dto) {
-        log.info("[后台管理-编辑系统参数] >> DTO={}", dto);
+        log.info("[后台管理-编辑系统参数] >> 入参={}", dto);
         this.checkExistence(dto);
 
         SysParamEntity entity = new SysParamEntity();
@@ -93,7 +93,7 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     @SysLog(value = "删除系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除系统参数] >> ids={}", ids);
+        log.info("[后台管理-删除系统参数] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 

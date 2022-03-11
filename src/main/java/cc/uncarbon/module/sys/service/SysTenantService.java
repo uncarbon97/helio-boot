@@ -83,7 +83,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @SysLog(value = "新增系统租户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertSysTenantDTO dto) {
-        log.info("[后台管理-新增系统租户] >> DTO={}", dto);
+        log.info("[后台管理-新增系统租户] >> 入参={}", dto);
         this.checkExistence(dto);
 
         // 1. 加入一个新租户(tenant)
@@ -151,7 +151,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @SysLog(value = "编辑系统租户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminUpdateSysTenantDTO dto) {
-        log.info("[后台管理-编辑系统租户] >> DTO={}", dto);
+        log.info("[后台管理-编辑系统租户] >> 入参={}", dto);
         this.checkExistence(dto);
 
         SysTenantEntity entity = new SysTenantEntity();
@@ -166,7 +166,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @SysLog(value = "删除系统租户")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除系统租户] >> ids={}", ids);
+        log.info("[后台管理-删除系统租户] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 

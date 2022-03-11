@@ -3,6 +3,7 @@ package cc.uncarbon.module.sys.controller;
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysMenuDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysMenuDTO;
@@ -43,6 +44,8 @@ public class AdminSysMenuController {
 
     private final SysMenuService sysMenuService;
 
+    private final RolePermissionCacheHelper rolePermissionCacheHelper;
+
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "列表", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +66,6 @@ public class AdminSysMenuController {
     @PostMapping
     public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         sysMenuService.adminInsert(dto);
-        sysMenuService.cleanMenuCacheInRedis();
 
         return ApiResult.success();
     }
@@ -74,7 +76,6 @@ public class AdminSysMenuController {
     public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         dto.setId(id);
         sysMenuService.adminUpdate(dto);
-        sysMenuService.cleanMenuCacheInRedis();
 
         return ApiResult.success();
     }
@@ -84,7 +85,6 @@ public class AdminSysMenuController {
     @DeleteMapping
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysMenuService.adminDelete(dto.getIds());
-        sysMenuService.cleanMenuCacheInRedis();
 
         return ApiResult.success();
     }

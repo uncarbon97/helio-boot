@@ -26,12 +26,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,8 +48,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuEntity> {
 
     private static final Snowflake SNOWFLAKE = IdUtil.getSnowflake(0L, 0L);
+
     private final SysRoleMenuRelationService sysRoleMenuRelationService;
-    private final StringRedisTemplate stringRedisTemplate;
 
     /**
      * 后台管理-列表
@@ -72,7 +73,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @SysLog(value = "新增后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysMenuDTO dto) {
-        log.info("[后台管理-新增后台菜单] >> DTO={}", dto);
+        log.info("[后台管理-新增后台菜单] >> 入参={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -95,7 +96,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @SysLog(value = "编辑后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysMenuDTO dto) {
-        log.info("[后台管理-编辑后台菜单] >> DTO={}", dto);
+        log.info("[后台管理-编辑后台菜单] >> 入参={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -114,30 +115,8 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @SysLog(value = "删除后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除后台菜单] >> ids={}", ids);
+        log.info("[后台管理-删除后台菜单] >> 入参={}", ids);
         this.removeByIds(ids);
-    }
-
-    /**
-     * 后台管理-取侧边菜单
-     */
-    public List<SysMenuBO> adminListSideMenu() {
-        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuId();
-
-        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
-                SysMenuTypeEnum.EXTERNAL_LINK);
-        return this.listByIds(visibleMenuIds, requiredMenuTypes);
-    }
-
-    /**
-     * 后台管理-取所有可见菜单 包括按钮类型
-     */
-    public List<SysMenuBO> adminListVisibleMenu() {
-        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuId();
-
-        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
-                SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
-        return this.listByIds(visibleMenuIds, requiredMenuTypes);
     }
 
     /**
@@ -167,22 +146,25 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     }
 
     /**
-     * 通用-清除Redis中所有菜单缓存
+     * 后台管理-取侧边菜单
      */
-    public void cleanMenuCacheInRedis() {
-        String redisKey = "*";
+    public List<SysMenuBO> adminListSideMenu() {
+        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuId();
 
-        log.info("[清除Redis中相关菜单缓存] >> redisKey={}", redisKey);
+        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
+                SysMenuTypeEnum.EXTERNAL_LINK);
+        return this.listByIds(visibleMenuIds, requiredMenuTypes);
+    }
 
-        Set<String> keys = stringRedisTemplate.keys(SysConstant.REDIS_KEY_SIDE_MENU + redisKey);
-        if (keys != null && !keys.isEmpty()) {
-            stringRedisTemplate.delete(keys);
-        }
+    /**
+     * 后台管理-取所有可见菜单 包括按钮类型
+     */
+    public List<SysMenuBO> adminListVisibleMenu() {
+        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuId();
 
-        keys = stringRedisTemplate.keys(SysConstant.REDIS_KEY_VISIBLE_MENU + redisKey);
-        if (keys != null && !keys.isEmpty()) {
-            stringRedisTemplate.delete(keys);
-        }
+        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
+                SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
+        return this.listByIds(visibleMenuIds, requiredMenuTypes);
     }
 
     /**
@@ -209,6 +191,57 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                 SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
         return this.listByIds(menuIds, requiredMenuTypes).stream().map(SysMenuBO::getPermission)
                 .filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
+    }
+
+    /**
+     * 根据角色Ids，获取角色ID 对应的权限名 Map
+     *
+     * @return map key=角色ID value=权限名集合
+     */
+    public Map<Long, Set<String>> getRoleIdPermissionMap(Collection<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptyMap();
+        }
+
+        HashMap<Long, Set<String>> ret = new HashMap<>(roleIds.size());
+
+        roleIds.forEach(
+                roleId -> {
+                    Set<String> permissions;
+
+                    if (SysConstant.SUPER_ADMIN_ROLE_ID.equals(roleId)) {
+                        // 超级管理员读取所有权限，不管有没有被禁用
+                        permissions = this.list().stream()
+                                .map(SysMenuEntity::getPermission)
+                                .filter(StrUtil::isNotEmpty)
+                                .collect(Collectors.toSet())
+                        ;
+                    } else {
+                        // 非超级管理员则通过角色ID，关联查询拥有的菜单，菜单上有权限名
+
+                        Set<Long> menuIds = sysRoleMenuRelationService.listMenuIdByRoleId(roleId);
+                        if (CollUtil.isEmpty(menuIds)) {
+                            permissions = Collections.emptySet();
+                        } else {
+                            permissions = this.list(
+                                            new QueryWrapper<SysMenuEntity>()
+                                                    .lambda()
+                                                    .select(SysMenuEntity::getPermission)
+                                                    .in(SysMenuEntity::getId, menuIds)
+                                                    .eq(SysMenuEntity::getStatus, GenericStatusEnum.ENABLED)
+                                    )
+                                    .stream()
+                                    .map(SysMenuEntity::getPermission)
+                                    .filter(StrUtil::isNotEmpty)
+                                    .collect(Collectors.toSet());
+                        }
+                    }
+
+                    ret.put(roleId, permissions);
+                }
+        );
+
+        return ret;
     }
 
 
@@ -374,44 +407,5 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                 throw new BusinessException(400, "已存在相同权限标识，请重新输入");
             }
         }
-    }
-
-    /**
-     * 内部-过滤被禁用的菜单ID
-     *
-     * @param visibleMenuIds 待过滤的可见的菜单ID列表
-     * @return 过滤后的菜单ID列表
-     */
-    private Set<Long> filterDisabledIds(Set<Long> visibleMenuIds) {
-        if (CollUtil.isEmpty(visibleMenuIds)) {
-            return Collections.emptySet();
-        }
-
-        /*
-        1. 找出目前被禁用的菜单ID
-         */
-        Set<Long> disabledMenuIds = this.list(
-                new QueryWrapper<SysMenuEntity>()
-                        .lambda()
-                        .select(SysMenuEntity::getId)
-                        .eq(SysMenuEntity::getStatus, GenericStatusEnum.DISABLED)
-        ).stream().map(SysMenuEntity::getId).collect(Collectors.toSet());
-
-        /*
-        2. 提取出符合以下条件的菜单ID:
-            启用状态 && 父菜单未被禁用
-         */
-        return this.list(
-                new QueryWrapper<SysMenuEntity>()
-                        .lambda()
-                        .select(SysMenuEntity::getId)
-                        .and(
-                                wrapper -> wrapper
-                                        .eq(SysMenuEntity::getStatus, GenericStatusEnum.ENABLED)
-                                        .notIn(CollUtil.isNotEmpty(disabledMenuIds), SysMenuEntity::getParentId,
-                                                disabledMenuIds)
-                        )
-                        .in(SysMenuEntity::getId, visibleMenuIds)
-        ).stream().map(SysMenuEntity::getId).collect(Collectors.toSet());
     }
 }
