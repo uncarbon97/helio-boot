@@ -51,6 +51,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
 
     private final SysRoleMenuRelationService sysRoleMenuRelationService;
 
+
     /**
      * 后台管理-列表
      */
@@ -63,6 +64,32 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         );
 
         return this.entityList2BOs(entityList);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @return null or BO
+     */
+    public SysMenuBO getOneById(Long id) {
+        return this.getOneById(id, false);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id               主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysMenuBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysMenuEntity entity = this.getById(id);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity);
     }
 
     /**
@@ -120,32 +147,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     }
 
     /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @return null or BO
-     */
-    public SysMenuBO getOneById(Long id) {
-        return this.getOneById(id, false);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id               主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @return null or BO
-     */
-    public SysMenuBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysMenuEntity entity = this.getById(id);
-        if (throwIfInvalidId) {
-            SysErrorEnum.INVALID_ID.assertNotNull(entity);
-        }
-
-        return this.entity2BO(entity);
-    }
-
-    /**
      * 后台管理-取侧边菜单
      */
     public List<SysMenuBO> adminListSideMenu() {
@@ -165,32 +166,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
                 SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
         return this.listByIds(visibleMenuIds, requiredMenuTypes);
-    }
-
-    /**
-     * 根据角色Ids取权限串List
-     */
-    public Set<String> listPermissionByRoleIds(Collection<Long> roleIds) {
-        if (CollUtil.isEmpty(roleIds)) {
-            return Collections.emptySet();
-        }
-
-        // 超级管理员直接允许所有权限
-        if (roleIds.contains(SysConstant.SUPER_ADMIN_ROLE_ID)) {
-            return this.list().stream().map(SysMenuEntity::getPermission).filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
-        }
-
-        // 非超级管理员则通过角色ID，关联查询拥有的菜单
-        Set<Long> menuIds = sysRoleMenuRelationService.listMenuIdByRoleIds(roleIds);
-        if (CollUtil.isEmpty(menuIds)) {
-            return Collections.emptySet();
-        }
-
-        // 过滤实际已被禁用的菜单
-        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
-                SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
-        return this.listByIds(menuIds, requiredMenuTypes).stream().map(SysMenuBO::getPermission)
-                .filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
     }
 
     /**
@@ -242,6 +217,22 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         );
 
         return ret;
+    }
+
+    /**
+     * 根据菜单ID集合，取权限名集合
+     */
+    public Set<String> listPermissionByMenuIds(Collection<Long> menuIds) {
+        if (CollUtil.isEmpty(menuIds)) {
+            return Collections.emptySet();
+        }
+
+        return this.list(
+                new QueryWrapper<SysMenuEntity>()
+                        .lambda()
+                        .select(SysMenuEntity::getPermission)
+                        .in(SysMenuEntity::getId, menuIds)
+        ).stream().map(SysMenuEntity::getPermission).filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
     }
 
 

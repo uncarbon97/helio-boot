@@ -60,6 +60,32 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     }
 
     /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @return null or BO
+     */
+    public SysDeptBO getOneById(Long id) {
+        return this.getOneById(id, false);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysDeptBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysDeptEntity entity = this.getById(id);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity);
+    }
+
+    /**
      * 后台管理-新增
      */
     @SysLog(value = "新增部门")
@@ -108,32 +134,6 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除部门] >> 入参={}", ids);
         this.removeByIds(ids);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @return null or BO
-     */
-    public SysDeptBO getOneById(Long id) {
-        return this.getOneById(id, false);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @return null or BO
-     */
-    public SysDeptBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysDeptEntity entity = this.getById(id);
-        if (throwIfInvalidId) {
-            SysErrorEnum.INVALID_ID.assertNotNull(entity);
-        }
-
-        return this.entity2BO(entity);
     }
 
     /**

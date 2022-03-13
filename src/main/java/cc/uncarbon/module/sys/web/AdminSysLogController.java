@@ -1,4 +1,4 @@
-package cc.uncarbon.module.sys.controller;
+package cc.uncarbon.module.sys.web;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.page.PageParam;

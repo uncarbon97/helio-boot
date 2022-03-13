@@ -1,4 +1,4 @@
-package cc.uncarbon.module.app.controller;
+package cc.uncarbon.module.app.web;
 
 
 import cc.uncarbon.framework.core.constant.HelioConstant;

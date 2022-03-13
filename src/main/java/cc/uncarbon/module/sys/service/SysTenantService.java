@@ -26,6 +26,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -46,9 +48,11 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
 
     private final SysUserService sysUserService;
 
-    public SysTenantService(SysRoleService sysRoleService, SysUserRoleRelationService sysUserRoleRelationService,
-                            // TODO 需要改造
-                            @Lazy SysUserService sysUserService) {
+    public SysTenantService(SysRoleService sysRoleService,
+                            SysUserRoleRelationService sysUserRoleRelationService,
+                            // 缓解循环依赖，其实不建议这么做
+                            @Lazy SysUserService sysUserService
+    ) {
         this.sysRoleService = sysRoleService;
         this.sysUserRoleRelationService = sysUserRoleRelationService;
         this.sysUserService = sysUserService;
@@ -75,6 +79,32 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
         );
 
         return this.entityPage2BOPage(entityPage);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @return null or BO
+     */
+    public SysTenantBO getOneById(Long id) {
+        return this.getOneById(id, false);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysTenantBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysTenantEntity entity = this.getById(id);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity);
     }
 
     /**
@@ -168,32 +198,6 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除系统租户] >> 入参={}", ids);
         this.removeByIds(ids);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @return null or BO
-     */
-    public SysTenantBO getOneById(Long id) {
-        return this.getOneById(id, false);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @return null or BO
-     */
-    public SysTenantBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysTenantEntity entity = this.getById(id);
-        if (throwIfInvalidId) {
-            SysErrorEnum.INVALID_ID.assertNotNull(entity);
-        }
-
-        return this.entity2BO(entity);
     }
 
     /**

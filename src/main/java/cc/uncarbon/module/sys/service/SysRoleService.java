@@ -47,6 +47,9 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     private final SysRoleMenuRelationService sysRoleMenuRelationService;
 
+    private final SysMenuService sysMenuService;
+
+
     /**
      * 后台管理-分页列表
      */
@@ -66,6 +69,32 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         );
 
         return this.entityPage2BOPage(entityPage);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @return null or BO
+     */
+    public SysRoleBO getOneById(Long id) {
+        return this.getOneById(id, false);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysRoleBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysRoleEntity entity = this.getById(id);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity);
     }
 
     /**
@@ -114,36 +143,15 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     }
 
     /**
-     * 根据 ID 取详情
+     * 后台管理-绑定角色与菜单关联关系
      *
-     * @param id 主键ID
-     * @return null or BO
+     * @return 新菜单ID集合对应的权限名
      */
-    public SysRoleBO getOneById(Long id) {
-        return this.getOneById(id, false);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @return null or BO
-     */
-    public SysRoleBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysRoleEntity entity = this.getById(id);
-        if (throwIfInvalidId) {
-            SysErrorEnum.INVALID_ID.assertNotNull(entity);
-        }
-
-        return this.entity2BO(entity);
-    }
-
-    /**
-     * 后台管理-绑定用户与角色关联关系
-     */
-    public void adminBindMenus(AdminBindRoleMenuRelationDTO dto) {
+    public Set<String> adminBindMenus(AdminBindRoleMenuRelationDTO dto) {
+        Set<String> newPermissions = sysMenuService.listPermissionByMenuIds(dto.getMenuIds());
         sysRoleMenuRelationService.cleanAndBind(dto.getRoleId(), dto.getMenuIds());
+
+        return newPermissions;
     }
 
 
@@ -247,8 +255,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     /**
      * 主动忽略 map key 重复错误，不然 key 重复的话，转换成 map 的过程会抛异常
-     * @param <T>
-     * @return
      */
     private <T> BinaryOperator<T> ignoredThrowingMerger() {
         return (u, v) -> u;

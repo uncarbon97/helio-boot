@@ -1,20 +1,22 @@
-package cc.uncarbon.module.sys.controller;
+package cc.uncarbon.module.sys.web;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
+import cc.uncarbon.framework.core.page.PageParam;
+import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.sys.constant.SysConstant;
-import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysMenuDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysMenuDTO;
-import cc.uncarbon.module.sys.model.response.SysMenuBO;
-import cc.uncarbon.module.sys.service.SysMenuService;
+import cc.uncarbon.module.sys.model.request.AdminBindRoleMenuRelationDTO;
+import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
+import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
+import cc.uncarbon.module.sys.model.response.SysRoleBO;
+import cc.uncarbon.module.sys.service.SysRoleService;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
+
 
 /**
  * @author Uncarbon
@@ -35,37 +39,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
-@Api(value = "后台菜单管理接口", tags = {"后台菜单管理接口"})
-@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/sys/menus")
+@Api(value = "后台角色管理接口", tags = {"后台角色管理接口"})
+@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/sys/roles")
 @RestController
-public class AdminSysMenuController {
+public class AdminSysRoleController {
 
-    private static final String PERMISSION_PREFIX = "SysMenu:";
+    private static final String PERMISSION_PREFIX = "SysRole:";
 
-    private final SysMenuService sysMenuService;
+    private final SysRoleService sysRoleService;
 
     private final RolePermissionCacheHelper rolePermissionCacheHelper;
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
-    @ApiOperation(value = "列表", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "分页列表", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping
-    public ApiResult<List<SysMenuBO>> list(AdminListSysMenuDTO dto) {
-        return ApiResult.data(sysMenuService.adminList(dto));
+    public ApiResult<PageResult<SysRoleBO>> list(PageParam pageParam, AdminListSysRoleDTO dto) {
+        return ApiResult.data(sysRoleService.adminList(pageParam, dto));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping(value = "/{id}")
-    public ApiResult<SysMenuBO> getById(@PathVariable Long id) {
-        return ApiResult.data(sysMenuService.getOneById(id, true));
+    public ApiResult<SysRoleBO> getById(@PathVariable Long id) {
+        return ApiResult.data(sysRoleService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
-        sysMenuService.adminInsert(dto);
+    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
+        sysRoleService.adminInsert(dto);
 
         return ApiResult.success();
     }
@@ -73,9 +77,9 @@ public class AdminSysMenuController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping(value = "/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
+    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
         dto.setId(id);
-        sysMenuService.adminUpdate(dto);
+        sysRoleService.adminUpdate(dto);
 
         return ApiResult.success();
     }
@@ -84,21 +88,24 @@ public class AdminSysMenuController {
     @ApiOperation(value = "删除", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @DeleteMapping
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
-        sysMenuService.adminDelete(dto.getIds());
+        sysRoleService.adminDelete(dto.getIds());
+
+        // 角色删除时，删除对应缓存键
+        rolePermissionCacheHelper.deleteCache(dto.getIds());
 
         return ApiResult.success();
     }
 
-    @ApiOperation(value = "取侧边菜单", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping("/side")
-    public ApiResult<List<SysMenuBO>> adminListSideMenu() {
-        return ApiResult.data(sysMenuService.adminListSideMenu());
-    }
+    @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "bindMenus")
+    @ApiOperation(value = "绑定角色与菜单关联关系", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/bindMenus")
+    public ApiResult<?> bindMenus(@RequestBody @Valid AdminBindRoleMenuRelationDTO dto) {
+        Set<String> newPermissions = sysRoleService.adminBindMenus(dto);
 
-    @ApiOperation(value = "取所有可见菜单", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping("/all")
-    public ApiResult<List<SysMenuBO>> adminListVisibleMenu() {
-        return ApiResult.data(sysMenuService.adminListVisibleMenu());
+        // 覆盖更新缓存
+        rolePermissionCacheHelper.putCache(dto.getRoleId(), newPermissions);
+
+        return ApiResult.success();
     }
 
 }

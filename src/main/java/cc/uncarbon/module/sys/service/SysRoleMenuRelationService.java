@@ -57,6 +57,9 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
 
     /**
      * 绑定角色ID与菜单ID关联关系，增量更新
+     *
+     * @param roleId 角色ID
+     * @param menuIds 新菜单ID集合
      */
     @Transactional(rollbackFor = Exception.class)
     public void cleanAndBind(Long roleId, Collection<Long> menuIds) {
@@ -75,19 +78,12 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
         /*
         先删除不再需要的关联关系
          */
-        int effectedRows = this.getBaseMapper().delete(
+        this.remove(
                 new QueryWrapper<SysRoleMenuRelationEntity>()
                         .lambda()
                         .eq(SysRoleMenuRelationEntity::getRoleId, roleId)
                         .notIn(SysRoleMenuRelationEntity::getMenuId, menuIds)
         );
-
-        /*
-        如果新旧菜单一致，那么 effectedRows 将等于 0，不继续执行
-         */
-        if (effectedRows <= 0) {
-            return;
-        }
 
         /*
         取出需要增量更新的部分
@@ -100,16 +96,18 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
         /*
         构造 && 批量插入
          */
-        List<SysRoleMenuRelationEntity> entityList = new ArrayList<>(menuIds.size());
-        menuIds.forEach(
-                menuId -> entityList.add(SysRoleMenuRelationEntity.builder()
-                        .roleId(roleId)
-                        .menuId(menuId)
-                        .build()
-                )
-        );
+        if (!menuIds.isEmpty()) {
+            List<SysRoleMenuRelationEntity> entityList = new ArrayList<>();
+            menuIds.forEach(
+                    menuId -> entityList.add(SysRoleMenuRelationEntity.builder()
+                            .roleId(roleId)
+                            .menuId(menuId)
+                            .build()
+                    )
+            );
 
-        this.saveBatch(entityList);
+            this.saveBatch(entityList);
+        }
     }
 
     /**

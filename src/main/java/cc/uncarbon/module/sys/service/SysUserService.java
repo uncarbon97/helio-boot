@@ -43,9 +43,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
 
 
 /**
@@ -55,6 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserEntity> {
 
     private final SysRoleService sysRoleService;
@@ -69,20 +74,12 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
     private final SysUserRoleRelationService sysUserRoleRelationService;
 
-    private final boolean isTenantEnabled;
+    private final HelioProperties helioProperties;
 
-    public SysUserService(SysRoleService sysRoleService, SysDeptService sysDeptService,
-            SysMenuService sysMenuService, SysTenantService sysTenantService,
-            SysUserDeptRelationService sysUserDeptRelationService,
-            SysUserRoleRelationService sysUserRoleRelationService,
-            HelioProperties helioProperties) {
-        this.sysRoleService = sysRoleService;
-        this.sysDeptService = sysDeptService;
-        this.sysMenuService = sysMenuService;
-        this.sysTenantService = sysTenantService;
-        this.sysUserDeptRelationService = sysUserDeptRelationService;
-        this.sysUserRoleRelationService = sysUserRoleRelationService;
+    private boolean isTenantEnabled;
 
+    @PostConstruct
+    public void postConstruct() {
         this.isTenantEnabled = helioProperties.getTenant().getEnabled();
     }
 
@@ -101,6 +98,32 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         );
 
         return this.entityPage2BOPage(entityPage);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @return null or BO
+     */
+    public SysUserBO getOneById(Long id) {
+        return this.getOneById(id, false);
+    }
+
+    /**
+     * 根据 ID 取详情
+     *
+     * @param id 主键ID
+     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
+     * @return null or BO
+     */
+    public SysUserBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysUserEntity entity = this.getById(id);
+        if (throwIfInvalidId) {
+            SysErrorEnum.INVALID_ID.assertNotNull(entity);
+        }
+
+        return this.entity2BO(entity);
     }
 
     /**
@@ -157,32 +180,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台用户] >> 入参={}", ids);
         this.removeByIds(ids);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @return null or BO
-     */
-    public SysUserBO getOneById(Long id) {
-        return this.getOneById(id, false);
-    }
-
-    /**
-     * 根据 ID 取详情
-     *
-     * @param id 主键ID
-     * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @return null or BO
-     */
-    public SysUserBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysUserEntity entity = this.getById(id);
-        if (throwIfInvalidId) {
-            SysErrorEnum.INVALID_ID.assertNotNull(entity);
-        }
-
-        return this.entity2BO(entity);
     }
 
     /**
