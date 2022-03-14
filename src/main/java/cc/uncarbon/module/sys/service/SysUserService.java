@@ -241,7 +241,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         BeanUtil.copyProperties(sysUserBO, ret);
 
         // 使用并行流提升效率
-        HashSet<String> permissions = new HashSet<>(roleIdPermissionMap.size() * 32);
+        HashSet<String> permissions = new HashSet<>(roleIdPermissionMap.size() * 64);
         roleIdPermissionMap.values().parallelStream().forEach(permissions::addAll);
 
         ret
