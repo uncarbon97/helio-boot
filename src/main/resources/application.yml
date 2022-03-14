@@ -15,7 +15,7 @@ spring:
       cache-null-values: true
   mvc:
     pathmatch:
-      # Boot 2.6+ 默认的
+      # Boot 2.6+ 默认的路由匹配策略，Swagger 暂不兼容，使用老策略
       matching-strategy: ant_path_matcher
 
 helio:
@@ -50,8 +50,6 @@ helio:
       - sys_role_menu_relation
       - sys_user_dept_relation
       - sys_user_role_relation
-  web-logging:
-    enabled-request-log: false
 
 knife4j:
   # 保持true
@@ -63,8 +61,6 @@ knife4j:
 
 server:
   port: 7003
-  http2:
-    enabled: true
 
 mybatis-plus:
   # 枚举和XML扫描，支持统配符 * 或者 ; 分割
@@ -73,7 +69,7 @@ mybatis-plus:
 
 logging:
   level:
-    # 指定日志级别
+    # 指定日志级别，开发、测试环境建议为 DEBUG，生产环境建议为 INFO
     cc.uncarbon: DEBUG
 
 sa-token:
