@@ -187,8 +187,9 @@
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
 
     <logger name="io.undertow" level="WARN"/>
-    <logger name="com.alibaba.nacos" level="INFO"/>
+    <logger name="com.alibaba.nacos.client" level="ERROR"/>
     <logger name="org.apache.dubbo.common.Version" level="off"/>
+    <logger name="org.apache.dubbo.registry.nacos.NacosRegistry" level="ERROR"/>
 
     <!-- 默认日志输出级别 -->
     <root level="WARN">
