@@ -1,6 +1,5 @@
 package cc.uncarbon.module.sys.service;
 
-import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.context.TenantContext;
 import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContextHolder;
@@ -43,13 +42,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
 
 
 /**
@@ -312,12 +309,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 根据用户账号查询
      */
     public SysUserEntity getUserByPin(String pin) {
-        return this.getOne(
-                new QueryWrapper<SysUserEntity>()
-                        .lambda()
-                        .eq(SysUserEntity::getPin, pin)
-                        .last(HelioConstant.CRUD.SQL_LIMIT_1)
-        );
+        return this.getBaseMapper().getUserByPin(pin);
     }
 
     /**

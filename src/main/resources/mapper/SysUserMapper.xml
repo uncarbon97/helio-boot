@@ -2,6 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.uncarbon.module.sys.mapper.SysUserMapper">
 
+    <select id="getUserByPin" resultType="cc.uncarbon.module.sys.entity.SysUserEntity">
+        SELECT *
+        FROM sys_user
+        WHERE pin = #{pin}
+        LIMIT 1
+    </select>
+
     <update id="updateLastLoginAt">
         UPDATE sys_user
         SET last_login_at = #{lastLoginAt}
@@ -9,14 +16,15 @@
     </update>
 
     <select id="getBaseInfoByUserId" resultType="cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO">
-        SELECT pin AS username,
-               nickname,
-               status,
-               gender,
-               email,
-               phone_no
+        SELECT pin AS username
+               , nickname
+               , status
+               , gender
+               , email
+               , phone_no
         FROM sys_user
-        WHERE id = #{userId} LIMIT 1
+        WHERE id = #{userId}
+        LIMIT 1
     </select>
 
 </mapper>

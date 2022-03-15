@@ -41,8 +41,10 @@ helio:
       # C端登录接口
       - /app/api/v1/auth/login
   tenant:
-    # 是否开启多租户
-    enabled: false
+    # 是否开启多租户，详情请见文档【进阶使用-多租户】
+    enabled: true
+    # 多租户隔离级别
+    isolate-level: LINE
     ignored-tables:
       # 以下表不参与租户隔离
       - sys_menu
