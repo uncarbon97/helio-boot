@@ -31,7 +31,8 @@ public class RolePermissionCacheHelper {
      */
     public List<String> getUserPermissions() {
         Set<Long> rolesIds = UserContextHolder.getUserContext().getRolesIds();
-        List<String> ret = new ArrayList<>(rolesIds.size() * 64);
+        // aka * 64
+        List<String> ret = new ArrayList<>(rolesIds.size() << 6);
 
         rolesIds.forEach(
                 roleId -> {

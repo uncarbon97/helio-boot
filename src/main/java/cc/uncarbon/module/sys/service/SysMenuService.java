@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -325,24 +328,27 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     private Set<Long> listCurrentUserVisibleMenuId() {
         // 1. 取当前账号拥有角色Ids
         Set<Long> roleIds = UserContextHolder.getUserContext().getRolesIds();
-        log.debug("[后台管理][取当前账号可见菜单Ids] 当前账号拥有角色Ids >> {}", roleIds);
         SysErrorEnum.NO_ROLE_AVAILABLE_FOR_CURRENT_USER.assertNotEmpty(roleIds);
 
-        // 2. 超级管理员直接允许所有菜单，即使是禁用状态
+        // 2. 得到所有可用的 菜单ID-上级菜单ID map，备用
+        Map<Long, Long> allMenuMap = this.list(
+                new QueryWrapper<SysMenuEntity>()
+                        .lambda()
+                        .select(SysMenuEntity::getId, SysMenuEntity::getParentId)
+                        .eq(SysMenuEntity::getStatus, GenericStatusEnum.ENABLED)
+        ).stream().collect(Collectors.toMap(SysMenuEntity::getId, SysMenuEntity::getParentId, ignoredThrowingMerger()));
+
+        // 3. 超级管理员直接返回所有菜单
         if (roleIds.contains(SysConstant.SUPER_ADMIN_ROLE_ID)) {
-            return this.list(
-                    new QueryWrapper<SysMenuEntity>()
-                            .lambda()
-                            .select(SysMenuEntity::getId)
-            ).stream().map(SysMenuEntity::getId).collect(Collectors.toSet());
+            return new HashSet<>(allMenuMap.keySet());
         }
 
-        // 3. 根据角色Ids取菜单Ids
-        Set<Long> menuIds = sysRoleMenuRelationService.listMenuIdByRoleIds(roleIds);
-        log.debug("[后台管理][取当前账号可见菜单Ids] 根据角色Ids取菜单Ids >> {}", menuIds);
-        SysErrorEnum.NO_MENU_AVAILABLE_FOR_CURRENT_ROLE.assertNotEmpty(menuIds);
+        // 4. 根据现有角色，获取直接关联的菜单ID
+        Set<Long> directlyRelatedMenuIds = sysRoleMenuRelationService.listMenuIdByRoleIds(roleIds);
+        SysErrorEnum.NO_MENU_AVAILABLE_FOR_CURRENT_ROLE.assertNotEmpty(directlyRelatedMenuIds);
 
-        return menuIds;
+        // 5. 因为直接关联的菜单ID，可能不包含父级菜单，使得级联关系缺失，这里得给他补上
+        return this.traceParentMenuIds(allMenuMap, directlyRelatedMenuIds);
     }
 
     private List<SysMenuBO> listByIds(Collection<Long> visibleMenuIds, List<SysMenuTypeEnum> requiredMenuTypes)
@@ -398,5 +404,53 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                 throw new BusinessException(400, "已存在相同权限标识，请重新输入");
             }
         }
+    }
+
+    /**
+     * 追溯并补充可能缺失的级联上级菜单ID
+     *
+     * @param allMenuMap 完整的 菜单ID-上级菜单ID map
+     * @param directlyRelatedMenuIds 当前用户直接关联的菜单ID集合
+     * @return Set<Long> 已经补充好的、完整的菜单ID集合
+     */
+    private Set<Long> traceParentMenuIds(Map<Long, Long> allMenuMap, Collection<Long> directlyRelatedMenuIds) {
+        // 返回值
+        Set<Long> ret = new HashSet<>(directlyRelatedMenuIds.size() << 1);
+        ret.addAll(directlyRelatedMenuIds);
+
+        // 本次循环要遍历的菜单ID集合
+        HashSet<Long> thisLoop;
+        // 下次循环要遍历的菜单ID集合
+        HashSet<Long> nextLoop = new HashSet<>(directlyRelatedMenuIds);
+
+        do {
+            // 深拷贝数据，用于本次循环
+            thisLoop = new HashSet<>(nextLoop);
+            nextLoop.clear();
+
+            for (Long menuId : thisLoop) {
+                Long parentId = allMenuMap.get(menuId);
+
+                if (Objects.nonNull(parentId)) {
+                    // 上级菜单可能还会有祖级菜单，需要继续上溯
+                    nextLoop.add(parentId);
+                }
+            }
+
+            ret.addAll(nextLoop);
+
+        } while (!nextLoop.isEmpty());
+
+        return ret;
+    }
+
+    /**
+     * 原来键冲突会报错，使用自定义函数来无视
+     *
+     * @param <T> 键类型
+     * @return 键
+     */
+    private static <T> BinaryOperator<T> ignoredThrowingMerger() {
+        return (u, v) -> u;
     }
 }

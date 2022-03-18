@@ -2,7 +2,7 @@ package cc.uncarbon.module.sys.model.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +27,6 @@ public class AdminBindRoleMenuRelationDTO implements Serializable {
     private Long roleId;
 
     @ApiModelProperty(value = "菜单Ids(空=清理关联关系后不再绑定任何菜单)")
-    private List<Long> menuIds;
+    private Set<Long> menuIds;
 
 }

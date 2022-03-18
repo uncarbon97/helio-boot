@@ -26,8 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -201,17 +199,15 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     }
 
     /**
-     * 通用-根据租户ID(非主键ID)查询
+     * 根据租户ID(非主键ID)，得到租户实体
      */
-    public SysTenantBO getTenantByTenantId(Long tenantId) {
-        SysTenantEntity entity = this.getOne(
+    public SysTenantEntity getTenantEntityByTenantId(Long tenantId) {
+        return this.getOne(
                 new QueryWrapper<SysTenantEntity>()
                         .lambda()
                         .eq(SysTenantEntity::getTenantId, tenantId)
                         .last(HelioConstant.CRUD.SQL_LIMIT_1)
         );
-
-        return this.entity2BO(entity);
     }
 
     /*
