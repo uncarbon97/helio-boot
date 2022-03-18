@@ -1,5 +1,6 @@
 package cc.uncarbon.module.sys.service;
 
+import cc.uncarbon.framework.core.constant.HelioConstant.CRUD;
 import cc.uncarbon.framework.core.context.TenantContext;
 import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContextHolder;
@@ -9,6 +10,7 @@ import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
 import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
@@ -21,7 +23,6 @@ import cc.uncarbon.module.sys.model.request.AdminResetSysUserPasswordDTO;
 import cc.uncarbon.module.sys.model.request.AdminUpdateCurrentSysUserPasswordDTO;
 import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
-import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cc.uncarbon.module.sys.model.response.SysUserBO;
 import cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
@@ -33,8 +34,10 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -185,15 +188,20 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "登录后台用户")
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
         /*
-        这里是实际启用了多租户功能，并信任前端主动传欲登录的租户ID
+        这里是实际启用了多租户功能，并主动指定租户ID
         实际生产应用时，推荐前端传值加密，后端在此解密
+
+        表级、数据源级多租户，登录前【必须】主动指定租户ID
+        e.g. dto.setTenantId(101L)
          */
+
+        dto.setTenantId(101L);
 
         // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
         TenantContext tenantContext = new TenantContext();
         if (isTenantEnabled && ObjectUtil.isNotNull(dto.getTenantId())) {
-            // 验证通过，将所属租户写入租户上下文，使得 SQL 拦截器可以正确执行
             tenantContext = this.checkAndGetTenantContext(dto.getTenantId());
+            // 验证通过，将所属租户写入租户上下文，使得 SQL 拦截器可以正确执行
             TenantContextHolder.setTenantContext(tenantContext);
         }
 
@@ -222,28 +230,28 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         }
 
         try {
-            this.getBaseMapper().updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
+            this.updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
         } catch (Exception ignored) {
             // 实际开发环境请删除本try-catch块
         }
 
-        // 取账号完整BO
+        // 取账号完整信息
         SysUserBO sysUserBO = this.entity2BO(sysUserEntity);
+        Map<Long, String> roleMap = sysRoleService.getRoleMapByUserId(sysUserBO.getId());
 
-        Map<Long, Set<String>> roleIdPermissionMap = sysMenuService.getRoleIdPermissionMap(
-                sysUserBO.getRoleMap().keySet());
+        Map<Long, Set<String>> roleIdPermissionMap = sysMenuService.getRoleIdPermissionMap(roleMap.keySet());
 
         // 包装返回体；有的字段类型不一致, 单独转换
         SysUserLoginBO ret = new SysUserLoginBO();
         BeanUtil.copyProperties(sysUserBO, ret);
 
-        // 使用并行流提升效率
-        HashSet<String> permissions = new HashSet<>(roleIdPermissionMap.size() * 64);
-        roleIdPermissionMap.values().parallelStream().forEach(permissions::addAll);
+        // aka * 64
+        HashSet<String> permissions = new HashSet<>(roleIdPermissionMap.size() << 6);
+        roleIdPermissionMap.values().forEach(permissions::addAll);
 
         ret
-                .setRoleIds(new HashSet<>(sysUserBO.getRoleMap().keySet()))
-                .setRoles(new ArrayList<>(sysUserBO.getRoleMap().values()))
+                .setRoleIds(new HashSet<>(roleMap.keySet()))
+                .setRoles(new ArrayList<>(roleMap.values()))
                 .setPermissions(permissions)
                 .setRoleIdPermissionMap(roleIdPermissionMap)
                 .setTenantContext(tenantContext)
@@ -309,7 +317,11 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 根据用户账号查询
      */
     public SysUserEntity getUserByPin(String pin) {
-        return this.getBaseMapper().getUserByPin(pin);
+        return this.getOne(
+                new LambdaQueryWrapper<SysUserEntity>()
+                        .eq(SysUserEntity::getPin, pin)
+                        .last(CRUD.SQL_LIMIT_1)
+        );
     }
 
     /**
@@ -340,11 +352,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        Map<Long, String> roleMap = sysRoleService.getRoleMapByUserId(bo.getId());
-        bo
-                .setRoleMap(roleMap)
-                .setRoleIds(roleMap.keySet());
-
         SysDeptBO dept = sysDeptService.getPlainDeptByUserId(bo.getId());
         if (dept != null) {
             bo
@@ -409,20 +416,29 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * @return TenantContext
      */
     private TenantContext checkAndGetTenantContext(Long tenantId) throws BusinessException {
-        // 查询所属租户是否仍有效，这里是直接查库，可以自行改造为从缓存读取
-        SysTenantBO tenantInfo = sysTenantService.getTenantByTenantId(tenantId);
-        if (tenantInfo == null) {
+        // 查询租户是否仍有效
+        SysTenantEntity tenantEntity = sysTenantService.getTenantEntityByTenantId(tenantId);
+        if (tenantEntity == null) {
             throw new BusinessException(SysErrorEnum.INVALID_TENANT);
         }
 
-        if (GenericStatusEnum.DISABLED.equals(tenantInfo.getStatus())) {
+        if (GenericStatusEnum.DISABLED.equals(tenantEntity.getStatus())) {
             throw new BusinessException(SysErrorEnum.DISABLED_TENANT);
         }
 
         return TenantContext.builder()
-                .tenantId(tenantInfo.getTenantId())
-                .tenantName(tenantInfo.getTenantName())
+                .tenantId(tenantEntity.getTenantId())
+                .tenantName(tenantEntity.getTenantName())
                 .build()
         ;
+    }
+
+    private void updateLastLoginAt(Long userId, LocalDateTime lastLoginAt) {
+        SysUserEntity entity = new SysUserEntity();
+        entity
+                .setLastLoginAt(lastLoginAt)
+                .setId(userId)
+                ;
+        this.updateById(entity);
     }
 }

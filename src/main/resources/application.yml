@@ -44,14 +44,11 @@ helio:
     # 是否开启多租户，详情请见文档【进阶使用-多租户】
     enabled: true
     # 多租户隔离级别
-    isolate-level: LINE
+    isolate-level: TABLE
     ignored-tables:
-      # 以下表不参与租户隔离
+      # 以下表不参与多租户 SQL 拦截器条件拼接
       - sys_menu
       - sys_tenant
-      - sys_role_menu_relation
-      - sys_user_dept_relation
-      - sys_user_role_relation
 
 knife4j:
   # 保持true

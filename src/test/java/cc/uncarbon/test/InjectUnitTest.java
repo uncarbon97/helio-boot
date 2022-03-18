@@ -1,6 +1,7 @@
 package cc.uncarbon.test;
 
 import cc.uncarbon.HelioBootApplication;
+import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.support.TenantSupport;
 import cc.uncarbon.framework.crud.support.impl.DefaultTenantSupport;
@@ -25,11 +26,13 @@ class InjectUnitTest {
     private Boolean tenantEnabled;
 
     @Test
-    public void init() {
-        System.out.println(tenantEnabled);
-        System.out.println(helioProperties);
-        System.out.println(helioProperties.getTenant().getEnabled());
-        System.out.println(helioProperties.getTenant().getIgnoredTables());
-        System.out.println(tenantSupport.getClass().isAssignableFrom(DefaultTenantSupport.class));
+    void init() {
+        throw new BusinessException(500, "template test {} {} {} {} {}",
+                tenantEnabled,
+                helioProperties,
+                helioProperties.getTenant().getEnabled(),
+                helioProperties.getTenant().getIgnoredTables(),
+                tenantSupport.getClass().isAssignableFrom(DefaultTenantSupport.class)
+                );
     }
 }

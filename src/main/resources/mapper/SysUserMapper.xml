@@ -9,12 +9,6 @@
         LIMIT 1
     </select>
 
-    <update id="updateLastLoginAt">
-        UPDATE sys_user
-        SET last_login_at = #{lastLoginAt}
-        WHERE id = #{userId}
-    </update>
-
     <select id="getBaseInfoByUserId" resultType="cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO">
         SELECT pin AS username
                , nickname
