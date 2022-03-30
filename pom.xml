@@ -72,6 +72,10 @@
         </dependency>
 
         <!-- 这里写其他第三方依赖 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+        </dependency>
 
     </dependencies>
 
