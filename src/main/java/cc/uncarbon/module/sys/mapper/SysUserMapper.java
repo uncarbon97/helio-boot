@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Param;
 public interface SysUserMapper extends BaseMapper<SysUserEntity> {
 
     /**
-     * 取用户实体，忽略租户拦截器
+     * 取用户实体，忽略行级租户拦截器
      * @param pin 账号
      * @return SysUserEntity
      */
@@ -24,7 +24,7 @@ public interface SysUserMapper extends BaseMapper<SysUserEntity> {
     SysUserEntity getUserByPin(@Param(value = "pin") String pin);
 
     /**
-     * 取用户基本信息，忽略租户拦截器
+     * 取用户基本信息，忽略行级租户拦截器
      * @param userId 用户ID
      * @return SysUserBaseInfoBO
      */

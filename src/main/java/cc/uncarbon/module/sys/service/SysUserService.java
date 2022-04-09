@@ -301,20 +301,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 根据用户账号查询
      */
     public SysUserEntity getUserByPin(String pin) {
-        /*return this.getOne(
-                new LambdaQueryWrapper<SysUserEntity>()
-                        .eq(SysUserEntity::getPin, pin)
-                        .last(CRUD.SQL_LIMIT_1)
-        );*/
-
         return this.getBaseMapper().getUserByPin(pin);
-    }
-
-    /**
-     * 取用户基本信息
-     */
-    public SysUserBaseInfoBO getBaseInfoById(Long entityId) {
-        return this.getBaseMapper().getBaseInfoByUserId(entityId);
     }
 
     /*

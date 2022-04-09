@@ -60,22 +60,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- 多租户支持 -->
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-tenant</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>cc.uncarbon.framework</groupId>
             <artifactId>helio-starter-web</artifactId>
         </dependency>
 
         <!-- 这里写其他第三方依赖 -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
-        </dependency>
 
     </dependencies>
 
