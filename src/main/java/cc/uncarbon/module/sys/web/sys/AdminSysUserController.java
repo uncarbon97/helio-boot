@@ -1,4 +1,4 @@
-package cc.uncarbon.module.sys.web;
+package cc.uncarbon.module.sys.web.sys;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.exception.BusinessException;

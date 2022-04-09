@@ -30,6 +30,9 @@ public enum SysErrorEnum implements HelioBaseEnum<Integer> {
     NO_ROLE_AVAILABLE_FOR_CURRENT_USER(400, "当前用户没有可用角色"),
 
     NO_MENU_AVAILABLE_FOR_CURRENT_ROLE(400, "当前角色没有可用菜单"),
+
+    UUID_CANNOT_BE_BLANK(400, "UUID不能为空"),
+
     ;
 
     private final Integer value;

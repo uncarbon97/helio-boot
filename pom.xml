@@ -60,12 +60,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- 多租户支持 -->
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-tenant</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>cc.uncarbon.framework</groupId>
             <artifactId>helio-starter-web</artifactId>
