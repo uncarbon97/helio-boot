@@ -1,75 +1,71 @@
 package cc.uncarbon.module.sys.service;
 
-import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.context.TenantContext;
+import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
+import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
 import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
-import cc.uncarbon.module.sys.model.request.AdminBindUserRoleRelationDTO;
-import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysUserDTO;
-import cc.uncarbon.module.sys.model.request.AdminResetSysUserPasswordDTO;
-import cc.uncarbon.module.sys.model.request.AdminUpdateCurrentSysUserPasswordDTO;
-import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
-import cc.uncarbon.module.sys.model.response.SysDeptBO;
-import cc.uncarbon.module.sys.model.response.SysRoleBO;
-import cc.uncarbon.module.sys.model.response.SysTenantBO;
-import cc.uncarbon.module.sys.model.response.SysUserBO;
-import cc.uncarbon.module.sys.model.response.SysUserBaseInfoBO;
-import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
-import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoBO;
+import cc.uncarbon.module.sys.model.request.*;
+import cc.uncarbon.module.sys.model.response.*;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.*;
+
 
 /**
  * 后台用户
+ *
  * @author Uncarbon
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserEntity> {
 
-    @Resource
-    private SysRoleService sysRoleService;
+    private final SysRoleService sysRoleService;
 
-    @Resource
-    private SysDeptService sysDeptService;
+    private final SysDeptService sysDeptService;
 
-    @Resource
-    private SysMenuService sysMenuService;
+    private final SysMenuService sysMenuService;
 
-    @Resource
-    private SysTenantService sysTenantService;
+    private final SysTenantService sysTenantService;
 
-    @Resource
-    private SysUserDeptRelationService sysUserDeptRelationService;
+    private final SysUserDeptRelationService sysUserDeptRelationService;
 
-    @Resource
-    private SysUserRoleRelationService sysUserRoleRelationService;
+    private final SysUserRoleRelationService sysUserRoleRelationService;
 
+    private final HelioProperties helioProperties;
+
+    private boolean isTenantEnabled;
+
+    @PostConstruct
+    public void postConstruct() {
+        this.isTenantEnabled = helioProperties.getTenant().getEnabled();
+    }
 
     /**
      * 后台管理-分页列表
@@ -89,40 +85,40 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     }
 
     /**
-     * 通用-详情
+     * 根据 ID 取详情
      *
-     * @deprecated 使用 getOneById(java.lang.Long, boolean, boolean) 替代
+     * @param id 主键ID
+     * @return null or BO
      */
-    @Deprecated
-    public SysUserBO getOneById(Long entityId) throws BusinessException {
-        return this.getOneById(entityId, true, false);
+    public SysUserBO getOneById(Long id) {
+        return this.getOneById(id, false);
     }
 
     /**
-     * 通用-详情
+     * 根据 ID 取详情
      *
-     * @param entityId 实体类主键ID
+     * @param id 主键ID
      * @param throwIfInvalidId 是否在 ID 无效时抛出异常
-     * @param joinFullRolesAndPermissions 是否显示完整角色和权限信息
      * @return null or BO
      */
-    public SysUserBO getOneById(Long entityId, boolean throwIfInvalidId, boolean joinFullRolesAndPermissions) throws BusinessException {
-        SysUserEntity entity = this.getById(entityId);
+    public SysUserBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysUserEntity entity = this.getById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
 
-        return this.entity2BO(entity, joinFullRolesAndPermissions);
+        return this.entity2BO(entity);
     }
 
     /**
      * 后台管理-新增
+     *
      * @return 主键ID
      */
     @SysLog(value = "新增后台用户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysUserDTO dto) {
-        log.info("[后台管理-新增后台用户] >> DTO={}", dto);
+        log.info("[后台管理-新增后台用户] >> 入参={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -149,7 +145,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "编辑后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysUserDTO dto) {
-        log.info("[后台管理-编辑后台用户] >> DTO={}", dto);
+        log.info("[后台管理-编辑后台用户] >> 入参={}", dto);
         this.checkExistence(dto);
 
         SysUserEntity updateEntity = new SysUserEntity();
@@ -166,7 +162,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "删除后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除后台用户] >> ids={}", ids);
+        log.info("[后台管理-删除后台用户] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 
@@ -175,8 +171,23 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      */
     @SysLog(value = "登录后台用户")
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
-        // 主动清空用户上下文，避免残留租户ID导致的尴尬
-        UserContextHolder.setUserContext(null);
+        /*
+        这里是实际启用了多租户功能，并主动指定租户ID
+        实际生产应用时，推荐前端传值加密，后端在此解密
+
+        表级、数据源级多租户，登录前【必须】主动指定租户ID
+        e.g. dto.setTenantId(101L)
+         */
+
+        dto.setTenantId(101L);
+
+        // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
+        TenantContext tenantContext = new TenantContext();
+        if (isTenantEnabled && ObjectUtil.isNotNull(dto.getTenantId())) {
+            tenantContext = this.checkAndGetTenantContext(dto.getTenantId());
+            // 验证通过，将所属租户写入租户上下文，使得 SQL 拦截器可以正确执行
+            TenantContextHolder.setTenantContext(tenantContext);
+        }
 
         SysUserEntity sysUserEntity = this.getUserByPin(dto.getUsername());
         if (sysUserEntity == null) {
@@ -191,47 +202,43 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             throw new BusinessException(SysErrorEnum.BANNED_USER);
         }
 
-        // 查询所属租户是否有效
-        SysTenantBO tenantInfo = sysTenantService.getTenantByTenantId(sysUserEntity.getTenantId());
-        if (tenantInfo == null) {
-            throw new BusinessException(SysErrorEnum.INVALID_TENANT);
-        }
-
-        if (GenericStatusEnum.DISABLED.equals(tenantInfo.getStatus())) {
-            throw new BusinessException(SysErrorEnum.DISABLED_TENANT);
-        }
-
         /*
         以上为有效性校验, 进入实际业务逻辑
         ---------------------------------------------------
          */
 
-        // 将所属租户写入到用户上下文，使得 Mybatis-Plus 多租户拦截器可以正确执行到对应租户ID
-        TenantContext currentTenantContext = TenantContext.builder()
-                .tenantId(tenantInfo.getTenantId())
-                .tenantName(tenantInfo.getTenantName())
-                .build();
-        UserContextHolder.setRelationalTenant(currentTenantContext);
+        if (isTenantEnabled && ObjectUtil.isNotNull(sysUserEntity.getTenantId())) {
+            // 二次赋值，以防万一（也许前端没有传租户ID，上方的 if 块并没有执行）
+            tenantContext = this.checkAndGetTenantContext(sysUserEntity.getTenantId());
+            TenantContextHolder.setTenantContext(tenantContext);
+        }
 
         try {
-            this.getBaseMapper().updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
+            this.updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
         } catch (Exception ignored) {
             // 实际开发环境请删除本try-catch块
         }
 
+        // 取账号完整信息
+        SysUserBO sysUserBO = this.entity2BO(sysUserEntity);
+        Map<Long, String> roleMap = sysRoleService.getRoleMapByUserId(sysUserBO.getId());
 
-        // 取账号完整BO
-        SysUserBO sysUserBO = this.getOneById(sysUserEntity.getId(), true, true);
+        Map<Long, Set<String>> roleIdPermissionMap = sysMenuService.getRoleIdPermissionMap(roleMap.keySet());
 
+        // 包装返回体；有的字段类型不一致, 单独转换
         SysUserLoginBO ret = new SysUserLoginBO();
         BeanUtil.copyProperties(sysUserBO, ret);
 
-        // 因字段类型不一致, 单独转换
+        // aka * 64
+        HashSet<String> permissions = new HashSet<>(roleIdPermissionMap.size() << 6);
+        roleIdPermissionMap.values().forEach(permissions::addAll);
+
         ret
-                .setRoleIds(sysUserBO.getRoles().stream().map(SysRoleBO::getId).filter(ObjectUtil::isNotNull).sorted().collect(Collectors.toList()))
-                .setRoles(sysUserBO.getRoles().stream().map(SysRoleBO::getValue).filter(StrUtil::isNotBlank).collect(Collectors.toList()))
-                .setPermissions(sysUserBO.getPermissions())
-                .setRelationalTenant(currentTenantContext)
+                .setRoleIds(new HashSet<>(roleMap.keySet()))
+                .setRoles(new ArrayList<>(roleMap.values()))
+                .setPermissions(permissions)
+                .setRoleIdPermissionMap(roleIdPermissionMap)
+                .setTenantContext(tenantContext)
         ;
 
         return ret;
@@ -240,9 +247,9 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-取当前用户信息
      */
-    public VbenAdminUserInfoBO adminGetCurrentUserInfo() {
-        SysUserBO sysUserBO = this.getOneById(UserContextHolder.getUserId(), true, false);
-        return VbenAdminUserInfoBO.builder()
+    public VbenAdminUserInfoVO adminGetCurrentUserInfo() {
+        SysUserBO sysUserBO = this.getOneById(UserContextHolder.getUserId(), true);
+        return VbenAdminUserInfoVO.builder()
                 .username(sysUserBO.getUsername())
                 .nickname(sysUserBO.getNickname())
                 .lastLoginAt(sysUserBO.getLastLoginAt())
@@ -260,7 +267,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         templateEntity
                 .setPwd(PwdUtil.encrypt(dto.getRandomPassword(), sysUserEntity.getSalt()))
                 .setId(dto.getUserId())
-                ;
+        ;
 
         this.updateById(templateEntity);
     }
@@ -284,37 +291,32 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     }
 
     /**
-     * 通用-根据用户账号查询
-     */
-    public SysUserEntity getUserByPin(String pin) {
-        return this.getOne(
-                new QueryWrapper<SysUserEntity>()
-                        .lambda()
-                        .eq(SysUserEntity::getPin, pin)
-                        .last(HelioConstant.CRUD.SQL_LIMIT_1)
-        );
-    }
-
-    /**
-     * 通用-取用户基本信息
-     */
-    public SysUserBaseInfoBO getBaseInfoById(Long entityId) {
-        return this.getBaseMapper().getBaseInfoByUserId(entityId);
-    }
-
-    /**
      * 后台管理-绑定用户与角色关联关系
      */
     public void adminBindRoles(AdminBindUserRoleRelationDTO dto) {
         sysUserRoleRelationService.cleanAndBind(dto.getUserId(), dto.getRoleIds());
     }
 
+    /**
+     * 根据用户账号查询
+     */
+    public SysUserEntity getUserByPin(String pin) {
+        return this.getBaseMapper().getUserByPin(pin);
+    }
+
     /*
-    私  有  方  法
-    ------------------------------------------------------------------------------------------------
+    ----------------------------------------------------------------
+                        私有方法 private methods
+    ----------------------------------------------------------------
      */
 
-    private SysUserBO entity2BO(SysUserEntity entity, boolean joinFullRolesAndPermissions) {
+    /**
+     * 实体转 BO
+     *
+     * @param entity 实体
+     * @return BO
+     */
+    private SysUserBO entity2BO(SysUserEntity entity) {
         if (entity == null) {
             return null;
         }
@@ -323,8 +325,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        bo.setRoleIds(sysUserRoleRelationService.listRoleIdByUserId(bo.getId()));
-
         SysDeptBO dept = sysDeptService.getPlainDeptByUserId(bo.getId());
         if (dept != null) {
             bo
@@ -333,27 +333,40 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             ;
         }
 
-        if (joinFullRolesAndPermissions) {
-            List<SysRoleBO> roleBOs = sysRoleService.listRoleByUserId(bo.getId());
-            bo
-                    .setRoles(roleBOs)
-                    .setPermissions(sysMenuService.adminListPermissionByRoleIds(roleBOs.stream().map(SysRoleBO::getId).collect(Collectors.toList())))
-            ;
-        }
-
         return bo;
     }
 
-    private PageResult<SysUserBO> entityPage2BOPage(Page<SysUserEntity> entityPage) {
+    /**
+     * 实体 List 转 BO List
+     *
+     * @param entityList 实体 List
+     * @return BO List
+     */
+    private List<SysUserBO> entityList2BOs(List<SysUserEntity> entityList) {
+        if (CollUtil.isEmpty(entityList)) {
+            return Collections.emptyList();
+        }
+
         // 深拷贝
-        List<SysUserBO> boRecords = new ArrayList<>(entityPage.getRecords().size());
-        entityPage.getRecords().forEach(
-                entity -> boRecords.add(this.entity2BO(entity, false))
+        List<SysUserBO> ret = new ArrayList<>(entityList.size());
+        entityList.forEach(
+                entity -> ret.add(this.entity2BO(entity))
         );
 
+        return ret;
+    }
+
+    /**
+     * 实体分页转 BO 分页
+     *
+     * @param entityPage 实体分页
+     * @return BO 分页
+     */
+    private PageResult<SysUserBO> entityPage2BOPage(Page<SysUserEntity> entityPage) {
         PageResult<SysUserBO> ret = new PageResult<>();
         BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(boRecords);
+        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
+
         return ret;
     }
 
@@ -368,5 +381,37 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同账号，请重新输入");
         }
+    }
+
+    /**
+     * 检查并获取租户上下文 bean，无效或被禁用则直接抛出异常
+     * @param tenantId 租户ID
+     * @return TenantContext
+     */
+    private TenantContext checkAndGetTenantContext(Long tenantId) throws BusinessException {
+        // 查询租户是否仍有效
+        SysTenantEntity tenantEntity = sysTenantService.getTenantEntityByTenantId(tenantId);
+        if (tenantEntity == null) {
+            throw new BusinessException(SysErrorEnum.INVALID_TENANT);
+        }
+
+        if (GenericStatusEnum.DISABLED.equals(tenantEntity.getStatus())) {
+            throw new BusinessException(SysErrorEnum.DISABLED_TENANT);
+        }
+
+        return TenantContext.builder()
+                .tenantId(tenantEntity.getTenantId())
+                .tenantName(tenantEntity.getTenantName())
+                .build()
+        ;
+    }
+
+    private void updateLastLoginAt(Long userId, LocalDateTime lastLoginAt) {
+        SysUserEntity entity = new SysUserEntity();
+        entity
+                .setLastLoginAt(lastLoginAt)
+                .setId(userId)
+                ;
+        this.updateById(entity);
     }
 }

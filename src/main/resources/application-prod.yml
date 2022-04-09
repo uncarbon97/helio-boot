@@ -14,6 +14,10 @@ helio:
     db-password: root
     # 数据库名
     db-name: helio_boot
+  web:
+    logging:
+      # 是否启用 Web 访问日志切面；开发、测试环境可以开启，生产环境不开启
+      enabled: false
 
 spring:
   redis:
@@ -32,6 +36,5 @@ knife4j:
 
 logging:
   level:
-    # 分别指定脚手架、业务模块的日志级别
-    cc.uncarbon.framework: INFO
-    cc.uncarbon.module: INFO
+    # 指定日志级别，开发、测试环境建议为 DEBUG，生产环境建议为 INFO
+    cc.uncarbon: INFO

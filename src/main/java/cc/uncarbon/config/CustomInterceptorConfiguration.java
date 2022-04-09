@@ -7,11 +7,10 @@ import cc.uncarbon.interceptor.AppSaTokenRouteInterceptor;
 import cc.uncarbon.module.app.constant.AppConstant;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -20,10 +19,10 @@ import javax.annotation.Resource;
  * @author Uncarbon
  */
 @Configuration
+@RequiredArgsConstructor
 public class CustomInterceptorConfiguration implements WebMvcConfigurer {
 
-    @Resource
-    private HelioProperties helioProperties;
+    private final HelioProperties helioProperties;
 
 
     @Override
@@ -38,17 +37,6 @@ public class CustomInterceptorConfiguration implements WebMvcConfigurer {
         registry
                 .addInterceptor(new AdminSaTokenParseInterceptor())
                 .addPathPatterns(SysConstant.SYS_MODULE_CONTEXT_PATH + "/**");
-
-        /*
-        可选拦截器 - 从请求头解析租户信息
-        其他家后台管理登录时，账号上面可以手动填入租户ID，如"000000"
-        这个拦截器就是为了满足这种需要
-
-        注：若使用该拦截器，cc.uncarbon.module.sys.service.SysUserService#adminLogin 处的“主动清空用户上下文”代码需要删除
-         */
-        /* registry
-                .addInterceptor(new DefaultTenantParseInterceptor())
-                .addPathPatterns("/**");*/
 
         /*
         2. App-路由拦截器, 使几乎所有接口都需要登录

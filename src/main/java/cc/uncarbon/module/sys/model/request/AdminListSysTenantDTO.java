@@ -36,12 +36,12 @@ public class AdminListSysTenantDTO implements Serializable {
     private GenericStatusEnum status;
 
     @ApiModelProperty(value = "时间区间起")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT, timezone = HelioConstant.Jackson.TIME_ZONE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime beginAt;
 
     @ApiModelProperty(value = "时间区间止")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT, timezone = HelioConstant.Jackson.TIME_ZONE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime endAt;
 

@@ -14,6 +14,10 @@ helio:
     db-password: root
     # 数据库名
     db-name: helio_boot
+  web:
+    logging:
+      # 是否启用 Web 访问日志切面；开发、测试环境可以开启，生产环境不开启
+      enabled: true
 
 spring:
   redis:

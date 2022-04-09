@@ -13,6 +13,10 @@ spring:
     type: redis
     redis:
       cache-null-values: true
+  mvc:
+    pathmatch:
+      # Boot 2.6+ 默认的路由匹配策略，Swagger 暂不兼容，使用老策略
+      matching-strategy: ant_path_matcher
 
 helio:
   crud:
@@ -23,16 +27,6 @@ helio:
       datacenter-id: ${DATACENTER_ID:0}
       # 雪花ID-起始日期-可以选用项目开工的日期-这个一旦确定就不要改动了
       epoch-date: '2021-07-17'
-    tenant:
-      # 是否开启租户
-      enabled: true
-      ignored-tables:
-        # 以下表不参与租户隔离
-        - sys_menu
-        - sys_tenant
-        - sys_role_menu_relation
-        - sys_user_dept_relation
-        - sys_user_role_relation
     optimistic-lock:
       # 是否开启乐观锁
       enabled: true
@@ -46,7 +40,18 @@ helio:
       - /v3/api-docs
       # C端登录接口
       - /app/api/v1/auth/login
-
+  tenant:
+    # 是否开启多租户，详情请见文档【进阶使用-多租户】
+    enabled: false
+    # 多租户隔离级别
+    isolate-level: LINE
+    ignored-tables:
+      # 以下表不参与【行级】多租户 SQL 拦截器条件拼接
+      - sys_menu
+      - sys_tenant
+      - sys_role_menu_relation
+      - sys_user_dept_relation
+      - sys_user_role_relation
 
 knife4j:
   # 保持true
@@ -58,8 +63,6 @@ knife4j:
 
 server:
   port: 7003
-  http2:
-    enabled: true
 
 mybatis-plus:
   # 枚举和XML扫描，支持统配符 * 或者 ; 分割
@@ -68,10 +71,8 @@ mybatis-plus:
 
 logging:
   level:
-    # 分别指定脚手架、业务模块、单元测试的日志级别
-    cc.uncarbon.framework: DEBUG
-    cc.uncarbon.module: DEBUG
-    cc.uncarbon.test: DEBUG
+    # 指定日志级别，开发、测试环境建议为 DEBUG，生产环境建议为 INFO
+    cc.uncarbon: DEBUG
 
 sa-token:
   # token名称

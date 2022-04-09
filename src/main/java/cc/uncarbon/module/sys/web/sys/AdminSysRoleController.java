@@ -1,35 +1,42 @@
-package cc.uncarbon.module.sys.controller;
+package cc.uncarbon.module.sys.web.sys;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.sys.constant.SysConstant;
+import cc.uncarbon.module.sys.model.request.AdminBindRoleMenuRelationDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
 import cc.uncarbon.module.sys.model.response.SysRoleBO;
 import cc.uncarbon.module.sys.service.SysRoleService;
-import cc.uncarbon.module.sys.service.SysUserRoleRelationService;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.collection.CollUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
 
 
 /**
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "后台角色管理接口", tags = {"后台角色管理接口"})
@@ -39,14 +46,9 @@ public class AdminSysRoleController {
 
     private static final String PERMISSION_PREFIX = "SysRole:";
 
-    @Resource
-    private SysRoleService sysRoleService;
+    private final SysRoleService sysRoleService;
 
-    @Resource
-    private SysUserRoleRelationService sysUserRoleRelationService;
-
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private final RolePermissionCacheHelper rolePermissionCacheHelper;
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
@@ -79,22 +81,6 @@ public class AdminSysRoleController {
         dto.setId(id);
         sysRoleService.adminUpdate(dto);
 
-        /*
-        清除该角色下所有用户, 菜单相关的缓存
-         */
-        List<Long> userIds = sysUserRoleRelationService.listUserIdByRoleIds(CollUtil.newArrayList(dto.getId()));
-        userIds.forEach(
-                userId -> {
-                    String redisKey;
-
-                    redisKey = String.format(SysConstant.REDIS_KEY_SIDE_MENU_BY_USERID, userId);
-                    stringRedisTemplate.delete(redisKey);
-
-                    redisKey = String.format(SysConstant.REDIS_KEY_VISIBLE_MENU_BY_USERID, userId);
-                    stringRedisTemplate.delete(redisKey);
-                }
-        );
-
         return ApiResult.success();
     }
 
@@ -103,6 +89,21 @@ public class AdminSysRoleController {
     @DeleteMapping
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysRoleService.adminDelete(dto.getIds());
+
+        // 角色删除时，删除对应缓存键
+        rolePermissionCacheHelper.deleteCache(dto.getIds());
+
+        return ApiResult.success();
+    }
+
+    @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "bindMenus")
+    @ApiOperation(value = "绑定角色与菜单关联关系", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/bindMenus")
+    public ApiResult<?> bindMenus(@RequestBody @Valid AdminBindRoleMenuRelationDTO dto) {
+        Set<String> newPermissions = sysRoleService.adminBindMenus(dto);
+
+        // 覆盖更新缓存
+        rolePermissionCacheHelper.putCache(dto.getRoleId(), newPermissions);
 
         return ApiResult.success();
     }

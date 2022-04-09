@@ -7,17 +7,17 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>helio-boot</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0-SNAPSHOT</version>
 
     <properties>
     </properties>
 
     <dependencies>
-        <!-- 脚手架starter -->
+        <!-- 脚手架 starters -->
         <dependency>
             <groupId>cc.uncarbon.framework</groupId>
             <artifactId>helio-core</artifactId>

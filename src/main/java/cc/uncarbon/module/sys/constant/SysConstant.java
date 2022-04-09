@@ -48,4 +48,19 @@ public interface SysConstant {
      */
     String PARAM_KEY_CACHE_MENU_DURATION = "sys:cache-menu-duration";
 
+    /**
+     * 缓存键名前缀-用户业务缓存
+     */
+    String CACHE_KEY_USER_BIZ_CACHE = "sys-service:userBizCache:%s";
+
+    /**
+     * 缓存键名-用户拥有角色ID
+     */
+    String REDIS_KEY_USER_OWNED_ROLE_IDS = CACHE_KEY_USER_BIZ_CACHE + ":ownedRoleIds";
+
+    /**
+     * 一整天有多少秒
+     */
+    long ONE_DAY_SECONDS = 86400;
+
 }

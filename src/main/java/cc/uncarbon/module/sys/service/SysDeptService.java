@@ -19,8 +19,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import javax.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Uncarbon
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptEntity> {
 
-    @Resource
-    private SysUserDeptRelationService sysUserDeptRelationService;
+    private final SysUserDeptRelationService sysUserDeptRelationService;
 
 
     /**
@@ -59,29 +60,29 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     }
 
     /**
-     * 通用-详情
+     * 根据 ID 取详情
      *
-     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
+     * @param id 主键ID
+     * @return null or BO
      */
-    @Deprecated
-    public SysDeptBO getOneById(Long entityId) throws BusinessException {
-        return this.getOneById(entityId, true);
+    public SysDeptBO getOneById(Long id) {
+        return this.getOneById(id, false);
     }
 
     /**
-     * 通用-详情
+     * 根据 ID 取详情
      *
-     * @param entityId         实体类主键ID
+     * @param id 主键ID
      * @param throwIfInvalidId 是否在 ID 无效时抛出异常
      * @return null or BO
      */
-    public SysDeptBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
-        SysDeptEntity entity = this.getById(entityId);
+    public SysDeptBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysDeptEntity entity = this.getById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
 
-        return this.entity2BO(entity, false);
+        return this.entity2BO(entity);
     }
 
     /**
@@ -90,7 +91,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "新增部门")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDeptDTO dto) {
-        log.info("[后台管理-新增部门] >> DTO={}", dto);
+        log.info("[后台管理-新增部门] >> 入参={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -112,7 +113,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "编辑部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDeptDTO dto) {
-        log.info("[后台管理-编辑部门] >> DTO={}", dto);
+        log.info("[后台管理-编辑部门] >> 入参={}", dto);
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
@@ -131,7 +132,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @SysLog(value = "删除部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除部门] >> ids={}", ids);
+        log.info("[后台管理-删除部门] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 
@@ -153,16 +154,23 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         }
 
         SysDeptEntity entity = this.getById(relationEntity.getDeptId());
-        return this.entity2BO(entity, false);
+        return this.entity2BO(entity);
     }
 
 
     /*
-    私有方法
-    ------------------------------------------------------------------------------------------------
+    ----------------------------------------------------------------
+                        私有方法 private methods
+    ----------------------------------------------------------------
      */
 
-    private SysDeptBO entity2BO(SysDeptEntity entity, boolean traverseChildren) {
+    /**
+     * 实体转 BO
+     *
+     * @param entity 实体
+     * @return BO
+     */
+    private SysDeptBO entity2BO(SysDeptEntity entity) {
         if (entity == null) {
             return null;
         }
@@ -175,32 +183,31 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
             bo.setParentId(null);
         }
 
-        if (traverseChildren) {
-            List<SysDeptBO> children = this.adminList(
-                    AdminListSysDeptDTO.builder()
-                            .parentId(bo.getId())
-                            .build()
-            );
-            if (CollUtil.isEmpty(children)) {
-                children = null;
-            }
-
-            bo.setChildren(children);
-        }
-
         return bo;
     }
 
+    /**
+     * 实体 List 转 BO List
+     *
+     * @param entityList 实体 List
+     * @return BO List
+     */
     private List<SysDeptBO> entityList2BOs(List<SysDeptEntity> entityList) {
+        if (CollUtil.isEmpty(entityList)) {
+            return Collections.emptyList();
+        }
+
         // 深拷贝
         List<SysDeptBO> ret = new ArrayList<>(entityList.size());
         entityList.forEach(
-                entity -> ret.add(this.entity2BO(entity, true))
+                entity -> {
+                    SysDeptBO bo = this.entity2BO(entity);
+                    ret.add(this.traverseChildren(bo));
+                }
         );
 
         return ret;
     }
-
 
     /**
      * 检查是否已存在相同数据
@@ -221,5 +228,26 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同部门，请重新输入");
         }
+    }
+
+    /**
+     * 递归遍历子级
+     *
+     * @param bo BO
+     * @return SysDeptBO
+     */
+    private SysDeptBO traverseChildren(SysDeptBO bo) {
+        List<SysDeptBO> children = this.adminList(
+                AdminListSysDeptDTO.builder()
+                        .parentId(bo.getId())
+                        .build()
+        );
+        if (CollUtil.isEmpty(children)) {
+            children = null;
+        }
+
+        bo.setChildren(children);
+
+        return bo;
     }
 }

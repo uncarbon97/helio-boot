@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 
 
 /**
- * 后台管理-绑定用户与角色关联关系
+ * 后台管理-绑定角色与菜单关联关系
  * @author Uncarbon
  */
 @Accessors(chain = true)
@@ -20,13 +20,13 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AdminBindUserRoleRelationDTO implements Serializable {
+public class AdminBindRoleMenuRelationDTO implements Serializable {
 
-    @ApiModelProperty(value = "用户ID", required = true)
-    @NotNull(message = "用户ID不能为空")
-    private Long userId;
+    @ApiModelProperty(value = "角色ID", required = true)
+    @NotNull(message = "角色ID不能为空")
+    private Long roleId;
 
-    @ApiModelProperty(value = "角色Ids(空=清理关联关系后不再绑定任何角色)")
-    private Set<Long> roleIds;
+    @ApiModelProperty(value = "菜单Ids(空=清理关联关系后不再绑定任何菜单)")
+    private Set<Long> menuIds;
 
 }

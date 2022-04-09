@@ -9,6 +9,7 @@ import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysRoleEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysRoleMapper;
+import cc.uncarbon.module.sys.model.request.AdminBindRoleMenuRelationDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
 import cc.uncarbon.module.sys.model.response.SysRoleBO;
@@ -20,8 +21,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import javax.annotation.Resource;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,17 +35,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 后台角色
+ *
  * @author Uncarbon
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleEntity> {
 
-    @Resource
-    private SysUserRoleRelationService sysUserRoleRelationService;
+    private final SysUserRoleRelationService sysUserRoleRelationService;
 
-    @Resource
-    private SysRoleMenuRelationService sysRoleMenuRelationService;
+    private final SysRoleMenuRelationService sysRoleMenuRelationService;
+
+    private final SysMenuService sysMenuService;
 
 
     /**
@@ -64,24 +72,24 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     }
 
     /**
-     * 通用-详情
+     * 根据 ID 取详情
      *
-     * @deprecated 使用 getOneById(java.lang.Long, boolean) 替代
+     * @param id 主键ID
+     * @return null or BO
      */
-    @Deprecated
-    public SysRoleBO getOneById(Long entityId) throws BusinessException {
-        return this.getOneById(entityId, true);
+    public SysRoleBO getOneById(Long id) {
+        return this.getOneById(id, false);
     }
 
     /**
-     * 通用-详情
+     * 根据 ID 取详情
      *
-     * @param entityId 实体类主键ID
+     * @param id 主键ID
      * @param throwIfInvalidId 是否在 ID 无效时抛出异常
      * @return null or BO
      */
-    public SysRoleBO getOneById(Long entityId, boolean throwIfInvalidId) throws BusinessException {
-        SysRoleEntity entity = this.getById(entityId);
+    public SysRoleBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        SysRoleEntity entity = this.getById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -91,12 +99,13 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
 
     /**
      * 后台管理-新增
+     *
      * @return 主键ID
      */
     @SysLog(value = "新增后台角色")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysRoleDTO dto) {
-        log.info("[后台管理-新增后台角色] >> DTO={}", dto);
+        log.info("[后台管理-新增后台角色] >> 入参={}", dto);
         this.checkExistence(dto);
 
         dto.setId(null);
@@ -104,8 +113,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         BeanUtil.copyProperties(dto, entity);
 
         this.save(entity);
-
-        sysRoleMenuRelationService.cleanAndBind(entity.getId(), dto.getMenuIds());
 
         return entity.getId();
     }
@@ -116,13 +123,11 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "编辑后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysRoleDTO dto) {
-        log.info("[后台管理-编辑后台角色] >> DTO={}", dto);
+        log.info("[后台管理-编辑后台角色] >> 入参={}", dto);
         this.checkExistence(dto);
 
         SysRoleEntity entity = new SysRoleEntity();
         BeanUtil.copyProperties(dto, entity);
-
-        sysRoleMenuRelationService.cleanAndBind(dto.getId(), dto.getMenuIds());
 
         this.updateById(entity);
     }
@@ -133,34 +138,35 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @SysLog(value = "删除后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
-        log.info("[后台管理-删除后台角色] >> ids={}", ids);
+        log.info("[后台管理-删除后台角色] >> 入参={}", ids);
         this.removeByIds(ids);
     }
 
     /**
-     * 取拥有角色列表
-     * @param userId 用户ID
-     * @return 失败返回空列表
+     * 后台管理-绑定角色与菜单关联关系
+     *
+     * @return 新菜单ID集合对应的权限名
      */
-    public List<SysRoleBO> listRoleByUserId(Long userId) {
-        List<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(userId);
+    public Set<String> adminBindMenus(AdminBindRoleMenuRelationDTO dto) {
+        Set<String> newPermissions = sysMenuService.listPermissionByMenuIds(dto.getMenuIds());
+        sysRoleMenuRelationService.cleanAndBind(dto.getRoleId(), dto.getMenuIds());
 
-        if (CollUtil.isEmpty(roleIds)) {
-            return CollUtil.newArrayList();
-        }
-
-        // 根据角色Ids取BO
-        List<SysRoleEntity> entityList = this.listByIds(roleIds);
-
-        return this.entityList2BOs(entityList);
+        return newPermissions;
     }
 
 
     /*
-    私有方法
-    ------------------------------------------------------------------------------------------------
+    ----------------------------------------------------------------
+                        私有方法 private methods
+    ----------------------------------------------------------------
      */
 
+    /**
+     * 实体转 BO
+     *
+     * @param entity 实体
+     * @return BO
+     */
     private SysRoleBO entity2BO(SysRoleEntity entity) {
         if (entity == null) {
             return null;
@@ -170,12 +176,16 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        bo.setMenuIds(sysRoleMenuRelationService.listMenuIdByRoleIds(
-           CollUtil.newArrayList(bo.getId())
-        ));
+        bo.setMenuIds(sysRoleMenuRelationService.listMenuIdByRoleIds(CollUtil.newHashSet(bo.getId())));
         return bo;
     }
 
+    /**
+     * 实体 List 转 BO List
+     *
+     * @param entityList 实体 List
+     * @return BO List
+     */
     private List<SysRoleBO> entityList2BOs(List<SysRoleEntity> entityList) {
         // 深拷贝
         List<SysRoleBO> ret = new ArrayList<>(entityList.size());
@@ -186,6 +196,12 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         return ret;
     }
 
+    /**
+     * 实体分页转 BO 分页
+     *
+     * @param entityPage 实体分页
+     * @return BO 分页
+     */
     private PageResult<SysRoleBO> entityPage2BOPage(Page<SysRoleEntity> entityPage) {
         PageResult<SysRoleBO> ret = new PageResult<>();
         BeanUtil.copyProperties(entityPage, ret);
@@ -213,5 +229,34 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同后台角色，请重新输入");
         }
+    }
+
+    /**
+     * 取用户ID拥有角色对应的 角色ID-角色名 map
+     *
+     * @param userId 用户ID
+     * @return 失败返回空 map
+     */
+    public Map<Long, String> getRoleMapByUserId(Long userId) {
+        Set<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(userId);
+
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptyMap();
+        }
+
+        // 根据角色Ids取 map
+        return this.list(
+                new QueryWrapper<SysRoleEntity>()
+                        .lambda()
+                        .select(SysRoleEntity::getId, SysRoleEntity::getValue)
+                        .in(SysRoleEntity::getId, roleIds)
+        ).stream().collect(Collectors.toMap(SysRoleEntity::getId, SysRoleEntity::getValue, this.ignoredThrowingMerger()));
+    }
+
+    /**
+     * 主动忽略 map key 重复错误，不然 key 重复的话，转换成 map 的过程会抛异常
+     */
+    private <T> BinaryOperator<T> ignoredThrowingMerger() {
+        return (u, v) -> u;
     }
 }

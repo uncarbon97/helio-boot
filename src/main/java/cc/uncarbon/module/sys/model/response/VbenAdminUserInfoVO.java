@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class VbenAdminUserInfoBO implements Serializable {
+public class VbenAdminUserInfoVO implements Serializable {
 
     @ApiModelProperty(value = "账号")
     private String username;

@@ -21,7 +21,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class VbenAdminMenuMetaBO implements Serializable {
+public class VbenAdminMenuMetaVO implements Serializable {
 
     @ApiModelProperty(value = "标题")
     private String title;
