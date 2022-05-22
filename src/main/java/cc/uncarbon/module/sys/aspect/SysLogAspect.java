@@ -2,12 +2,13 @@ package cc.uncarbon.module.sys.aspect;
 
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysLogStatusEnum;
 import cc.uncarbon.module.sys.service.SysLogService;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.json.JSONUtil;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -17,6 +18,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 /**
  * SysLog切面实现类
@@ -48,21 +53,34 @@ public class SysLogAspect {
                 .setUsername(UserContextHolder.getUserName())
                 ;
 
-        // 请求方法
+        // 记录请求方法
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
         sysLogEntity.setMethod(methodSignature.toString());
 
-        // 操作内容
+        // 记录操作内容
         SysLog sysLogAnnotation = methodSignature.getMethod().getAnnotation(SysLog.class);
         sysLogEntity.setOperation(sysLogAnnotation.value());
 
-        // 请求参数
-        sysLogEntity.setParams(Arrays.stream(point.getArgs()).map(JSONUtil::toJsonStr).collect(Collectors.joining(",")));
+        /*
+        记录请求参数
+         */
+        HashMap<Object, Object> afterMasked = new HashMap<>();
+        CopyOptions copyOptions = new CopyOptions();
+        copyOptions.setIgnoreNullValue(false);
+        copyOptions.setIgnoreProperties(SysConstant.SENSITIVE_FIELDS);
+        sysLogEntity.setParams(Arrays.stream(point.getArgs()).map(
+                each -> {
+                    // 先去除敏感字段后再入库
+                    afterMasked.clear();
+                    BeanUtil.copyProperties(each, afterMasked, copyOptions);
+                    return JSONUtil.toJsonStr(afterMasked);
+                }
+        ).collect(Collectors.joining(",")));
 
-        // IP地址
+        // 记录IP地址
         sysLogEntity.setIp(UserContextHolder.getClientIP());
 
-        // 状态
+        // 记录状态
         sysLogEntity.setStatus(SysLogStatusEnum.SUCCESS);
 
         this.callSysLogServiceSave(sysLogEntity);
