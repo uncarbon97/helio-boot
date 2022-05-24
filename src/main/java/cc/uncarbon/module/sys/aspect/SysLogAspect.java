@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 /**
- * SysLog切面实现类
+ * SysLog 切面实现类
+ *
  * @author Uncarbon
  */
 @Aspect
@@ -34,7 +35,13 @@ import java.util.stream.Collectors;
 public class SysLogAspect {
 
     private final SysLogService sysLogService;
+    // Bean 属性复制配置项
+    private static final CopyOptions copyOptions4MaskingArgs = new CopyOptions();
 
+    static {
+        copyOptions4MaskingArgs.setIgnoreNullValue(false);
+        copyOptions4MaskingArgs.setIgnoreProperties(SysConstant.SENSITIVE_FIELDS);
+    }
 
     @Pointcut("@annotation(cc.uncarbon.module.sys.annotation.SysLog)")
     public void sysLogPointcut() {
@@ -65,14 +72,11 @@ public class SysLogAspect {
         记录请求参数
          */
         HashMap<Object, Object> afterMasked = new HashMap<>();
-        CopyOptions copyOptions = new CopyOptions();
-        copyOptions.setIgnoreNullValue(false);
-        copyOptions.setIgnoreProperties(SysConstant.SENSITIVE_FIELDS);
         sysLogEntity.setParams(Arrays.stream(point.getArgs()).map(
                 each -> {
                     // 先去除敏感字段后再入库
                     afterMasked.clear();
-                    BeanUtil.copyProperties(each, afterMasked, copyOptions);
+                    BeanUtil.copyProperties(each, afterMasked, copyOptions4MaskingArgs);
                     return JSONUtil.toJsonStr(afterMasked);
                 }
         ).collect(Collectors.joining(",")));
