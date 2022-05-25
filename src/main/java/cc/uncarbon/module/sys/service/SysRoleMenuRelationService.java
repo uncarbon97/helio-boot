@@ -42,7 +42,8 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
             throw new IllegalArgumentException("roleIds不能为空");
         }
 
-        Set<Long> ret = new HashSet<>(roleIds.size() * 16);
+        // aka * 16
+        Set<Long> ret = new HashSet<>(roleIds.size() << 4);
         roleIds.forEach(
                 roleId -> ret.addAll(this.list(
                             new QueryWrapper<SysRoleMenuRelationEntity>()

@@ -172,15 +172,10 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @SysLog(value = "登录后台用户")
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
         /*
-        这里是实际启用了多租户功能，并主动指定租户ID
-        实际生产应用时，推荐前端传值加密，后端在此解密
+        如果启用了多租户功能，并且前端指定了租户ID，则先查库确认租户是否有效
 
-        表级、数据源级多租户，登录前【必须】主动指定租户ID
-        e.g. dto.setTenantId(101L)
+        注意：数据源级多租户，登录前【必须】主动指定租户ID，如: dto.setTenantId(101L);
          */
-
-        dto.setTenantId(101L);
-
         // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
         TenantContext tenantContext = new TenantContext();
         if (isTenantEnabled && ObjectUtil.isNotNull(dto.getTenantId())) {

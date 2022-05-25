@@ -1,5 +1,8 @@
 package cc.uncarbon.config;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
@@ -9,10 +12,6 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import javax.annotation.Resource;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-
 
 /**
  * @author Uncarbon
@@ -20,10 +19,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 @EnableAsync
 @Configuration
+@RequiredArgsConstructor
 public class AsyncConfiguration implements AsyncConfigurer {
 
-    @Resource
-    private TaskExecutionProperties taskExecutionProperties;
+    private final TaskExecutionProperties taskExecutionProperties;
+
 
     @Bean(name = "taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
