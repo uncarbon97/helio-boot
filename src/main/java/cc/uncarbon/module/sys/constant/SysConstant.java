@@ -26,6 +26,6 @@ public interface SysConstant {
     /**
      * 敏感字段，`SysLogAspect` 切面记录系统操作日志时，会先去除敏感字段后再入库
      */
-    String[] SENSITIVE_FIELDS = {"password", "oldPassword", "newPassword", "confirmNewPassword"};
+    String[] SENSITIVE_FIELDS = {"password", "oldPassword", "newPassword", "confirmNewPassword", "passwordOfNewUser", "randomPassword", "tenantAdminPassword"};
 
 }
