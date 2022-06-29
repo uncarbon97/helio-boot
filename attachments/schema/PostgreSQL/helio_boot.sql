@@ -385,6 +385,9 @@ VALUES (46, 0, 1, 0, '2021-07-17 23:40:26', 'admin', '2021-07-17 23:40:26', 'adm
 INSERT INTO "sys_menu"
 VALUES (47, 0, 1, 0, '2021-07-17 23:40:47', 'admin', '2021-07-17 23:41:15', 'admin', '踢某用户下线', 17, 2, 'SysUser:kickOut',
         'ant-design:disconnect-outlined', 7, 1, 'LAYOUT', '');
+INSERT INTO "sys_menu"
+VALUES (48, 0, 1, 0, '2022-06-29 17:35:26', 'admin', '2022-06-29 17:35:26', 'admin', '绑定角色与菜单关联关系', 12, 2, 'SysRole:bindMenus',
+        'ant-design:share-alt-outlined', 5, 1, NULL, '');
 COMMIT;
 
 -- ----------------------------
