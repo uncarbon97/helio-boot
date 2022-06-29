@@ -237,7 +237,9 @@ VALUES (1, 0, 1, 0, '2021-06-01 17:16:48', NULL, '2021-06-02 17:14:16', NULL, '�
        (46, 0, 1, 0, '2021-07-17 23:40:26', 'admin', '2021-07-17 23:40:26', 'admin', '绑定用户与角色关联关系', 17, 2,
         'SysUser:bindRoles', 'ant-design:share-alt-outlined', 6, 1, NULL, ''),
        (47, 0, 1, 0, '2021-07-17 23:40:47', 'admin', '2021-07-17 23:41:15', 'admin', '踢某用户下线', 17, 2, 'SysUser:kickOut',
-        'ant-design:disconnect-outlined', 7, 1, 'LAYOUT', '');
+        'ant-design:disconnect-outlined', 7, 1, 'LAYOUT', ''),
+       (48, 0, 1, 0, '2022-06-29 17:35:26', 'admin', '2022-06-29 17:35:26', 'admin', '绑定角色与菜单关联关系', 12, 2, 'SysRole:bindMenus',
+        'ant-design:share-alt-outlined', 5, 1, NULL, '');
 COMMIT;
 
 -- ----------------------------
