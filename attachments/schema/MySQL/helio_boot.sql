@@ -153,7 +153,7 @@ VALUES (1, 0, 1, 0, '2021-06-01 17:16:48', NULL, '2021-06-02 17:14:16', NULL, '�
        (4, 0, 1, 0, '2021-06-01 17:14:47', NULL, '2021-06-02 11:32:23', NULL, '工作台', 2, 1, 'Dashboard:workbench',
         'ant-design:database-outlined', 2, 1, '/dashboard/workbench/index', ''),
        (5, 0, 1, 0, '2021-06-01 17:15:38', NULL, '2021-07-15 23:56:43', 'admin', '关于', 0, 1, 'About',
-        'ant-design:eye-outlined', 2, 1, '/sys/vben/about/index', ''),
+        'ant-design:eye-outlined', 2, 1, '/sys/about/index', ''),
        (6, 0, 1, 0, '2021-06-02 16:06:58', NULL, '2021-07-17 23:55:52', 'admin', '学(mo)习(yu)', 2, 3, '',
         'ant-design:zhihu-outlined', 3, 1, 'https://www.zhihu.com/', 'https://www.zhihu.com/'),
        (7, 0, 1, 0, '2021-07-17 23:32:15', NULL, '2021-07-17 23:32:15', NULL, '部门管理', 1, 1, 'SysDept',
