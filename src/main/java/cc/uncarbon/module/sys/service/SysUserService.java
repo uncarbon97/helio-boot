@@ -184,13 +184,14 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             TenantContextHolder.setTenantContext(tenantContext);
         }
 
+        // 不要直接提示“账号不存在”或“密码不正确”，避免撞库攻击
         SysUserEntity sysUserEntity = this.getUserByPin(dto.getUsername());
         if (sysUserEntity == null) {
-            throw new BusinessException(SysErrorEnum.USER_NOT_EXISTS);
+            throw new BusinessException(SysErrorEnum.INCORRECT_PIN_OR_PWD);
         }
 
         if (!PwdUtil.encrypt(dto.getPassword(), sysUserEntity.getSalt()).equals(sysUserEntity.getPwd())) {
-            throw new BusinessException(SysErrorEnum.INCORRECT_USER_PASSWORD);
+            throw new BusinessException(SysErrorEnum.INCORRECT_PIN_OR_PWD);
         }
 
         if (SysUserStatusEnum.BANNED.equals(sysUserEntity.getStatus())) {
