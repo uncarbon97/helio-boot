@@ -45,8 +45,8 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
             TenantContextHolder.setTenantContext(tenantContext);
 
         } else {
-            UserContextHolder.setUserContext(null);
-            TenantContextHolder.setTenantContext(null);
+            UserContextHolder.clear();
+            TenantContextHolder.clear();
         }
 
         return true;
