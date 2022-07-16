@@ -124,6 +124,12 @@ public class AdminSysUserController {
     @PostMapping(value = "/bindRoles")
     public ApiResult<?> bindRoles(@RequestBody @Valid AdminBindUserRoleRelationDTO dto) {
         sysUserService.adminBindRoles(dto);
+        // 该用户会被强制踢下线，以更新对应权限；可以视业务需要决定是否删除该代码
+        this.kickOut(
+                AdminKickOutSysUserDTO.builder()
+                        .userId(dto.getUserId())
+                        .build()
+        );
 
         return ApiResult.success();
     }

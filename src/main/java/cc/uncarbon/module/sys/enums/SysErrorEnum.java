@@ -15,9 +15,7 @@ public enum SysErrorEnum implements HelioBaseEnum<Integer> {
 
     INVALID_ID(400, "无效ID"),
 
-    USER_NOT_EXISTS(400, "用户不存在"),
-
-    INCORRECT_USER_PASSWORD(400, "密码不正确"),
+    INCORRECT_PIN_OR_PWD(400, "账号或密码不正确"),
 
     BANNED_USER(400, "用户被封禁"),
 

@@ -6,7 +6,6 @@ import cc.uncarbon.framework.core.context.TenantContext;
 import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
-import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.helper.CaptchaHelper;
 import cc.uncarbon.helper.RolePermissionCacheHelper;
@@ -20,7 +19,6 @@ import cc.uncarbon.module.sys.service.SysUserService;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.captcha.AbstractCaptcha;
-import cn.hutool.core.lang.Assert;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -95,8 +93,8 @@ public class AdminAuthController {
     @PostMapping(value = "/logout")
     public ApiResult<?> logout() {
         AdminStpUtil.logout();
-        UserContextHolder.setUserContext(null);
-        TenantContextHolder.setTenantContext(null);
+        UserContextHolder.clear();
+        TenantContextHolder.clear();
 
         return ApiResult.success();
     }
@@ -105,7 +103,12 @@ public class AdminAuthController {
     @ApiImplicitParam(name = "uuid", value = "验证码图片UUID", required = true)
     @GetMapping(value = "/captcha")
     public void captcha(HttpServletResponse response, String uuid) throws IOException {
-        Assert.notBlank(uuid, () -> new BusinessException(SysErrorEnum.UUID_CANNOT_BE_BLANK));
+        /*
+        由前端定义 UUID 其实并不算太好的办法，但是够简单
+        更复杂而安全的做法是：由后端生成一个 UUID，通过响应头返回给前端（这对前端有一定的技能技术要求）
+         */
+        // uuid 为空则抛出异常
+        SysErrorEnum.UUID_CANNOT_BE_BLANK.assertNotBlank(uuid);
 
         // 核验方法：captchaHelper.validate(uuid, true);
         AbstractCaptcha captcha = captchaHelper.generate(uuid);

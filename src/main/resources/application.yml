@@ -74,6 +74,7 @@ logging:
     # 指定日志级别，开发、测试环境建议为 DEBUG，生产环境建议为 INFO
     cc.uncarbon: DEBUG
 
+# 详细配置文档：https://sa-token.dev33.cn/doc/index.html#/use/config
 sa-token:
   # token名称
   token-name: Authorization
@@ -87,3 +88,8 @@ sa-token:
   is-read-body: false
   # 是否尝试从cookie里读取token
   is-read-cookie: false
+  # 有效期解释：https://sa-token.dev33.cn/doc/index.html#/fun/token-timeout
+  # token 有效期，单位=秒；默认30天，-1代表永不过期
+  timeout: 2592000
+  # token 临时有效期 (指定时间内无操作就视为token过期)，单位=秒
+  activity-timeout: -1
