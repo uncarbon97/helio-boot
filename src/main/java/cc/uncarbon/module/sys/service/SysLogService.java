@@ -8,6 +8,7 @@ import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysLogMapper;
 import cc.uncarbon.module.sys.model.request.AdminListSysLogDTO;
+import cc.uncarbon.module.sys.model.response.SysDataDictBO;
 import cc.uncarbon.module.sys.model.response.SysLogBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -133,11 +134,12 @@ public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEnti
      * @return BO 分页
      */
     private PageResult<SysLogBO> entityPage2BOPage(Page<SysLogEntity> entityPage) {
-        PageResult<SysLogBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysLogBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
 }

@@ -12,6 +12,7 @@ import cc.uncarbon.module.sys.mapper.SysTenantMapper;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
 import cc.uncarbon.module.sys.model.request.AdminListSysTenantDTO;
 import cc.uncarbon.module.sys.model.request.AdminUpdateSysTenantDTO;
+import cc.uncarbon.module.sys.model.response.SysRoleBO;
 import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -202,11 +203,12 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      * @return BO 分页
      */
     private PageResult<SysTenantBO> entityPage2BOPage(Page<SysTenantEntity> entityPage) {
-        PageResult<SysTenantBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysTenantBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
 }
