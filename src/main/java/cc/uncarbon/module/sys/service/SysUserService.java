@@ -16,7 +16,10 @@ import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
 import cc.uncarbon.module.sys.model.request.*;
-import cc.uncarbon.module.sys.model.response.*;
+import cc.uncarbon.module.sys.model.response.SysDeptBO;
+import cc.uncarbon.module.sys.model.response.SysUserBO;
+import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
+import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -209,11 +212,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             TenantContextHolder.setTenantContext(tenantContext);
         }
 
-        try {
-            this.updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
-        } catch (Exception ignored) {
-            // 实际开发环境请删除本try-catch块
-        }
+        this.updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
 
         // 取账号完整信息
         SysUserBO sysUserBO = this.entity2BO(sysUserEntity);
