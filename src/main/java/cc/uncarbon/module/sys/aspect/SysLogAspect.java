@@ -1,6 +1,7 @@
 package cc.uncarbon.module.sys.aspect;
 
 import cc.uncarbon.framework.core.context.UserContextHolder;
+import cc.uncarbon.framework.satoken.util.IPUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysLogEntity;
@@ -18,6 +19,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -81,8 +84,19 @@ public class SysLogAspect {
                 }
         ).collect(Collectors.joining(",")));
 
-        // 记录IP地址
-        sysLogEntity.setIp(UserContextHolder.getClientIP());
+        /*
+        记录IP地址
+        https://gitee.com/uncarbon97/helio-boot/issues/I5KN1X
+         */
+        String ip = UserContextHolder.getClientIP();
+        if (ip == null) {
+            // 还没登录完成等情况时，用户上下文中可能还没有IP地址，直接从请求头中拿
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (requestAttributes != null) {
+                ip = IPUtil.getClientIPAddress(requestAttributes.getRequest());
+            }
+        }
+        sysLogEntity.setIp(ip);
 
         // 记录状态
         sysLogEntity.setStatus(SysLogStatusEnum.SUCCESS);
