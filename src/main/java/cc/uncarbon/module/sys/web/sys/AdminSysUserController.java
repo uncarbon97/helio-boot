@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 
 /**
@@ -91,8 +92,9 @@ public class AdminSysUserController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "resetPassword")
     @ApiOperation(value = "重置某用户密码", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "/resetPassword")
-    public ApiResult<?> resetPassword(@RequestBody @Valid AdminResetSysUserPasswordDTO dto) {
+    @PutMapping(value = "/{userId}/password")
+    public ApiResult<?> resetPassword(@PathVariable Long userId, @RequestBody @Valid AdminResetSysUserPasswordDTO dto) {
+        dto.setUserId(userId);
         sysUserService.adminResetUserPassword(dto);
 
         // 踢出原登录
@@ -121,26 +123,31 @@ public class AdminSysUserController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "bindRoles")
     @ApiOperation(value = "绑定用户与角色关联关系", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "/bindRoles")
-    public ApiResult<?> bindRoles(@RequestBody @Valid AdminBindUserRoleRelationDTO dto) {
+    @PutMapping(value = "/{userId}/roles")
+    public ApiResult<?> bindRoles(@PathVariable Long userId, @RequestBody AdminBindUserRoleRelationDTO dto) {
+        dto.setUserId(userId);
         sysUserService.adminBindRoles(dto);
+
         // 该用户会被强制踢下线，以更新对应权限；可以视业务需要决定是否删除该代码
-        this.kickOut(
-                AdminKickOutSysUserDTO.builder()
-                        .userId(dto.getUserId())
-                        .build()
-        );
+        this.kickOut(dto.getUserId());
 
         return ApiResult.success();
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "kickOut")
     @ApiOperation(value = "踢某用户下线", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping(value = "/kickOut")
-    public ApiResult<?> kickOut(@RequestBody @Valid AdminKickOutSysUserDTO dto) {
-        AdminStpUtil.kickout(dto.getUserId());
+    @PostMapping(value = "/{userId}/kickOut")
+    public ApiResult<?> kickOut(@PathVariable Long userId) {
+        AdminStpUtil.kickout(userId);
 
         return ApiResult.success();
+    }
+
+    @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
+    @ApiOperation(value = "取指定用户关联角色ID", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{userId}/relatedRoleIds")
+    public ApiResult<Set<Long>> listRelatedRoleIds(@PathVariable Long userId) {
+        return ApiResult.data(sysUserService.listRelatedRoleIds(userId));
     }
 
 }
