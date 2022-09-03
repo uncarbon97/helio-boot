@@ -16,7 +16,10 @@ import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
 import cc.uncarbon.module.sys.model.request.*;
-import cc.uncarbon.module.sys.model.response.*;
+import cc.uncarbon.module.sys.model.response.SysDeptBO;
+import cc.uncarbon.module.sys.model.response.SysUserBO;
+import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
+import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -298,6 +301,19 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      */
     public SysUserEntity getUserByPin(String pin) {
         return this.getBaseMapper().getUserByPin(pin);
+    }
+
+    /**
+     * 后台管理 - 取指定用户关联角色ID
+     * @param userId 用户ID
+     * @return 角色Ids
+     */
+    public Set<Long> listRelatedRoleIds(Long userId) {
+        if (ObjectUtil.isNull(userId)) {
+            return Collections.emptySet();
+        }
+
+        return sysRoleService.getRoleMapByUserId(userId).keySet();
     }
 
     /*

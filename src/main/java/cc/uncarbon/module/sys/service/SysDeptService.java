@@ -10,21 +10,20 @@ import cc.uncarbon.module.sys.entity.SysUserDeptRelationEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDeptMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDeptDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysDeptDTO;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -43,15 +42,10 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     /**
      * 后台管理-列表
      */
-    public List<SysDeptBO> adminList(AdminListSysDeptDTO dto) {
+    public List<SysDeptBO> adminList() {
         List<SysDeptEntity> entityList = this.list(
                 new QueryWrapper<SysDeptEntity>()
                         .lambda()
-                        // 名称
-                        .like(StrUtil.isNotBlank(dto.getTitle()), SysDeptEntity::getTitle,
-                                StrUtil.cleanBlank(dto.getTitle()))
-                        // 上级ID
-                        .eq(ObjectUtil.isNotNull(dto.getParentId()), SysDeptEntity::getParentId, dto.getParentId())
                         // 排序
                         .orderByAsc(SysDeptEntity::getSort)
         );
@@ -95,7 +89,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
-            dto.setParentId(0L);
+            dto.setParentId(SysConstant.ROOT_PARENT_ID);
         }
 
         dto.setId(null);
@@ -117,7 +111,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         this.checkExistence(dto);
 
         if (ObjectUtil.isNull(dto.getParentId())) {
-            dto.setParentId(0L);
+            dto.setParentId(SysConstant.ROOT_PARENT_ID);
         }
 
         SysDeptEntity entity = new SysDeptEntity();
@@ -180,6 +174,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
 
         // 可以在此处为BO填充字段
         if (SysConstant.ROOT_PARENT_ID.equals(bo.getParentId())) {
+            // 返回前端时，不显示 parentId = 0
             bo.setParentId(null);
         }
 
@@ -200,10 +195,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         // 深拷贝
         List<SysDeptBO> ret = new ArrayList<>(entityList.size());
         entityList.forEach(
-                entity -> {
-                    SysDeptBO bo = this.entity2BO(entity);
-                    ret.add(this.traverseChildren(bo));
-                }
+                entity -> ret.add(this.entity2BO(entity))
         );
 
         return ret;
@@ -228,26 +220,5 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同部门，请重新输入");
         }
-    }
-
-    /**
-     * 递归遍历子级
-     *
-     * @param bo BO
-     * @return SysDeptBO
-     */
-    private SysDeptBO traverseChildren(SysDeptBO bo) {
-        List<SysDeptBO> children = this.adminList(
-                AdminListSysDeptDTO.builder()
-                        .parentId(bo.getId())
-                        .build()
-        );
-        if (CollUtil.isEmpty(children)) {
-            children = null;
-        }
-
-        bo.setChildren(children);
-
-        return bo;
     }
 }

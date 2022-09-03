@@ -1,6 +1,5 @@
 package cc.uncarbon.module.sys.model.response;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +14,6 @@ import java.io.Serializable;
  * 后台菜单子项详情 for VbenAdmin
  * @author Uncarbon
  */
-@ApiModel(value = "后台菜单子项详情")
 @Accessors(chain = true)
 @Builder
 @AllArgsConstructor

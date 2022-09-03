@@ -2,7 +2,6 @@ package cc.uncarbon.module.sys.model.response;
 
 import cc.uncarbon.module.sys.enums.GenderEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +17,6 @@ import java.io.Serializable;
  * 仅保留基本信息
  * @author Uncarbon
  */
-@ApiModel(value = "后台用户基本信息")
 @Accessors(chain = true)
 @Builder
 @AllArgsConstructor

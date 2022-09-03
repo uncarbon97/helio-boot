@@ -5,12 +5,13 @@ import cc.uncarbon.module.sys.entity.SysUserRoleRelationEntity;
 import cc.uncarbon.module.sys.mapper.SysUserRoleRelationMapper;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -50,7 +51,7 @@ public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRole
      * @param userId 用户ID
      * @return 失败返回空列表
      */
-    public Set<Long> listRoleIdByUserId(Long userId) throws IllegalArgumentException {
+    public Set<Long> listRoleIdsByUserId(Long userId) throws IllegalArgumentException {
         if (userId == null) {
             throw new IllegalArgumentException("userId不能为空");
         }

@@ -6,7 +6,6 @@ import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDeptDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysDeptDTO;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cc.uncarbon.module.sys.service.SysDeptService;
 import cc.uncarbon.module.sys.util.AdminStpUtil;
@@ -41,8 +40,8 @@ public class AdminSysDeptController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "列表", produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping
-    public ApiResult<List<SysDeptBO>> list(AdminListSysDeptDTO dto) {
-        return ApiResult.data(sysDeptService.adminList(dto));
+    public ApiResult<List<SysDeptBO>> list() {
+        return ApiResult.data(sysDeptService.adminList());
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)

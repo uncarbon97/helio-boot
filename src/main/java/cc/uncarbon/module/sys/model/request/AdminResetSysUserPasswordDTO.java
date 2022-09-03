@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -24,13 +23,12 @@ import java.io.Serializable;
 @Data
 public class AdminResetSysUserPasswordDTO implements Serializable {
 
-    @ApiModelProperty(value = "用户ID", required = true)
-    @NotNull(message = "用户ID不能为空")
-    private Long userId;
-
     @ApiModelProperty(value = "随机新密码", required = true)
     @Size(min = 16, max = 64, message = "随机新密码须为16-64位")
     @NotBlank(message = "随机新密码不能为空")
     private String randomPassword;
+
+    @ApiModelProperty(value = "用户ID", hidden  = true)
+    private Long userId;
 
 }

@@ -1,6 +1,5 @@
 package cc.uncarbon.module.sys.model.response;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
  * 后台用户 for VbenAdmin
  * @author Uncarbon
  */
-@ApiModel(value = "后台用户")
 @Accessors(chain = true)
 @Builder
 @AllArgsConstructor
