@@ -1,7 +1,5 @@
 package cc.uncarbon.config;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -11,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 
 /**
@@ -29,13 +30,23 @@ public class AsyncConfiguration implements AsyncConfigurer {
     public ThreadPoolTaskExecutor taskExecutor() {
         final String threadNamePrefix = "taskExecutor-";
 
+        log.debug("[异步任务线程池] 创建默认线程池【taskExecutor】，该线程池参数可通过 spring.task.execution 调节 >> " +
+                        "corePoolSize核心线程池大小={}, maxPoolSize最大线程数={}, queueCapacity队列容量={}" +
+                        ", rejectedExecutionHandler拒绝策略={}",
+                taskExecutionProperties.getPool().getCoreSize(),
+                taskExecutionProperties.getPool().getMaxSize(),
+                taskExecutionProperties.getPool().getQueueCapacity(),
+                "CallerRunsPolicy"
+                );
+
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        // 核心线程池大小 or 10
+        // 核心线程池大小，默认 8
         executor.setCorePoolSize(taskExecutionProperties.getPool().getCoreSize());
-        // 最大线程数 or 50
+        // 最大线程数，默认 Integer.MAX_VALUE
         executor.setMaxPoolSize(taskExecutionProperties.getPool().getMaxSize());
-        // 队列容量 or 10
+        // 队列容量，默认 Integer.MAX_VALUE
         executor.setQueueCapacity(taskExecutionProperties.getPool().getQueueCapacity());
+        // 拒绝策略
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         // 线程名前缀
         executor.setThreadNamePrefix(threadNamePrefix);
@@ -48,15 +59,13 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
-        log.debug("Creating Default Async Task Executor");
         return this.taskExecutor();
     }
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (ex, method, params) -> {
-            log.error("执行异步任务'{}'出错", method);
-            ex.printStackTrace();
+            log.error("[异步任务线程池] 执行异步任务【{}】时出错 >> 堆栈\t\n", method, ex);
         };
     }
 }
