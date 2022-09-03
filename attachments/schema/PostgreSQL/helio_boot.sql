@@ -251,7 +251,7 @@ INSERT INTO "sys_menu"
 VALUES (2, 0, 1, 0, '2021-06-01 17:13:13', NULL, '2021-07-18 00:10:33', 'admin', '中控台', 0, 0, 'Dashboard',
         'ant-design:appstore-outlined', 1, 1, 'LAYOUT', '');
 INSERT INTO "sys_menu"
-VALUES (3, 0, 1, 0, '2021-06-01 17:14:22', NULL, '2021-06-02 11:24:38', NULL, '分析页(默认页必须分配, 否则进不去后台)', 2, 1,
+VALUES (3, 0, 1, 0, '2021-06-01 17:14:22', NULL, '2021-06-02 11:24:38', NULL, '分析页(后台登录后默认首页)', 2, 1,
         'Dashboard:analysis', 'ant-design:fund-outlined', 1, 1, '/dashboard/analysis/index', '');
 INSERT INTO "sys_menu"
 VALUES (4, 0, 1, 0, '2021-06-01 17:14:47', NULL, '2021-06-02 11:32:23', NULL, '工作台', 2, 1, 'Dashboard:workbench',
