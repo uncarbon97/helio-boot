@@ -3,6 +3,7 @@ package cc.uncarbon.module.sys.aspect;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.satoken.util.IPUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.aspect.extension.SysLogAspectExtension;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysLogStatusEnum;
@@ -17,6 +18,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -38,8 +40,10 @@ import java.util.stream.Collectors;
 public class SysLogAspect {
 
     private final SysLogService sysLogService;
+    private final ObjectProvider<SysLogAspectExtension> extensions;
     // Bean 属性复制配置项
     private static final CopyOptions copyOptions4MaskingArgs = new CopyOptions();
+
 
     static {
         copyOptions4MaskingArgs.setIgnoreNullValue(false);
@@ -58,18 +62,17 @@ public class SysLogAspect {
         Object executeResult;
         executeResult = point.proceed();
 
+        MethodSignature methodSignature = (MethodSignature) point.getSignature();
+        SysLog sysLogAnnotation = methodSignature.getMethod().getAnnotation(SysLog.class);
+
         SysLogEntity sysLogEntity = new SysLogEntity()
+                // 记录操作人
                 .setUserId(UserContextHolder.getUserId())
                 .setUsername(UserContextHolder.getUserName())
-                ;
-
-        // 记录请求方法
-        MethodSignature methodSignature = (MethodSignature) point.getSignature();
-        sysLogEntity.setMethod(methodSignature.toString());
-
-        // 记录操作内容
-        SysLog sysLogAnnotation = methodSignature.getMethod().getAnnotation(SysLog.class);
-        sysLogEntity.setOperation(sysLogAnnotation.value());
+                // 记录请求方法
+                .setMethod(methodSignature.toString())
+                // 记录操作内容
+                .setOperation(sysLogAnnotation.value());
 
         /*
         记录请求参数
@@ -90,7 +93,7 @@ public class SysLogAspect {
          */
         String ip = UserContextHolder.getClientIP();
         if (ip == null) {
-            // 还没登录完成等情况时，用户上下文中可能还没有IP地址，直接从请求头中拿
+            // 兜底处理，直接从当前线程的请求头中拿
             ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (requestAttributes != null) {
                 ip = IPUtil.getClientIPAddress(requestAttributes.getRequest());
@@ -100,6 +103,11 @@ public class SysLogAspect {
 
         // 记录状态
         sysLogEntity.setStatus(SysLogStatusEnum.SUCCESS);
+
+        // 执行扩展 - 保存到 DB 前
+        for (SysLogAspectExtension extension : extensions) {
+            extension.beforeSaving(sysLogAnnotation, point, sysLogEntity);
+        }
 
         this.callSysLogServiceSave(sysLogEntity);
         // --------------------End @SysLog--------------------

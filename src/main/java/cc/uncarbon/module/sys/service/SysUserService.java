@@ -9,6 +9,7 @@ import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
 import cc.uncarbon.module.sys.enums.GenericStatusEnum;
@@ -172,7 +173,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-登录
      */
-    @SysLog(value = "登录后台用户")
+    @SysLog(value = SysConstant.SysLogOperation.SYS_USER_LOGIN)
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
         /*
         如果启用了多租户功能，并且前端指定了租户ID，则先查库确认租户是否有效
