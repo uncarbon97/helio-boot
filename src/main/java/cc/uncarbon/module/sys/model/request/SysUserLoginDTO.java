@@ -48,7 +48,7 @@ public class SysUserLoginDTO implements Serializable {
     @ApiModelProperty(value = "验证码答案(可选，需自行对接业务逻辑)")
     private String captchaAnswer;
 
-    @ApiModelProperty(value = "【内部】客户端IP地址", hidden = true)
+    @ApiModelProperty(value = "客户端IP地址", hidden = true)
     private String clientIP;
 
 }
