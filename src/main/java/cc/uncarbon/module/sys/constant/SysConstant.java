@@ -8,6 +8,9 @@ package cc.uncarbon.module.sys.constant;
  */
 public interface SysConstant {
 
+    /**
+     * 后台管理接口路由前缀
+     */
     String SYS_MODULE_CONTEXT_PATH = "/sys";
 
     /**
