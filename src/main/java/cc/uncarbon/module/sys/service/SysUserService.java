@@ -154,6 +154,8 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
         SysUserEntity updateEntity = new SysUserEntity();
         BeanUtil.copyProperties(dto, updateEntity);
+        // 手动处理异名字段
+        updateEntity.setPin(dto.getUsername());
 
         sysUserDeptRelationService.cleanAndBind(dto.getId(), dto.getDeptId());
 
@@ -334,6 +336,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
+        bo.setUsername(entity.getPin());
         SysDeptBO dept = sysDeptService.getPlainDeptByUserId(bo.getId());
         if (dept != null) {
             bo
