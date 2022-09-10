@@ -200,7 +200,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             throw new BusinessException(SysErrorEnum.INCORRECT_PIN_OR_PWD);
         }
 
-        if (SysUserStatusEnum.BANNED.equals(sysUserEntity.getStatus())) {
+        if (SysUserStatusEnum.BANNED == sysUserEntity.getStatus()) {
             throw new BusinessException(SysErrorEnum.BANNED_USER);
         }
 
@@ -408,7 +408,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             throw new BusinessException(SysErrorEnum.INVALID_TENANT);
         }
 
-        if (GenericStatusEnum.DISABLED.equals(tenantEntity.getStatus())) {
+        if (GenericStatusEnum.DISABLED == tenantEntity.getStatus()) {
             throw new BusinessException(SysErrorEnum.DISABLED_TENANT);
         }
 

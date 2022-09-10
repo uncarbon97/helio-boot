@@ -147,7 +147,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     public List<SysMenuBO> adminListSideMenu() {
         Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuIds();
 
-        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
+        List<SysMenuTypeEnum> requiredMenuTypes = Arrays.asList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
                 SysMenuTypeEnum.EXTERNAL_LINK);
         return this.listByIds(visibleMenuIds, requiredMenuTypes);
     }
@@ -158,7 +158,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     public List<SysMenuBO> adminListVisibleMenu() {
         Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuIds();
 
-        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
+        List<SysMenuTypeEnum> requiredMenuTypes = Arrays.asList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
                 SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
         return this.listByIds(visibleMenuIds, requiredMenuTypes);
     }
