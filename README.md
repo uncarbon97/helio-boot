@@ -5,7 +5,7 @@
 
 JDK compatibility: 1.8 - 17
 
-[官方文档](https://helio.uncarbon.cc/)
+[官方文档](https://helio.uncarbon.cc/) [主要技术栈依赖](https://helio.uncarbon.cc/#/i18n/zh-CN/helio-starters/dependencies) [前端演示站](https://helio-demo.uncarbon.cc/)
 
 需要先安装 `MySQL`、`Redis` 等必需中间件
 
