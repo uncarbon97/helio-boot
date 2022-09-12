@@ -7,6 +7,7 @@ import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.framework.web.util.IPUtil;
 import cc.uncarbon.helper.CaptchaHelper;
 import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.sys.constant.SysConstant;
@@ -22,17 +23,15 @@ import cn.hutool.captcha.AbstractCaptcha;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
 
 
 /**
@@ -54,7 +53,10 @@ public class AdminAuthController {
 
     @ApiOperation(value = "登录", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/login")
-    public ApiResult<SysUserLoginVO> login(@RequestBody @Valid SysUserLoginDTO dto) {
+    public ApiResult<SysUserLoginVO> login(HttpServletRequest request, @RequestBody @Valid SysUserLoginDTO dto) {
+        // 从请求中得到客户端IP地址
+        dto.setClientIP(IPUtil.getClientIPAddress(request));
+
         // RPC调用, 失败抛异常, 成功返回用户信息
         SysUserLoginBO userInfo = sysUserService.adminLogin(dto);
 

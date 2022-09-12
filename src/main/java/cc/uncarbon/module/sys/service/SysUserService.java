@@ -9,6 +9,7 @@ import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.core.props.HelioProperties;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
+import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
 import cc.uncarbon.module.sys.enums.GenericStatusEnum;
@@ -16,7 +17,10 @@ import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
 import cc.uncarbon.module.sys.model.request.*;
-import cc.uncarbon.module.sys.model.response.*;
+import cc.uncarbon.module.sys.model.response.SysDeptBO;
+import cc.uncarbon.module.sys.model.response.SysUserBO;
+import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
+import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
 import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -150,6 +154,8 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
         SysUserEntity updateEntity = new SysUserEntity();
         BeanUtil.copyProperties(dto, updateEntity);
+        // 手动处理异名字段
+        updateEntity.setPin(dto.getUsername());
 
         sysUserDeptRelationService.cleanAndBind(dto.getId(), dto.getDeptId());
 
@@ -169,7 +175,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-登录
      */
-    @SysLog(value = "登录后台用户")
+    @SysLog(value = SysConstant.SysLogOperation.SYS_USER_LOGIN)
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
         /*
         如果启用了多租户功能，并且前端指定了租户ID，则先查库确认租户是否有效
@@ -194,7 +200,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             throw new BusinessException(SysErrorEnum.INCORRECT_PIN_OR_PWD);
         }
 
-        if (SysUserStatusEnum.BANNED.equals(sysUserEntity.getStatus())) {
+        if (SysUserStatusEnum.BANNED == sysUserEntity.getStatus()) {
             throw new BusinessException(SysErrorEnum.BANNED_USER);
         }
 
@@ -209,11 +215,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             TenantContextHolder.setTenantContext(tenantContext);
         }
 
-        try {
-            this.updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
-        } catch (Exception ignored) {
-            // 实际开发环境请删除本try-catch块
-        }
+        this.updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
 
         // 取账号完整信息
         SysUserBO sysUserBO = this.entity2BO(sysUserEntity);
@@ -300,6 +302,19 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         return this.getBaseMapper().getUserByPin(pin);
     }
 
+    /**
+     * 后台管理 - 取指定用户关联角色ID
+     * @param userId 用户ID
+     * @return 角色Ids
+     */
+    public Set<Long> listRelatedRoleIds(Long userId) {
+        if (ObjectUtil.isNull(userId)) {
+            return Collections.emptySet();
+        }
+
+        return sysRoleService.getRoleMapByUserId(userId).keySet();
+    }
+
     /*
     ----------------------------------------------------------------
                         私有方法 private methods
@@ -321,6 +336,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
+        bo.setUsername(entity.getPin());
         SysDeptBO dept = sysDeptService.getPlainDeptByUserId(bo.getId());
         if (dept != null) {
             bo
@@ -359,11 +375,12 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * @return BO 分页
      */
     private PageResult<SysUserBO> entityPage2BOPage(Page<SysUserEntity> entityPage) {
-        PageResult<SysUserBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysUserBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
     /**
@@ -391,7 +408,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
             throw new BusinessException(SysErrorEnum.INVALID_TENANT);
         }
 
-        if (GenericStatusEnum.DISABLED.equals(tenantEntity.getStatus())) {
+        if (GenericStatusEnum.DISABLED == tenantEntity.getStatus()) {
             throw new BusinessException(SysErrorEnum.DISABLED_TENANT);
         }
 

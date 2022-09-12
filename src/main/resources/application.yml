@@ -65,8 +65,6 @@ server:
   port: 7003
 
 mybatis-plus:
-  # 枚举和XML扫描，支持统配符 * 或者 ; 分割
-  type-enums-package: cc.uncarbon.module.*.enums
   mapper-locations: classpath*:/mapper/**/*.xml
 
 logging:

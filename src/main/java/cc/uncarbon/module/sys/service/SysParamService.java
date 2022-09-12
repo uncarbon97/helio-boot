@@ -213,11 +213,12 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
      * @return BO 分页
      */
     private PageResult<SysParamBO> entityPage2BOPage(Page<SysParamEntity> entityPage) {
-        PageResult<SysParamBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysParamBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
     /**

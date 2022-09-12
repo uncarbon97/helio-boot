@@ -12,6 +12,7 @@ import cc.uncarbon.module.sys.mapper.SysDataDictMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDataDictDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysDataDictDTO;
 import cc.uncarbon.module.sys.model.response.SysDataDictBO;
+import cc.uncarbon.module.sys.model.response.SysParamBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -175,11 +176,12 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
      * @return BO 分页
      */
     private PageResult<SysDataDictBO> entityPage2BOPage(Page<SysDataDictEntity> entityPage) {
-        PageResult<SysDataDictBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysDataDictBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
     /**

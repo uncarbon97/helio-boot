@@ -15,12 +15,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -40,6 +41,8 @@ public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEnti
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<SysLogEntity>()
                         .lambda()
+                        // 仅返回给前端少量字段
+                        .select(SysLogEntity::getCreatedAt, SysLogEntity::getUsername, SysLogEntity::getOperation, SysLogEntity::getIp, SysLogEntity::getStatus)
                         // 用户账号
                         .like(StrUtil.isNotBlank(dto.getUsername()), SysLogEntity::getUsername, StrUtil.cleanBlank(dto.getUsername()))
                         // 操作内容
@@ -133,11 +136,12 @@ public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEnti
      * @return BO 分页
      */
     private PageResult<SysLogBO> entityPage2BOPage(Page<SysLogEntity> entityPage) {
-        PageResult<SysLogBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysLogBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
 }

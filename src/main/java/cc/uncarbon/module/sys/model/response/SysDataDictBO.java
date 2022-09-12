@@ -2,7 +2,6 @@ package cc.uncarbon.module.sys.model.response;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +19,6 @@ import java.time.LocalDateTime;
  *
  * @author Uncarbon
  */
-@ApiModel(value = "数据字典")
 @Accessors(chain = true)
 @Builder
 @AllArgsConstructor

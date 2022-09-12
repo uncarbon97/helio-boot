@@ -18,13 +18,14 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -53,8 +54,6 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
                         .eq(ObjectUtil.isNotNull(dto.getTenantId()), SysTenantEntity::getTenantId, dto.getTenantId())
                         // 状态
                         .eq(ObjectUtil.isNotNull(dto.getStatus()), SysTenantEntity::getStatus, dto.getStatus())
-                        // 时间区间
-                        .between(ObjectUtil.isNotNull(dto.getBeginAt()) && ObjectUtil.isNotNull(dto.getEndAt()), SysTenantEntity::getCreatedAt, dto.getBeginAt(), dto.getEndAt())
                         // 排序
                         .orderByDesc(SysTenantEntity::getCreatedAt)
         );
@@ -202,11 +201,12 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      * @return BO 分页
      */
     private PageResult<SysTenantBO> entityPage2BOPage(Page<SysTenantEntity> entityPage) {
-        PageResult<SysTenantBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysTenantBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
 }

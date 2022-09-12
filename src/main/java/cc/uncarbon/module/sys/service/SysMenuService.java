@@ -3,6 +3,7 @@ package cc.uncarbon.module.sys.service;
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.exception.BusinessException;
+import cc.uncarbon.framework.core.function.StreamFunction;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
@@ -12,7 +13,6 @@ import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysMenuTypeEnum;
 import cc.uncarbon.module.sys.mapper.SysMenuMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysMenuDTO;
-import cc.uncarbon.module.sys.model.request.AdminListSysMenuDTO;
 import cc.uncarbon.module.sys.model.response.SysMenuBO;
 import cc.uncarbon.module.sys.model.response.VbenAdminMenuMetaVO;
 import cn.hutool.core.bean.BeanUtil;
@@ -23,21 +23,13 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.BinaryOperator;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -58,7 +50,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     /**
      * 后台管理-列表
      */
-    public List<SysMenuBO> adminList(AdminListSysMenuDTO dto) {
+    public List<SysMenuBO> adminList() {
         List<SysMenuEntity> entityList = this.list(
                 new QueryWrapper<SysMenuEntity>()
                         .lambda()
@@ -153,9 +145,9 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      * 后台管理-取侧边菜单
      */
     public List<SysMenuBO> adminListSideMenu() {
-        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuId();
+        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuIds();
 
-        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
+        List<SysMenuTypeEnum> requiredMenuTypes = Arrays.asList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
                 SysMenuTypeEnum.EXTERNAL_LINK);
         return this.listByIds(visibleMenuIds, requiredMenuTypes);
     }
@@ -164,9 +156,9 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      * 后台管理-取所有可见菜单 包括按钮类型
      */
     public List<SysMenuBO> adminListVisibleMenu() {
-        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuId();
+        Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuIds();
 
-        List<SysMenuTypeEnum> requiredMenuTypes = CollUtil.newArrayList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
+        List<SysMenuTypeEnum> requiredMenuTypes = Arrays.asList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
                 SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
         return this.listByIds(visibleMenuIds, requiredMenuTypes);
     }
@@ -197,7 +189,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                     } else {
                         // 非超级管理员则通过角色ID，关联查询拥有的菜单，菜单上有权限名
 
-                        Set<Long> menuIds = sysRoleMenuRelationService.listMenuIdByRoleId(roleId);
+                        Set<Long> menuIds = sysRoleMenuRelationService.listMenuIdsByRoleIds(Collections.singleton(roleId));
                         if (CollUtil.isEmpty(menuIds)) {
                             permissions = Collections.emptySet();
                         } else {
@@ -225,7 +217,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     /**
      * 根据菜单ID集合，取权限名集合
      */
-    public Set<String> listPermissionByMenuIds(Collection<Long> menuIds) {
+    public Set<String> listPermissionsByMenuIds(Collection<Long> menuIds) {
         if (CollUtil.isEmpty(menuIds)) {
             return Collections.emptySet();
         }
@@ -325,7 +317,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      *
      * @return 菜单Ids
      */
-    private Set<Long> listCurrentUserVisibleMenuId() {
+    private Set<Long> listCurrentUserVisibleMenuIds() {
         // 1. 取当前账号拥有角色Ids
         Set<Long> roleIds = UserContextHolder.getUserContext().getRolesIds();
         SysErrorEnum.NO_ROLE_AVAILABLE_FOR_CURRENT_USER.assertNotEmpty(roleIds);
@@ -336,7 +328,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                         .lambda()
                         .select(SysMenuEntity::getId, SysMenuEntity::getParentId)
                         .eq(SysMenuEntity::getStatus, GenericStatusEnum.ENABLED)
-        ).stream().collect(Collectors.toMap(SysMenuEntity::getId, SysMenuEntity::getParentId, ignoredThrowingMerger()));
+        ).stream().collect(Collectors.toMap(SysMenuEntity::getId, SysMenuEntity::getParentId, StreamFunction.ignoredThrowingMerger()));
 
         // 3. 超级管理员直接返回所有菜单
         if (roleIds.contains(SysConstant.SUPER_ADMIN_ROLE_ID)) {
@@ -344,7 +336,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         }
 
         // 4. 根据现有角色，获取直接关联的菜单ID
-        Set<Long> directlyRelatedMenuIds = sysRoleMenuRelationService.listMenuIdByRoleIds(roleIds);
+        Set<Long> directlyRelatedMenuIds = sysRoleMenuRelationService.listMenuIdsByRoleIds(roleIds);
         SysErrorEnum.NO_MENU_AVAILABLE_FOR_CURRENT_ROLE.assertNotEmpty(directlyRelatedMenuIds);
 
         // 5. 因为直接关联的菜单ID，可能不包含父级菜单，使得级联关系缺失，这里得给他补上
@@ -373,12 +365,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
             return Collections.emptyList();
         }
 
-        List<SysMenuBO> ret = new ArrayList<>(entityList.size());
-        entityList.forEach(
-                each -> ret.add(this.entity2BO(each))
-        );
-
-        return ret;
+        return this.entityList2BOs(entityList);
     }
 
     /**
@@ -442,15 +429,5 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         } while (!nextLoop.isEmpty());
 
         return ret;
-    }
-
-    /**
-     * 原来键冲突会报错，使用自定义函数来无视
-     *
-     * @param <T> 键类型
-     * @return 键
-     */
-    private static <T> BinaryOperator<T> ignoredThrowingMerger() {
-        return (u, v) -> u;
     }
 }

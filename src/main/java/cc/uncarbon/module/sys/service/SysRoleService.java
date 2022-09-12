@@ -2,6 +2,7 @@ package cc.uncarbon.module.sys.service;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.exception.BusinessException;
+import cc.uncarbon.framework.core.function.StreamFunction;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
@@ -15,22 +16,16 @@ import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
 import cc.uncarbon.module.sys.model.response.SysRoleBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BinaryOperator;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -62,8 +57,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
                         .like(StrUtil.isNotBlank(dto.getTitle()), SysRoleEntity::getTitle, StrUtil.cleanBlank(dto.getTitle()))
                         // 值
                         .like(StrUtil.isNotBlank(dto.getValue()), SysRoleEntity::getValue, StrUtil.cleanBlank(dto.getValue()))
-                        // 时间区间
-                        .between(ObjectUtil.isNotNull(dto.getBeginAt()) && ObjectUtil.isNotNull(dto.getEndAt()), SysRoleEntity::getCreatedAt, dto.getBeginAt(), dto.getEndAt())
                         // 排序
                         .orderByDesc(SysRoleEntity::getCreatedAt)
         );
@@ -148,7 +141,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      * @return 新菜单ID集合对应的权限名
      */
     public Set<String> adminBindMenus(AdminBindRoleMenuRelationDTO dto) {
-        Set<String> newPermissions = sysMenuService.listPermissionByMenuIds(dto.getMenuIds());
+        Set<String> newPermissions = sysMenuService.listPermissionsByMenuIds(dto.getMenuIds());
         sysRoleMenuRelationService.cleanAndBind(dto.getRoleId(), dto.getMenuIds());
 
         return newPermissions;
@@ -176,7 +169,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        bo.setMenuIds(sysRoleMenuRelationService.listMenuIdByRoleIds(CollUtil.newHashSet(bo.getId())));
+        bo.setMenuIds(sysRoleMenuRelationService.listMenuIdsByRoleIds(Collections.singleton(bo.getId())));
         return bo;
     }
 
@@ -203,11 +196,12 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      * @return BO 分页
      */
     private PageResult<SysRoleBO> entityPage2BOPage(Page<SysRoleEntity> entityPage) {
-        PageResult<SysRoleBO> ret = new PageResult<>();
-        BeanUtil.copyProperties(entityPage, ret);
-        ret.setRecords(this.entityList2BOs(entityPage.getRecords()));
-
-        return ret;
+        return new PageResult<SysRoleBO>()
+                .setCurrent(entityPage.getCurrent())
+                .setSize(entityPage.getSize())
+                .setTotal(entityPage.getTotal())
+                .setRecords(this.entityList2BOs(entityPage.getRecords()))
+                ;
     }
 
     /**
@@ -238,7 +232,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      * @return 失败返回空 map
      */
     public Map<Long, String> getRoleMapByUserId(Long userId) {
-        Set<Long> roleIds = sysUserRoleRelationService.listRoleIdByUserId(userId);
+        Set<Long> roleIds = sysUserRoleRelationService.listRoleIdsByUserId(userId);
 
         if (CollUtil.isEmpty(roleIds)) {
             return Collections.emptyMap();
@@ -250,13 +244,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
                         .lambda()
                         .select(SysRoleEntity::getId, SysRoleEntity::getValue)
                         .in(SysRoleEntity::getId, roleIds)
-        ).stream().collect(Collectors.toMap(SysRoleEntity::getId, SysRoleEntity::getValue, this.ignoredThrowingMerger()));
-    }
-
-    /**
-     * 主动忽略 map key 重复错误，不然 key 重复的话，转换成 map 的过程会抛异常
-     */
-    private <T> BinaryOperator<T> ignoredThrowingMerger() {
-        return (u, v) -> u;
+        ).stream().collect(Collectors.toMap(SysRoleEntity::getId, SysRoleEntity::getValue, StreamFunction.ignoredThrowingMerger()));
     }
 }
