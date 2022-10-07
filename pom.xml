@@ -67,6 +67,26 @@
         </dependency>
 
         <!-- 这里写其他第三方依赖 -->
+        <!-- 对象存储工具类 https://gitee.com/XYW1171736840/spring-file-storage -->
+        <dependency>
+            <groupId>cn.xuyanwu</groupId>
+            <artifactId>spring-file-storage</artifactId>
+            <version>0.6.1</version>
+            <exclusions>
+                <!-- 默认就带了 hutool，不需要重复引入 -->
+                <exclusion>
+                    <groupId>cn.hutool</groupId>
+                    <artifactId>hutool-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- MinIO 依赖包 -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.4.3</version>
+        </dependency>
 
     </dependencies>
 
