@@ -15,6 +15,8 @@
     <version>1.7.1-SNAPSHOT</version>
 
     <properties>
+        <spring-file-storage.version>0.6.1</spring-file-storage.version>
+        <minio.version>8.4.3</minio.version>
     </properties>
 
     <dependencies>
@@ -71,9 +73,9 @@
         <dependency>
             <groupId>cn.xuyanwu</groupId>
             <artifactId>spring-file-storage</artifactId>
-            <version>0.6.1</version>
+            <version>${spring-file-storage.version}</version>
             <exclusions>
-                <!-- 默认就带了 hutool，不需要重复引入 -->
+                <!-- helio-core 就带了 hutool，不需要重复引入 -->
                 <exclusion>
                     <groupId>cn.hutool</groupId>
                     <artifactId>hutool-core</artifactId>
@@ -85,7 +87,7 @@
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>8.4.3</version>
+            <version>${minio.version}</version>
         </dependency>
 
     </dependencies>
