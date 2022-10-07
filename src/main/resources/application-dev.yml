@@ -36,4 +36,5 @@ knife4j:
 
 mybatis-plus:
   configuration:
+    # 生产环境下建议去除该配置项，不在控制台打印SQL
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
