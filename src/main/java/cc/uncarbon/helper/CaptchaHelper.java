@@ -3,10 +3,11 @@ package cc.uncarbon.helper;
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.ShearCaptcha;
 import cn.hutool.core.util.StrUtil;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码助手类；可将验证码答案缓存至 Redis
@@ -43,6 +44,7 @@ public class CaptchaHelper {
      *
      * @param uuid          UUID
      * @param captchaAnswer 验证码答案
+     * @param removeWhenEquals 匹配时自动移除缓存键
      * @return 是否正确
      */
     public boolean validate(String uuid, String captchaAnswer, boolean removeWhenEquals) {

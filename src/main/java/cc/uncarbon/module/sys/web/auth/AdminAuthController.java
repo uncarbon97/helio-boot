@@ -12,7 +12,6 @@ import cc.uncarbon.helper.CaptchaHelper;
 import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
-import cc.uncarbon.module.sys.enums.UserTypeEnum;
 import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginVO;
@@ -65,7 +64,7 @@ public class AdminAuthController {
                 .userId(userInfo.getId())
                 .userName(userInfo.getUsername())
                 .userPhoneNo(userInfo.getPhoneNo())
-                .userType(UserTypeEnum.ADMIN_USER)
+                .userTypeStr("ADMIN_USER")
                 .extraData(null)
                 .rolesIds(userInfo.getRoleIds())
                 .roles(userInfo.getRoles())
@@ -112,7 +111,7 @@ public class AdminAuthController {
         // uuid 为空则抛出异常
         SysErrorEnum.UUID_CANNOT_BE_BLANK.assertNotBlank(uuid);
 
-        // 核验方法：captchaHelper.validate(uuid, true);
+        // 核验方法：captchaHelper.validate;
         AbstractCaptcha captcha = captchaHelper.generate(uuid);
 
         // 写入响应流
