@@ -5,7 +5,9 @@
 
 JDK compatibility: 1.8 - 17
 
-[官方文档](https://helio.uncarbon.cc/) [主要技术栈依赖](https://helio.uncarbon.cc/#/i18n/zh-CN/helio-starters/dependencies) [前端演示站](https://helio-demo.uncarbon.cc/)
+【[官方文档](https://helio.uncarbon.cc/)】 
+【[主要技术栈依赖](https://helio.uncarbon.cc/#/i18n/zh-CN/helio-starters/dependencies)】
+【[前端演示站](https://helio-demo.uncarbon.cc/)】
 
 需要先安装 `MySQL`、`Redis` 等必需中间件
 
@@ -18,4 +20,6 @@ JDK compatibility: 1.8 - 17
 | helio-admin-vue-vben | 基于[Vue vben admin](https://github.com/anncwb/vue-vben-admin) 改造适配的前端框架，开箱即用 | [Gitee](https://gitee.com/uncarbon97/helio-admin-vue-vben) | [GitHub](https://github.com/uncarbon97/helio-admin-vue-vben) |
 
 ## 代码分支
-分支`feature/oss_support`：支持对象存储（文件上传、下载）
+> 对应数据表说明请见`attachments/schema/README.md`
+- 分支`feature/oss_support`：支持对象存储（文件上传、下载）
+- 分支`demo/library`：图书管理系统（后台管理示例）
