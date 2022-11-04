@@ -15,6 +15,8 @@
     <version>1.7.1</version>
 
     <properties>
+        <spring-file-storage.version>0.6.1</spring-file-storage.version>
+        <minio.version>8.4.3</minio.version>
     </properties>
 
     <dependencies>
@@ -67,6 +69,26 @@
         </dependency>
 
         <!-- 这里写其他第三方依赖 -->
+        <!-- 对象存储工具类 https://gitee.com/XYW1171736840/spring-file-storage -->
+        <dependency>
+            <groupId>cn.xuyanwu</groupId>
+            <artifactId>spring-file-storage</artifactId>
+            <version>${spring-file-storage.version}</version>
+            <exclusions>
+                <!-- helio-core 就带了 hutool，不需要重复引入 -->
+                <exclusion>
+                    <groupId>cn.hutool</groupId>
+                    <artifactId>hutool-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- MinIO 依赖包 -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>${minio.version}</version>
+        </dependency>
 
     </dependencies>
 
