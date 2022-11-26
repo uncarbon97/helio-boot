@@ -7,12 +7,12 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>helio-boot</artifactId>
     <!-- 程序版本号，建议每次打包发布时都调整以作区分 -->
-    <version>1.7.1</version>
+    <version>1.7.2-SNAPSHOT</version>
 
     <properties>
     </properties>
