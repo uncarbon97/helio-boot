@@ -58,14 +58,50 @@ public class SysLogAspect {
 
     @Around("sysLogPointcut()")
     public Object sysLogAround(ProceedingJoinPoint point) throws Throwable {
-        // --------------------Begin @SysLog--------------------
+        // 切面点执行结果
+        Object executeResult = null;
+        // 切面点执行是否成功
+        boolean executeSuccessFlag = false;
+        // 切面点执行过程中抛出的异常
+        Exception executeFailedException = null;
+        try {
+            executeResult = point.proceed();
+            executeSuccessFlag = true;
+        } catch (Exception e) {
+            // store it
+            executeFailedException = e;
+        }
 
-        Object executeResult;
-        executeResult = point.proceed();
-
+        /*
+        记录对应系统日志
+         */
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
         SysLog sysLogAnnotation = methodSignature.getMethod().getAnnotation(SysLog.class);
 
+        if (sysLogAnnotation.syncSaving()) {
+            this.sysLogSaving(point, methodSignature, sysLogAnnotation, executeSuccessFlag);
+        } else {
+            this.sysLogSavingAsync(point, methodSignature, sysLogAnnotation, executeSuccessFlag);
+        }
+
+        /*
+        如果执行过程中存在异常则抛出
+         */
+        if (executeFailedException != null) {
+            throw executeFailedException;
+        }
+
+        return executeResult;
+    }
+
+    /**
+     * 同步保存系统日志
+     */
+    private void sysLogSaving(ProceedingJoinPoint point,
+                              MethodSignature methodSignature,
+                              SysLog sysLogAnnotation,
+                              boolean executeSuccessFlag
+    ) {
         AdminInsertSysLogDTO dto = new AdminInsertSysLogDTO()
                 // 记录操作人
                 .setUserId(UserContextHolder.getUserId())
@@ -103,22 +139,27 @@ public class SysLogAspect {
         dto.setIp(ip);
 
         // 记录状态
-        dto.setStatus(SysLogStatusEnum.SUCCESS);
+        dto.setStatus(executeSuccessFlag ? SysLogStatusEnum.SUCCESS : SysLogStatusEnum.FAILED);
 
         // 执行扩展 - 保存到 DB 前
         for (SysLogAspectExtension extension : extensions) {
             extension.beforeSaving(sysLogAnnotation, point, dto);
         }
 
-        this.asyncSaving(dto);
-        // --------------------End @SysLog--------------------
-
-        return executeResult;
+        // 保存系统日志
+        sysLogService.adminInsert(dto);
     }
 
+    /**
+     * 异步保存系统日志
+     */
     @Async(value = "taskExecutor")
-    void asyncSaving(AdminInsertSysLogDTO dto) {
-        sysLogService.adminInsert(dto);
+    public void sysLogSavingAsync(ProceedingJoinPoint point,
+                                  MethodSignature methodSignature,
+                                  SysLog sysLogAnnotation,
+                                  boolean executeSuccessFlag
+    ) {
+        this.sysLogSaving(point, methodSignature, sysLogAnnotation, executeSuccessFlag);
     }
 
 }
