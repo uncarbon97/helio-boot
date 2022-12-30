@@ -173,7 +173,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
             return Collections.emptyMap();
         }
 
-        HashMap<Long, Set<String>> ret = new HashMap<>(roleIds.size());
+        HashMap<Long, Set<String>> ret = new HashMap<>(roleIds.size(), 1);
 
         roleIds.forEach(
                 roleId -> {
