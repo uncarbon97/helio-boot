@@ -23,6 +23,11 @@ public enum SysLogStatusEnum implements HelioBaseEnum<Integer> {
      * 成功
      */
     SUCCESS(1, "成功"),
+
+    /**
+     * 失败
+     */
+    FAILED(2, "失败"),
     ;
 
     @EnumValue
