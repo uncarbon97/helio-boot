@@ -5,11 +5,12 @@ import cc.uncarbon.framework.satoken.util.IPUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.aspect.extension.SysLogAspectExtension;
 import cc.uncarbon.module.sys.constant.SysConstant;
-import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysLogStatusEnum;
+import cc.uncarbon.module.sys.model.request.AdminInsertSysLogDTO;
 import cc.uncarbon.module.sys.service.SysLogService;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.text.StrPool;
 import cn.hutool.json.JSONUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,15 +58,51 @@ public class SysLogAspect {
 
     @Around("sysLogPointcut()")
     public Object sysLogAround(ProceedingJoinPoint point) throws Throwable {
-        // --------------------Begin @SysLog--------------------
+        // 切面点执行结果
+        Object executeResult = null;
+        // 切面点执行是否成功
+        boolean executeSuccessFlag = false;
+        // 切面点执行过程中抛出的异常
+        Exception executeFailedException = null;
+        try {
+            executeResult = point.proceed();
+            executeSuccessFlag = true;
+        } catch (Exception e) {
+            // store it
+            executeFailedException = e;
+        }
 
-        Object executeResult;
-        executeResult = point.proceed();
-
+        /*
+        记录对应系统日志
+         */
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
         SysLog sysLogAnnotation = methodSignature.getMethod().getAnnotation(SysLog.class);
 
-        SysLogEntity sysLogEntity = new SysLogEntity()
+        if (sysLogAnnotation.syncSaving()) {
+            this.sysLogSaving(point, methodSignature, sysLogAnnotation, executeSuccessFlag);
+        } else {
+            this.sysLogSavingAsync(point, methodSignature, sysLogAnnotation, executeSuccessFlag);
+        }
+
+        /*
+        如果执行过程中存在异常则抛出
+         */
+        if (executeFailedException != null) {
+            throw executeFailedException;
+        }
+
+        return executeResult;
+    }
+
+    /**
+     * 同步保存系统日志
+     */
+    private void sysLogSaving(ProceedingJoinPoint point,
+                              MethodSignature methodSignature,
+                              SysLog sysLogAnnotation,
+                              boolean executeSuccessFlag
+    ) {
+        AdminInsertSysLogDTO dto = new AdminInsertSysLogDTO()
                 // 记录操作人
                 .setUserId(UserContextHolder.getUserId())
                 .setUsername(UserContextHolder.getUserName())
@@ -78,14 +115,14 @@ public class SysLogAspect {
         记录请求参数
          */
         HashMap<Object, Object> afterMasked = new HashMap<>();
-        sysLogEntity.setParams(Arrays.stream(point.getArgs()).map(
+        dto.setParams(Arrays.stream(point.getArgs()).map(
                 each -> {
                     // 先去除敏感字段后再入库
                     afterMasked.clear();
                     BeanUtil.copyProperties(each, afterMasked, copyOptions4MaskingArgs);
                     return JSONUtil.toJsonStr(afterMasked);
                 }
-        ).collect(Collectors.joining(",")));
+        ).collect(Collectors.joining(StrPool.COMMA)));
 
         /*
         记录IP地址
@@ -99,25 +136,30 @@ public class SysLogAspect {
                 ip = IPUtil.getClientIPAddress(requestAttributes.getRequest());
             }
         }
-        sysLogEntity.setIp(ip);
+        dto.setIp(ip);
 
         // 记录状态
-        sysLogEntity.setStatus(SysLogStatusEnum.SUCCESS);
+        dto.setStatus(executeSuccessFlag ? SysLogStatusEnum.SUCCESS : SysLogStatusEnum.FAILED);
 
         // 执行扩展 - 保存到 DB 前
         for (SysLogAspectExtension extension : extensions) {
-            extension.beforeSaving(sysLogAnnotation, point, sysLogEntity);
+            extension.beforeSaving(sysLogAnnotation, point, dto);
         }
 
-        this.callSysLogServiceSave(sysLogEntity);
-        // --------------------End @SysLog--------------------
-
-        return executeResult;
+        // 保存系统日志
+        sysLogService.adminInsert(dto);
     }
 
+    /**
+     * 异步保存系统日志
+     */
     @Async(value = "taskExecutor")
-    void callSysLogServiceSave(SysLogEntity sysLogEntity) {
-        sysLogService.save(sysLogEntity);
+    public void sysLogSavingAsync(ProceedingJoinPoint point,
+                                  MethodSignature methodSignature,
+                                  SysLog sysLogAnnotation,
+                                  boolean executeSuccessFlag
+    ) {
+        this.sysLogSaving(point, methodSignature, sysLogAnnotation, executeSuccessFlag);
     }
 
 }

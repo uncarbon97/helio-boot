@@ -7,6 +7,7 @@ import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysLogMapper;
+import cc.uncarbon.module.sys.model.request.AdminInsertSysLogDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysLogDTO;
 import cc.uncarbon.module.sys.model.response.SysLogBO;
 import cn.hutool.core.bean.BeanUtil;
@@ -18,6 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,6 +84,21 @@ public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEnti
         }
 
         return this.entity2BO(entity);
+    }
+
+    /**
+     * 后台管理-新增
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Long adminInsert(AdminInsertSysLogDTO dto) {
+        log.info("[后台管理-新增操作日志] >> 入参={}", dto);
+
+        SysLogEntity entity = new SysLogEntity();
+        BeanUtil.copyProperties(dto, entity);
+
+        this.save(entity);
+
+        return entity.getId();
     }
 
     /*

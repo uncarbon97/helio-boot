@@ -17,6 +17,9 @@ spring:
     pathmatch:
       # Boot 2.6+ 默认的路由匹配策略，Swagger 暂不兼容，使用老策略
       matching-strategy: ant_path_matcher
+  messages:
+    # 国际化资源目录，一般不做修改
+    basename: i18n/messages
 
 helio:
   crud:
@@ -52,6 +55,9 @@ helio:
       - sys_role_menu_relation
       - sys_user_dept_relation
       - sys_user_role_relation
+  i18n:
+    # 是否对返回消息启用国际化翻译
+    enabled: false
 
 knife4j:
   # 保持true
