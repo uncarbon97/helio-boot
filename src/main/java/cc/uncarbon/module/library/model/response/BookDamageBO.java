@@ -36,6 +36,9 @@ public class BookDamageBO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime createdAt;
 
+    @ApiModelProperty(value = "创建人")
+    private String createdBy;
+
     @ApiModelProperty(value = "更新时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
