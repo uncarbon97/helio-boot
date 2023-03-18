@@ -7,8 +7,7 @@ import lombok.Getter;
 
 
 /**
- * 菜单类型枚举类
- * @author Uncarbon
+ * 预置系统菜单类型枚举类
  */
 @AllArgsConstructor
 @Getter
@@ -33,8 +32,8 @@ public enum SysMenuTypeEnum implements HelioBaseEnum<Integer> {
      * 外链
      */
     EXTERNAL_LINK(3, "外链"),
-    ;
 
+    ;
     @EnumValue
     private final Integer value;
     private final String label;

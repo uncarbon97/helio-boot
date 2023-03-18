@@ -6,8 +6,7 @@ import lombok.Getter;
 
 
 /**
- * 后台管理异常枚举类
- * @author Uncarbon
+ * SYS异常枚举类
  */
 @AllArgsConstructor
 @Getter
@@ -32,7 +31,6 @@ public enum SysErrorEnum implements HelioBaseEnum<Integer> {
     UUID_CANNOT_BE_BLANK(400, "UUID不能为空"),
 
     ;
-
     private final Integer value;
     private final String label;
 

@@ -19,3 +19,8 @@ JDK compatibility: 1.8 - 17
 |----------------------|-----------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------|
 | helio-generator      | 可一键生成单体or微服务版的前、后端代码，减少无谓的重复劳动                                              | [Gitee](https://gitee.com/uncarbon97/helio-generator)      | [GitHub](https://github.com/uncarbon97/helio-generator)      |
 | helio-admin-vue-vben | 基于[Vue vben admin](https://github.com/anncwb/vue-vben-admin) 改造适配的前端框架，开箱即用 | [Gitee](https://gitee.com/uncarbon97/helio-admin-vue-vben) | [GitHub](https://github.com/uncarbon97/helio-admin-vue-vben) |
+
+## 演示项目
+| 项目名            | 后端                                                                    | 前端                                                                              | 需导入数据库文件                                                                     |
+|----------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| library 图书管理系统 | [Gitee](https://gitee.com/uncarbon97/helio-boot/tree/demo%2Flibrary/) | [Gitee](https://gitee.com/uncarbon97/helio-admin-vue-vben/tree/demo%2Flibrary/) | attachments/db/MySQL/helio_boot.sql<br>attachments/db/demo/library_MySQL.sql |
