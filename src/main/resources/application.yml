@@ -20,6 +20,15 @@ spring:
   messages:
     # 国际化资源目录，一般不做修改
     basename: i18n/messages
+  task:
+    # spring-schedule 线程池容量
+    scheduling:
+      pool:
+        size: 8
+    # spring-async 线程池容量
+    execution:
+      pool:
+        core-size: 8
 
 helio:
   crud:
