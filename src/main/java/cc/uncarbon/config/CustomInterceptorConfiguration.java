@@ -32,7 +32,8 @@ public class CustomInterceptorConfiguration implements WebMvcConfigurer {
          */
         registry
                 .addInterceptor(new DefaultSaTokenParseInterceptor())
-                .addPathPatterns(AppConstant.APP_MODULE_CONTEXT_PATH + "/**");
+                // @since 1.7.3 fix: 访问除 /app/** 以外的路由时，不会清除复用线程中残留的用户态
+                .addPathPatterns("/**");
 
         registry
                 .addInterceptor(new AdminSaTokenParseInterceptor())
