@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -227,9 +228,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         SysUserLoginBO ret = new SysUserLoginBO();
         BeanUtil.copyProperties(sysUserBO, ret);
 
-        // aka * 64
-        HashSet<String> permissions = new HashSet<>(roleIdPermissionMap.size() << 6);
-        roleIdPermissionMap.values().forEach(permissions::addAll);
+        Set<String> permissions = roleIdPermissionMap.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
         ret
                 .setRoleIds(new HashSet<>(roleMap.keySet()))

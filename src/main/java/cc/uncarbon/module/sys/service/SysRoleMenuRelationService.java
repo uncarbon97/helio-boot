@@ -4,6 +4,7 @@ import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysRoleMenuRelationEntity;
 import cc.uncarbon.module.sys.mapper.SysRoleMenuRelationMapper;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,7 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
      * @return 菜单Ids
      */
     public Set<Long> listMenuIdsByRoleIds(Collection<Long> roleIds) throws IllegalArgumentException {
-        if (CollUtil.isEmpty(roleIds)) {
-            throw new IllegalArgumentException("roleIds不能为空");
-        }
+        Assert.notEmpty(roleIds);
 
         // aka * 16
         Set<Long> ret = new HashSet<>(roleIds.size() << 4);
