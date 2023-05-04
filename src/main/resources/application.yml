@@ -80,8 +80,8 @@ server:
   port: 7003
 
 mybatis-plus:
-  # XML扫描，支持统配符 * 或者 ; 分割
-  mapper-locations: classpath*:/mapper/**/*.xml
+  # XML扫描，支持统配符 * 或者 , 分割
+  mapper-locations: classpath*:/mapper/**/*.xml, classpath*:/**/mapper/xml/*.xml
 
 logging:
   level:

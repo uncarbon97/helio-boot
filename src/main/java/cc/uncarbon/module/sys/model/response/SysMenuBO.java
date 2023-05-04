@@ -76,7 +76,4 @@ public class SysMenuBO implements Serializable {
     @ApiModelProperty(value = "【用于Vben Admin】菜单详情", hidden = true)
     private VbenAdminMenuMetaVO meta;
 
-    @ApiModelProperty(value = "【用于Vben Admin树状菜单】菜单主键ID字符串", hidden = true)
-    private String idStr;
-
 }

@@ -96,6 +96,19 @@
     </dependencies>
 
     <build>
+        <!-- 支持 mybatis XML 放置在 java 包下 -->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
         <plugins>
             <!-- Spring Boot 打包插件 -->
             <plugin>

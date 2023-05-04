@@ -253,7 +253,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
 
         String snowflakeIdStr = SNOWFLAKE.nextIdStr();
         bo
-                .setIdStr(StrUtil.toString(bo.getId()))
                 .setName(snowflakeIdStr)
                 .setMeta(
                         VbenAdminMenuMetaVO.builder()
