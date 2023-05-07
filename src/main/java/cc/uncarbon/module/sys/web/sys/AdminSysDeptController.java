@@ -38,21 +38,21 @@ public class AdminSysDeptController {
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
-    @ApiOperation(value = "列表", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "列表")
     @GetMapping
     public ApiResult<List<SysDeptBO>> list() {
         return ApiResult.data(sysDeptService.adminList());
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
-    @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "详情")
     @GetMapping(value = "/{id}")
     public ApiResult<SysDeptBO> getById(@PathVariable Long id) {
         return ApiResult.data(sysDeptService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
-    @ApiOperation(value = "新增", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "新增")
     @PostMapping
     public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
         sysDeptService.adminInsert(dto);
@@ -61,7 +61,7 @@ public class AdminSysDeptController {
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
-    @ApiOperation(value = "编辑", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "编辑")
     @PutMapping(value = "/{id}")
     public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
         dto.setId(id);
@@ -71,7 +71,7 @@ public class AdminSysDeptController {
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
-    @ApiOperation(value = "删除", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "删除")
     @DeleteMapping
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysDeptService.adminDelete(dto.getIds());

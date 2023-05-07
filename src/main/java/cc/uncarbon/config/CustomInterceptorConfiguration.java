@@ -5,8 +5,7 @@ import cc.uncarbon.framework.satoken.interceptor.DefaultSaTokenParseInterceptor;
 import cc.uncarbon.interceptor.AdminSaTokenParseInterceptor;
 import cc.uncarbon.module.app.constant.AppConstant;
 import cc.uncarbon.module.sys.constant.SysConstant;
-import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
-import cn.dev33.satoken.interceptor.SaRouteInterceptor;
+import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -29,34 +28,35 @@ public class CustomInterceptorConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         /*
-        1. 请求头解析, 设定用户上下文
+        1. 通用请求头解析，设定用户、租户上下文
          */
         registry
                 .addInterceptor(new DefaultSaTokenParseInterceptor())
-                .addPathPatterns(AppConstant.APP_MODULE_CONTEXT_PATH + "/**");
+                // @since 1.7.3 fix: 访问除 /app/** 以外的路由时，不会清除复用线程中残留的用户态
+                .addPathPatterns("/**");
 
         registry
                 .addInterceptor(new AdminSaTokenParseInterceptor())
                 .addPathPatterns(SysConstant.SYS_MODULE_CONTEXT_PATH + "/**");
 
         /*
-        2. App-路由拦截器, 使几乎所有接口都需要登录
+        2. 注解拦截器，启用注解功能
+         */
+        registry
+                .addInterceptor(new SaInterceptor())
+                .addPathPatterns("/**");
+
+        /*
+        3. /app/** 路由拦截器, 使几乎所有接口都需要登录
         放行接口请在配置文件的 helio.security.exclude-routes 中设置
 
         @see http://sa-token.dev33.cn/doc/index.html#/use/route-check
          */
         registry
-                .addInterceptor(new SaRouteInterceptor(
-                        (req, res, handler) -> StpUtil.checkLogin()
+                .addInterceptor(new SaInterceptor(
+                        (handler) -> StpUtil.checkLogin()
                 ))
                 .addPathPatterns(AppConstant.APP_MODULE_CONTEXT_PATH + "/**")
                 .excludePathPatterns(helioProperties.getSecurity().getExcludeRoutes());
-
-        /*
-        3. 注解拦截器, 启用注解功能
-         */
-        registry
-                .addInterceptor(new SaAnnotationInterceptor())
-                .addPathPatterns("/**");
     }
 }

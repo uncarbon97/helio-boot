@@ -140,6 +140,8 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      *
      * @return 新菜单ID集合对应的权限名
      */
+    @SysLog(value = "绑定角色与菜单关联关系")
+    @Transactional(rollbackFor = Exception.class)
     public Set<String> adminBindMenus(AdminBindRoleMenuRelationDTO dto) {
         Set<String> newPermissions = sysMenuService.listPermissionsByMenuIds(dto.getMenuIds());
         sysRoleMenuRelationService.cleanAndBind(dto.getRoleId(), dto.getMenuIds());
