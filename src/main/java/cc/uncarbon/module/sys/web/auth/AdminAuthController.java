@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +49,7 @@ public class AdminAuthController {
     private final CaptchaHelper captchaHelper;
 
 
-    @ApiOperation(value = "登录", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "登录")
     @PostMapping(value = "/login")
     public ApiResult<SysUserLoginVO> login(HttpServletRequest request, @RequestBody @Valid SysUserLoginDTO dto) {
         // 从请求中得到客户端IP地址
@@ -90,7 +89,7 @@ public class AdminAuthController {
     }
 
     @SaCheckLogin(type = AdminStpUtil.TYPE)
-    @ApiOperation(value = "登出", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "登出")
     @PostMapping(value = "/logout")
     public ApiResult<?> logout() {
         AdminStpUtil.logout();

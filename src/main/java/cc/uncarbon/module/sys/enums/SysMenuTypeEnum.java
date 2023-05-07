@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
- * 菜单类型枚举类
- * @author Uncarbon
+ * 预置系统菜单类型枚举类
  */
 @AllArgsConstructor
 @Getter
@@ -33,10 +35,31 @@ public enum SysMenuTypeEnum implements HelioBaseEnum<Integer> {
      * 外链
      */
     EXTERNAL_LINK(3, "外链"),
-    ;
 
+    ;
     @EnumValue
     private final Integer value;
     private final String label;
+
+    /**
+     * 所有菜单类型
+     */
+    public static List<SysMenuTypeEnum> all() {
+        return Arrays.asList(DIR, MENU, BUTTON, EXTERNAL_LINK);
+    }
+
+    /**
+     * 用于后台管理-侧边菜单的几种菜单类型
+     */
+    public static List<SysMenuTypeEnum> forAdminSide() {
+        return Arrays.asList(DIR, MENU, EXTERNAL_LINK);
+    }
+
+    /**
+     * 用于后台管理-绑定角色与菜单关联关系
+     */
+    public static List<SysMenuTypeEnum> forAdminBindMenus() {
+        return Arrays.asList(DIR, MENU, BUTTON, EXTERNAL_LINK);
+    }
 
 }

@@ -38,21 +38,21 @@ public class AdminSysMenuController {
 
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
-    @ApiOperation(value = "列表", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "列表")
     @GetMapping
     public ApiResult<List<SysMenuBO>> list() {
         return ApiResult.data(sysMenuService.adminList());
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
-    @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "详情")
     @GetMapping(value = "/{id}")
     public ApiResult<SysMenuBO> getById(@PathVariable Long id) {
         return ApiResult.data(sysMenuService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
-    @ApiOperation(value = "新增", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "新增")
     @PostMapping
     public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         sysMenuService.adminInsert(dto);
@@ -61,7 +61,7 @@ public class AdminSysMenuController {
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
-    @ApiOperation(value = "编辑", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "编辑")
     @PutMapping(value = "/{id}")
     public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         dto.setId(id);
@@ -71,7 +71,7 @@ public class AdminSysMenuController {
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
-    @ApiOperation(value = "删除", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "删除")
     @DeleteMapping
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysMenuService.adminDelete(dto.getIds());
@@ -79,13 +79,13 @@ public class AdminSysMenuController {
         return ApiResult.success();
     }
 
-    @ApiOperation(value = "取侧边菜单", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "取侧边菜单")
     @GetMapping("/side")
     public ApiResult<List<SysMenuBO>> adminListSideMenu() {
         return ApiResult.data(sysMenuService.adminListSideMenu());
     }
 
-    @ApiOperation(value = "取所有可见菜单", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "取所有可见菜单")
     @GetMapping("/all")
     public ApiResult<List<SysMenuBO>> adminListVisibleMenu() {
         return ApiResult.data(sysMenuService.adminListVisibleMenu());

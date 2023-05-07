@@ -17,6 +17,7 @@ import cc.uncarbon.module.sys.model.response.SysMenuBO;
 import cc.uncarbon.module.sys.model.response.VbenAdminMenuMetaVO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.IdUtil;
@@ -146,21 +147,15 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      */
     public List<SysMenuBO> adminListSideMenu() {
         Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuIds();
-
-        List<SysMenuTypeEnum> requiredMenuTypes = Arrays.asList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
-                SysMenuTypeEnum.EXTERNAL_LINK);
-        return this.listByIds(visibleMenuIds, requiredMenuTypes);
+        return this.listByIds(visibleMenuIds, SysMenuTypeEnum.forAdminSide());
     }
 
     /**
-     * 后台管理-取所有可见菜单 包括按钮类型
+     * 后台管理-取所有可见菜单
      */
     public List<SysMenuBO> adminListVisibleMenu() {
         Set<Long> visibleMenuIds = this.listCurrentUserVisibleMenuIds();
-
-        List<SysMenuTypeEnum> requiredMenuTypes = Arrays.asList(SysMenuTypeEnum.DIR, SysMenuTypeEnum.MENU,
-                SysMenuTypeEnum.EXTERNAL_LINK, SysMenuTypeEnum.BUTTON);
-        return this.listByIds(visibleMenuIds, requiredMenuTypes);
+        return this.listByIds(visibleMenuIds, SysMenuTypeEnum.all());
     }
 
     /**
@@ -258,7 +253,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
 
         String snowflakeIdStr = SNOWFLAKE.nextIdStr();
         bo
-                .setIdStr(StrUtil.toString(bo.getId()))
                 .setName(snowflakeIdStr)
                 .setMeta(
                         VbenAdminMenuMetaVO.builder()
@@ -343,21 +337,16 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         return this.traceParentMenuIds(allMenuMap, directlyRelatedMenuIds);
     }
 
-    private List<SysMenuBO> listByIds(Collection<Long> visibleMenuIds, List<SysMenuTypeEnum> requiredMenuTypes)
+    private List<SysMenuBO> listByIds(Collection<Long> ids, List<SysMenuTypeEnum> types)
             throws IllegalArgumentException {
-        if (CollUtil.isEmpty(visibleMenuIds)) {
-            throw new IllegalArgumentException("visibleMenuIds不能为空");
-        }
-
-        if (CollUtil.isEmpty(requiredMenuTypes)) {
-            throw new IllegalArgumentException("requiredMenuTypes不能为空");
-        }
+        Assert.notEmpty(ids);
+        Assert.notEmpty(types);
 
         List<SysMenuEntity> entityList = this.list(
                 new QueryWrapper<SysMenuEntity>()
                         .lambda()
-                        .in(SysMenuEntity::getId, visibleMenuIds)
-                        .in(SysMenuEntity::getType, requiredMenuTypes)
+                        .in(SysMenuEntity::getId, ids)
+                        .in(SysMenuEntity::getType, types)
                         .orderByAsc(SysMenuEntity::getSort)
         );
 
