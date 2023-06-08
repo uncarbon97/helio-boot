@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.aspect;
 
 import cc.uncarbon.framework.core.context.UserContextHolder;
-import cc.uncarbon.framework.satoken.util.IPUtil;
+import cc.uncarbon.framework.web.util.IPUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.aspect.extension.SysLogAspectExtension;
 import cc.uncarbon.module.sys.constant.SysConstant;

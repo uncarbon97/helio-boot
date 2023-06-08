@@ -5,8 +5,8 @@ import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.web.util.IPUtil;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
 import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.stp.StpUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
@@ -15,27 +15,25 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
- * 从请求头解析并赋值到用户上下文，用于后台管理用户的鉴权
- * 其实就是"DefaultSaTokenParseInterceptor"改个名, 工具类换成"AdminStpUtil"
+ * 从请求头解析并赋值到用户上下文，默认用于C端用户的鉴权
+ *
  * @author Uncarbon
  */
 @Slf4j
-public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
+public class DefaultSaTokenParseInterceptor implements AsyncHandlerInterceptor {
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
-
         if (handler instanceof ResourceHttpRequestHandler) {
             // 直接放行静态资源
             return true;
         }
 
         // SA-Token 会自动从请求头中解析 token，所以这里可以直接拿到对应 session，从而取出业务字段
-        if (AdminStpUtil.isLogin()) {
-            setContextsFromSaSession(AdminStpUtil.getSession(), request);
-            log.debug("[SA-Token][Admin] 从请求头解析出用户上下文 >> {}", UserContextHolder.getUserContext());
+        if (StpUtil.isLogin()) {
+            setContextsFromSaSession(StpUtil.getSession(), request);
+            log.debug("[SA-Token] 从请求头解析出用户上下文 >> {}", UserContextHolder.getUserContext());
         } else {
             UserContextHolder.clear();
             TenantContextHolder.clear();
@@ -62,5 +60,4 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
         TenantContext tenantContext = (TenantContext) session.get(TenantContext.CAMEL_NAME);
         TenantContextHolder.setTenantContext(tenantContext);
     }
-
 }
