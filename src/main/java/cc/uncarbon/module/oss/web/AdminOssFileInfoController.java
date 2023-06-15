@@ -21,15 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 
-/**
- * 后台管理-上传文件信息管理接口
- *
- * @author Uncarbon
- */
 @RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
-@Api(value = "上传文件信息管理接口", tags = {"上传文件信息管理接口"})
+@Api(value = "后台管理-上传文件信息管理接口", tags = {"后台管理-上传文件信息管理接口"})
 @RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/oss/file/infos")
 @RestController
 public class AdminOssFileInfoController {

@@ -120,7 +120,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      *
      * @return 主键ID
      */
-    @SysLog(value = "新增后台用户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysUserDTO dto) {
         log.info("[后台管理-新增后台用户] >> 入参={}", dto);
@@ -147,7 +146,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-编辑
      */
-    @SysLog(value = "编辑后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysUserDTO dto) {
         log.info("[后台管理-编辑后台用户] >> 入参={}", dto);
@@ -166,7 +164,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-删除
      */
-    @SysLog(value = "删除后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台用户] >> 入参={}", ids);
@@ -176,7 +173,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-登录
      */
-    @SysLog(value = SysConstant.SysLogOperation.SYS_USER_LOGIN)
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
         /*
         如果启用了多租户功能，并且前端指定了租户ID，则先查库确认租户是否有效
@@ -256,7 +252,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-重置某用户密码
      */
-    @SysLog(value = "重置某用户密码")
     public void adminResetUserPassword(AdminResetSysUserPasswordDTO dto) {
         SysUserEntity sysUserEntity = this.getById(dto.getUserId());
 
@@ -272,7 +267,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     /**
      * 后台管理-修改当前用户密码
      */
-    @SysLog(value = "修改当前用户密码")
     public void adminUpdateCurrentUserPassword(AdminUpdateCurrentSysUserPasswordDTO dto) {
         SysUserEntity sysUserEntity = this.getById(UserContextHolder.getUserId());
         if (sysUserEntity == null || !sysUserEntity.getPwd().equals(PwdUtil.encrypt(dto.getOldPassword(), sysUserEntity.getSalt()))) {

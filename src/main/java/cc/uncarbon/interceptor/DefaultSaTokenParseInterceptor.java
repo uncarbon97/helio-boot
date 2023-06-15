@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 从请求头解析并赋值到用户上下文，默认用于C端用户的鉴权
- *
  * @author Uncarbon
  */
 @Slf4j
@@ -53,7 +52,7 @@ public class DefaultSaTokenParseInterceptor implements AsyncHandlerInterceptor {
         UserContext userContext = (UserContext) session.get(UserContext.CAMEL_NAME);
 
         // 获取用户公网IP
-        userContext.setClientIP(IPUtil.getClientIPAddress(request));
+        userContext.setClientIP(IPUtil.getClientIPAddress(request, 0));
         UserContextHolder.setUserContext(userContext);
 
         // 赋值租户上下文

@@ -5,7 +5,6 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
-import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysParamEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysParamMapper;
@@ -17,13 +16,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -83,7 +83,6 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     /**
      * 后台管理-新增
      */
-    @SysLog(value = "新增系统参数")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysParamDTO dto) {
         log.info("[后台管理-新增系统参数] >> 入参={}", dto);
@@ -101,7 +100,6 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     /**
      * 后台管理-编辑
      */
-    @SysLog(value = "编辑系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysParamDTO dto) {
         log.info("[后台管理-编辑系统参数] >> 入参={}", dto);
@@ -116,7 +114,6 @@ public class SysParamService extends HelioBaseServiceImpl<SysParamMapper, SysPar
     /**
      * 后台管理-删除
      */
-    @SysLog(value = "删除系统参数")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除系统参数] >> 入参={}", ids);

@@ -33,12 +33,4 @@ public interface SysConstant {
      */
     String[] SENSITIVE_FIELDS = {"password", "oldPassword", "newPassword", "confirmNewPassword", "passwordOfNewUser", "randomPassword", "tenantAdminPassword"};
 
-    /**
-     * SysLog 系统日志操作内容
-     */
-    interface SysLogOperation {
-
-        String SYS_USER_LOGIN = "登录后台用户";
-
-    }
 }

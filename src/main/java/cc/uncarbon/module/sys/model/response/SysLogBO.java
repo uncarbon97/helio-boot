@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * 后台操作日志BO
- * @author Uncarbon
+ * 系统日志BO
  */
 @Accessors(chain = true)
 @Builder
@@ -42,5 +41,6 @@ public class SysLogBO implements Serializable {
 
     @ApiModelProperty(value = "状态")
     private SysLogStatusEnum status;
+
 
 }

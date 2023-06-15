@@ -31,14 +31,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 
 
-/**
- * 后台管理专用 - 上传、下载文件接口
- *
- * @author Uncarbon
- */
 @RequiredArgsConstructor
 @Slf4j
-@Api(value = "【后台管理】上传、下载文件接口", tags = {"【后台管理】上传、下载文件接口"})
+@Api(value = "后台管理-上传、下载文件接口", tags = {"后台管理-上传、下载文件接口"})
 @RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/oss/files")
 @RestController
 public class AdminOssUploadDownloadController {

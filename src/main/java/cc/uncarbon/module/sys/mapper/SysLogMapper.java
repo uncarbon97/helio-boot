@@ -5,10 +5,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 后台操作日志
- * @author Uncarbon
+ * 系统日志
  */
 @Mapper
 public interface SysLogMapper extends BaseMapper<SysLogEntity> {
-	
+
 }
