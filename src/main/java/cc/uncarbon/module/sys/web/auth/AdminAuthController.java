@@ -46,7 +46,7 @@ public class AdminAuthController {
     private final CaptchaHelper captchaHelper;
 
 
-    @SysLog(value = "登录后台用户", syncSave = true, extension = SysLogAspectExtensionForSysUserLogin.class)
+    @SysLog(value = "登录后台用户", syncSave = true, extension = SysLogAspectExtensionForSysUserLogin.class, queryIPLocation = true)
     @ApiOperation(value = "登录")
     @PostMapping(value = "/login")
     public ApiResult<SysUserLoginVO> login(@RequestBody @Valid SysUserLoginDTO dto) {

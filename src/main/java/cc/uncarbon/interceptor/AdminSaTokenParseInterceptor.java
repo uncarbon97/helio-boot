@@ -56,6 +56,7 @@ public class AdminSaTokenParseInterceptor implements AsyncHandlerInterceptor {
         UserContext userContext = (UserContext) session.get(UserContext.CAMEL_NAME);
 
         // 获取用户公网IP
+        // 先按逗号分隔后，再取第index个IP地址（从0开始）；兼容启用了云防护盾CDN的服务器（可能获取到的IP会带上中间代理节点的IP地址）
         userContext.setClientIP(IPUtil.getClientIPAddress(request, 0));
         UserContextHolder.setUserContext(userContext);
 
