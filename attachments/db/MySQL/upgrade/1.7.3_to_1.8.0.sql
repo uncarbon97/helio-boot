@@ -1,4 +1,4 @@
--- v1.7.4 - Uncarbon - 新增错误原因堆栈、用户UA、IP属地字段；表注释更新
+-- v1.8.0 - Uncarbon - 新增错误原因堆栈、用户UA、IP属地字段；表注释更新
 ALTER TABLE sys_log
     ADD COLUMN error_stacktrace varchar(3000) NOT NULL DEFAULT '' COMMENT '错误原因堆栈' AFTER status,
     ADD COLUMN user_agent varchar(255) NOT NULL DEFAULT '' COMMENT '用户UA' AFTER error_stacktrace,
