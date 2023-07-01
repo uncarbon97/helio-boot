@@ -25,7 +25,7 @@ spring:
     host: 127.0.0.1
     # Redis连接端口
     port: 6379
-    # Redis登录密码
+    # Redis登录密码；如果没有设置密码，请注释掉下面这行，避免向 Redis-server 发送 AUTH 鉴权请求，引发程序启动失败
     password:
     # Redis数据库序号
     database: 1

@@ -5,7 +5,6 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
-import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysTenantMapper;
@@ -90,7 +89,6 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     /**
      * 后台管理-编辑
      */
-    @SysLog(value = "编辑系统租户")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminUpdateSysTenantDTO dto) {
         log.info("[后台管理-编辑系统租户] >> 入参={}", dto);
@@ -105,7 +103,6 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     /**
      * 后台管理-删除
      */
-    @SysLog(value = "删除系统租户")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除系统租户] >> 入参={}", ids);

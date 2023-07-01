@@ -5,6 +5,7 @@ import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.facade.SysTenantFacade;
 import cc.uncarbon.module.sys.model.request.AdminInsertSysTenantDTO;
@@ -24,9 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 
-/**
- * @author Uncarbon
- */
 @RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
@@ -56,6 +54,7 @@ public class AdminSysTenantController {
         return ApiResult.data(sysTenantService.getOneById(id, true));
     }
 
+    @SysLog(value = "新增系统租户")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping
@@ -65,6 +64,7 @@ public class AdminSysTenantController {
         return ApiResult.success();
     }
 
+    @SysLog(value = "编辑系统租户")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/{id}")
@@ -75,6 +75,7 @@ public class AdminSysTenantController {
         return ApiResult.success();
     }
 
+    @SysLog(value = "删除系统租户")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping

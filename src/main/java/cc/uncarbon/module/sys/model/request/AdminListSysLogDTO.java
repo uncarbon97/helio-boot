@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * 后台管理-分页列表后台操作日志
- * @author Uncarbon
+ * 后台管理-分页列表系统日志
  */
 @Accessors(chain = true)
 @Builder

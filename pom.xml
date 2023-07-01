@@ -8,12 +8,12 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>1.7.3</version>
+        <version>1.8.0</version>
     </parent>
 
     <artifactId>helio-boot</artifactId>
-    <!-- 程序版本号，建议每次打包发布时都调整以作区分 -->
-    <version>1.7.3</version>
+    <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
+    <version>1.8.0</version>
 
     <properties>
         <!-- 这里写其他第三方依赖 -->
@@ -114,9 +114,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
                 <configuration>
                     <fork>true</fork>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- 编译时，跳过单元测试 -->

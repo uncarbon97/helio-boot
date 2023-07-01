@@ -3,7 +3,6 @@ package cc.uncarbon.module.sys.service;
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
-import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysDeptEntity;
 import cc.uncarbon.module.sys.entity.SysUserDeptRelationEntity;
@@ -82,7 +81,6 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     /**
      * 后台管理-新增
      */
-    @SysLog(value = "新增部门")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDeptDTO dto) {
         log.info("[后台管理-新增部门] >> 入参={}", dto);
@@ -104,7 +102,6 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     /**
      * 后台管理-编辑
      */
-    @SysLog(value = "编辑部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDeptDTO dto) {
         log.info("[后台管理-编辑部门] >> 入参={}", dto);
@@ -123,7 +120,6 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     /**
      * 后台管理-删除
      */
-    @SysLog(value = "删除部门")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除部门] >> 入参={}", ids);
