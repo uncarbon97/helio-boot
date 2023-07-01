@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * 后台操作日志BO
- * @author Uncarbon
+ * 系统日志BO
  */
 @Accessors(chain = true)
 @Builder
@@ -42,5 +41,20 @@ public class SysLogBO implements Serializable {
 
     @ApiModelProperty(value = "状态")
     private SysLogStatusEnum status;
+
+    @ApiModelProperty(value = "用户UA")
+    private String userAgent;
+
+    @ApiModelProperty(value = "IP地址属地-国家或地区名")
+    private String ipLocationRegionName;
+
+    @ApiModelProperty(value = "IP地址属地-省级行政区名")
+    private String ipLocationProvinceName;
+
+    @ApiModelProperty(value = "IP地址属地-市级行政区名")
+    private String ipLocationCityName;
+
+    @ApiModelProperty(value = "IP地址属地-县级行政区名")
+    private String ipLocationDistrictName;
 
 }

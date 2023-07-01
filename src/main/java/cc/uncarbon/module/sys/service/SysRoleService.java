@@ -6,7 +6,6 @@ import cc.uncarbon.framework.core.function.StreamFunction;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
-import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysRoleEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysRoleMapper;
@@ -30,8 +29,6 @@ import java.util.stream.Collectors;
 
 /**
  * 后台角色
- *
- * @author Uncarbon
  */
 @Slf4j
 @Service
@@ -95,7 +92,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      *
      * @return 主键ID
      */
-    @SysLog(value = "新增后台角色")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysRoleDTO dto) {
         log.info("[后台管理-新增后台角色] >> 入参={}", dto);
@@ -113,7 +109,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     /**
      * 后台管理-编辑
      */
-    @SysLog(value = "编辑后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysRoleDTO dto) {
         log.info("[后台管理-编辑后台角色] >> 入参={}", dto);
@@ -128,7 +123,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     /**
      * 后台管理-删除
      */
-    @SysLog(value = "删除后台角色")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台角色] >> 入参={}", ids);
@@ -140,7 +134,6 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      *
      * @return 新菜单ID集合对应的权限名
      */
-    @SysLog(value = "绑定角色与菜单关联关系")
     @Transactional(rollbackFor = Exception.class)
     public Set<String> adminBindMenus(AdminBindRoleMenuRelationDTO dto) {
         Set<String> newPermissions = sysMenuService.listPermissionsByMenuIds(dto.getMenuIds());

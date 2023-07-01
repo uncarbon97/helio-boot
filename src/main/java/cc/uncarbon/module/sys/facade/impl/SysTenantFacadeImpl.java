@@ -1,7 +1,6 @@
 package cc.uncarbon.module.sys.facade.impl;
 
 import cc.uncarbon.framework.core.context.UserContextHolder;
-import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserRoleRelationEntity;
 import cc.uncarbon.module.sys.facade.SysTenantFacade;
@@ -13,11 +12,12 @@ import cc.uncarbon.module.sys.service.SysTenantService;
 import cc.uncarbon.module.sys.service.SysUserRoleRelationService;
 import cc.uncarbon.module.sys.service.SysUserService;
 import cn.hutool.core.bean.BeanUtil;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * 系统租户防腐层，用于解决循环依赖
@@ -39,7 +39,6 @@ public class SysTenantFacadeImpl implements SysTenantFacade {
 
 
     @Override
-    @SysLog(value = "新增系统租户")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertSysTenantDTO dto) {
         log.info("[后台管理-新增系统租户] >> 入参={}", dto);

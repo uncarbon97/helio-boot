@@ -5,7 +5,6 @@ import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.function.StreamFunction;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
-import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysMenuEntity;
 import cc.uncarbon.module.sys.enums.GenericStatusEnum;
@@ -93,7 +92,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      *
      * @return 主键ID
      */
-    @SysLog(value = "新增后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysMenuDTO dto) {
         log.info("[后台管理-新增后台菜单] >> 入参={}", dto);
@@ -116,7 +114,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     /**
      * 后台管理-编辑
      */
-    @SysLog(value = "编辑后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysMenuDTO dto) {
         log.info("[后台管理-编辑后台菜单] >> 入参={}", dto);
@@ -135,7 +132,6 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     /**
      * 后台管理-删除
      */
-    @SysLog(value = "删除后台菜单")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台菜单] >> 入参={}", ids);

@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-/**
- * @author Uncarbon
- */
 @RequiredArgsConstructor
 @Slf4j
 @Api(value = "APP鉴权接口", tags = {"APP鉴权接口"})

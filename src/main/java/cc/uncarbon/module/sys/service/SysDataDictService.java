@@ -5,27 +5,26 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
-import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.entity.SysDataDictEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDataDictMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDataDictDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysDataDictDTO;
 import cc.uncarbon.module.sys.model.response.SysDataDictBO;
-import cc.uncarbon.module.sys.model.response.SysParamBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -84,7 +83,6 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     /**
      * 后台管理-新增
      */
-    @SysLog(value = "新增数据字典")
     @Transactional(rollbackFor = Exception.class)
     public Long adminInsert(AdminInsertOrUpdateSysDataDictDTO dto) {
         log.info("[后台管理-新增数据字典] >> 入参={}", dto);
@@ -102,7 +100,6 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     /**
      * 后台管理-编辑
      */
-    @SysLog(value = "编辑数据字典")
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysDataDictDTO dto) {
         log.info("[后台管理-编辑数据字典] >> 入参={}", dto);
@@ -117,7 +114,6 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     /**
      * 后台管理-删除
      */
-    @SysLog(value = "删除数据字典")
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除数据字典] >> 入参={}", ids);

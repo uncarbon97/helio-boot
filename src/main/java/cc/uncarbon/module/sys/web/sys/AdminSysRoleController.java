@@ -6,6 +6,7 @@ import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.helper.RolePermissionCacheHelper;
+import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.AdminBindRoleMenuRelationDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
@@ -19,16 +20,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Set;
 
 
-/**
- * @author Uncarbon
- */
 @RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
@@ -58,6 +55,7 @@ public class AdminSysRoleController {
         return ApiResult.data(sysRoleService.getOneById(id, true));
     }
 
+    @SysLog(value = "新增后台角色")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping
@@ -67,6 +65,7 @@ public class AdminSysRoleController {
         return ApiResult.success();
     }
 
+    @SysLog(value = "编辑后台角色")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/{id}")
@@ -77,6 +76,7 @@ public class AdminSysRoleController {
         return ApiResult.success();
     }
 
+    @SysLog(value = "删除后台角色")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping
@@ -89,6 +89,7 @@ public class AdminSysRoleController {
         return ApiResult.success();
     }
 
+    @SysLog(value = "绑定角色与菜单关联关系")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "bindMenus")
     @ApiOperation(value = "绑定角色与菜单关联关系")
     @PutMapping(value = "/{id}/menus")
