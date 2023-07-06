@@ -27,7 +27,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.HttpHeaders;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +62,7 @@ public class SysLogAspect {
     private static final SysLogAspectExtension DEFAULT_SYS_LOG_ASPECT_EXTENSION = new DefaultSysLogAspectExtension();
 
     private final SysLogService sysLogService;
+    private final ThreadPoolTaskExecutor taskExecutor;
 
 
     /**
@@ -130,8 +131,7 @@ public class SysLogAspect {
                 // 记录操作内容
                 .setOperation(annotation.value())
                 // 默认置为成功
-                .setStatus(SysLogStatusEnum.SUCCESS)
-                ;
+                .setStatus(SysLogStatusEnum.SUCCESS);
 
         /*
         记录请求参数
@@ -197,8 +197,9 @@ public class SysLogAspect {
     /**
      * 异步保存系统日志
      */
-    @Async(value = "taskExecutor")
     public void saveSysLogAsync(final JoinPoint joinPoint, SysLog annotation, final Throwable e, Object ret) {
-        this.saveSysLog(joinPoint, annotation, e, ret);
+        taskExecutor.submit(
+                () -> this.saveSysLog(joinPoint, annotation, e, ret)
+        );
     }
 }
