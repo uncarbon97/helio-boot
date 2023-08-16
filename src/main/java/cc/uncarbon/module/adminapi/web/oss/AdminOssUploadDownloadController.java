@@ -1,7 +1,8 @@
-package cc.uncarbon.module.oss.web;
+package cc.uncarbon.module.adminapi.web.oss;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.oss.facade.OssUploadDownloadFacade;
 import cc.uncarbon.module.oss.model.request.UploadFileAttributeDTO;
 import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
@@ -34,7 +35,11 @@ import java.net.URLEncoder;
 @RequiredArgsConstructor
 @Slf4j
 @Api(value = "后台管理-上传、下载文件接口", tags = {"后台管理-上传、下载文件接口"})
-@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/oss/files")
+@RequestMapping(value = {
+        // 兼容旧的API路由前缀
+        SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
+        AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
+})
 @RestController
 public class AdminOssUploadDownloadController {
 
@@ -42,7 +47,7 @@ public class AdminOssUploadDownloadController {
 
 
     @ApiOperation(value = "上传文件", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PostMapping
+    @PostMapping(value = "/oss/files")
     // 约束：登录后才能上传   👇 后台管理对应的鉴权工具类
     @SaCheckLogin(type = AdminStpUtil.TYPE)
     public ApiResult<OssFileUploadResultVO> upload(
@@ -72,7 +77,7 @@ public class AdminOssUploadDownloadController {
     }
 
     @ApiOperation(value = "下载文件(根据文件ID)", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/oss/files/{id}")
     // 如果需要登录后才能下载，请解禁下方注解；注意是👇 后台管理对应的鉴权工具类
     // @SaCheckLogin(type = AdminStpUtil.TYPE)
     public void download(@PathVariable Long id, HttpServletResponse response) throws IOException {
