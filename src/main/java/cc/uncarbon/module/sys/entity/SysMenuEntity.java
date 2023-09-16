@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.entity;
 
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.framework.crud.entity.HelioBaseEntity;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysMenuTypeEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -53,7 +53,7 @@ public class SysMenuEntity extends HelioBaseEntity<Long> {
 
 	@ApiModelProperty(value = "状态")
 	@TableField(value = "status")
-	private GenericStatusEnum status;
+	private EnabledStatusEnum status;
 
 	@ApiModelProperty(value = "组件(Vue项目中`/@/views/`后的路径部分; 填`LAYOUT`为空页面)")
 	@TableField(value = "component")

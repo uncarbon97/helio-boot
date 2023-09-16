@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.request;
 
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.module.sys.enums.SysMenuTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -55,7 +55,7 @@ public class AdminInsertOrUpdateSysMenuDTO implements Serializable {
     private Integer sort;
 
     @ApiModelProperty(value = "状态")
-    private GenericStatusEnum status;
+    private EnabledStatusEnum status;
 
     @ApiModelProperty(value = "外链地址")
     private String externalLink;
