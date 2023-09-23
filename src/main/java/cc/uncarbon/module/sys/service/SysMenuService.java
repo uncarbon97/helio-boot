@@ -250,13 +250,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         String snowflakeIdStr = SNOWFLAKE.nextIdStr();
         bo
                 .setName(snowflakeIdStr)
-                .setMeta(
-                        VbenAdminMenuMetaVO.builder()
-                                .title(bo.getTitle())
-                                .affix(false)
-                                .icon(bo.getIcon())
-                                .build()
-                );
+                .setMeta(new VbenAdminMenuMetaVO(bo.getTitle(), false, bo.getIcon()));
 
         // 这里是兼容 JDK8 的写法，使用较高 JDK 版本可使用语法糖
         switch (bo.getType()) {
