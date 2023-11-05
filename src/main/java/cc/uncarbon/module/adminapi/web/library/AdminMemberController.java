@@ -1,10 +1,11 @@
-package cc.uncarbon.module.library.web;
+package cc.uncarbon.module.adminapi.web.library;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.library.model.request.AdminInsertOrUpdateMemberDTO;
 import cc.uncarbon.module.library.model.request.AdminListMemberDTO;
 import cc.uncarbon.module.library.model.response.MemberBO;
@@ -33,7 +34,11 @@ import java.util.List;
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "会员管理接口", tags = {"会员管理接口"})
-@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/library/members")
+@RequestMapping(value = {
+        // 兼容旧的API路由前缀
+        SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
+        AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
+})
 @RestController
 public class AdminMemberController {
 
@@ -45,21 +50,21 @@ public class AdminMemberController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "分页列表", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping
+    @GetMapping(value = "/library/members")
     public ApiResult<PageResult<MemberBO>> list(PageParam pageParam, AdminListMemberDTO dto) {
         return ApiResult.data(memberService.adminList(pageParam, dto));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "详情", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/library/members/{id}")
     public ApiResult<MemberBO> getById(@PathVariable Long id) {
         return ApiResult.data(memberService.getOneById(id, true));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping
+    @PostMapping(value = "/library/members")
     public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateMemberDTO dto) {
         memberService.adminInsert(dto);
 
@@ -68,7 +73,7 @@ public class AdminMemberController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/library/members/{id}")
     public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateMemberDTO dto) {
         dto.setId(id);
         memberService.adminUpdate(dto);
@@ -78,7 +83,7 @@ public class AdminMemberController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @DeleteMapping
+    @DeleteMapping(value = "/library/members")
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         memberService.adminDelete(dto.getIds());
 
@@ -87,7 +92,7 @@ public class AdminMemberController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "列表-下拉框专用", produces = MediaType.APPLICATION_JSON_VALUE)
-    @GetMapping(value = "/options")
+    @GetMapping(value = "/library/members/options")
     public ApiResult<List<MemberBO>> listOptions() {
         return ApiResult.data(memberService.adminListOptions());
     }

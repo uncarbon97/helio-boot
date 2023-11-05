@@ -1,5 +1,6 @@
 package cc.uncarbon.module.library.service;
 
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
@@ -9,7 +10,7 @@ import cc.uncarbon.module.library.mapper.MemberMapper;
 import cc.uncarbon.module.library.model.request.AdminInsertOrUpdateMemberDTO;
 import cc.uncarbon.module.library.model.request.AdminListMemberDTO;
 import cc.uncarbon.module.library.model.response.MemberBO;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -142,7 +143,7 @@ public class MemberService extends HelioBaseServiceImpl<MemberMapper, MemberEnti
                         // 只 SELECT 特定字段
                         .select(MemberEntity::getId, MemberEntity::getUsername, MemberEntity::getRealName)
                         // 仅启用状态
-                        .eq(MemberEntity::getStatus, GenericStatusEnum.ENABLED)
+                        .eq(MemberEntity::getStatus, EnabledStatusEnum.ENABLED)
         );
 
         return this.entityList2BOs(entityList);

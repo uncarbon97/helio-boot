@@ -1,6 +1,6 @@
 package cc.uncarbon.module.library.model.request;
 
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +36,6 @@ public class AdminListBookDTO implements Serializable {
     private Long bookClassifiedId;
 
     @ApiModelProperty(value = "状态")
-    private GenericStatusEnum status;
+    private EnabledStatusEnum status;
 
 }

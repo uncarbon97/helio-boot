@@ -1,6 +1,7 @@
 package cc.uncarbon.module.library.service;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
@@ -10,7 +11,6 @@ import cc.uncarbon.module.library.mapper.BookMapper;
 import cc.uncarbon.module.library.model.request.AdminInsertOrUpdateBookDTO;
 import cc.uncarbon.module.library.model.request.AdminListBookDTO;
 import cc.uncarbon.module.library.model.response.BookBO;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -144,7 +144,7 @@ public class BookService extends HelioBaseServiceImpl<BookMapper, BookEntity> {
                         // 只 SELECT 特定字段
                         .select(BookEntity::getId, BookEntity::getTitle, BookEntity::getIsbn)
                         // 仅启用状态
-                        .eq(BookEntity::getStatus, GenericStatusEnum.ENABLED)
+                        .eq(BookEntity::getStatus, EnabledStatusEnum.ENABLED)
         );
 
         return this.entityList2BOs(entityList);

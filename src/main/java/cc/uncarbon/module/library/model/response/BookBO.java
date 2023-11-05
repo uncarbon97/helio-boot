@@ -1,7 +1,7 @@
 package cc.uncarbon.module.library.model.response;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -62,7 +62,7 @@ public class BookBO implements Serializable {
     private BigDecimal unitPrice;
 
     @ApiModelProperty(value = "状态")
-    private GenericStatusEnum status;
+    private EnabledStatusEnum status;
 
     @ApiModelProperty(value = "封面图片URL")
     private String coverImgUrl;

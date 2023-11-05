@@ -1,8 +1,8 @@
 package cc.uncarbon.module.library.model.request;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
-import cc.uncarbon.module.sys.enums.GenderEnum;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
+import cc.uncarbon.framework.core.enums.GenderEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class AdminListMemberDTO implements Serializable {
     private String realName;
 
     @ApiModelProperty(value = "状态")
-    private GenericStatusEnum status;
+    private EnabledStatusEnum status;
 
     @ApiModelProperty(value = "性别")
     private GenderEnum gender;
