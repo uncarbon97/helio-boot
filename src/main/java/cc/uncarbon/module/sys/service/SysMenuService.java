@@ -2,12 +2,12 @@ package cc.uncarbon.module.sys.service;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.context.UserContextHolder;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.function.StreamFunction;
 import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysMenuEntity;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysMenuTypeEnum;
 import cc.uncarbon.module.sys.mapper.SysMenuMapper;
@@ -189,7 +189,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                                                     .lambda()
                                                     .select(SysMenuEntity::getPermission)
                                                     .in(SysMenuEntity::getId, menuIds)
-                                                    .eq(SysMenuEntity::getStatus, GenericStatusEnum.ENABLED)
+                                                    .eq(SysMenuEntity::getStatus, EnabledStatusEnum.ENABLED)
                                     )
                                     .stream()
                                     .map(SysMenuEntity::getPermission)
@@ -250,13 +250,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         String snowflakeIdStr = SNOWFLAKE.nextIdStr();
         bo
                 .setName(snowflakeIdStr)
-                .setMeta(
-                        VbenAdminMenuMetaVO.builder()
-                                .title(bo.getTitle())
-                                .affix(false)
-                                .icon(bo.getIcon())
-                                .build()
-                );
+                .setMeta(new VbenAdminMenuMetaVO(bo.getTitle(), false, bo.getIcon()));
 
         // 这里是兼容 JDK8 的写法，使用较高 JDK 版本可使用语法糖
         switch (bo.getType()) {
@@ -317,7 +311,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                 new QueryWrapper<SysMenuEntity>()
                         .lambda()
                         .select(SysMenuEntity::getId, SysMenuEntity::getParentId)
-                        .eq(SysMenuEntity::getStatus, GenericStatusEnum.ENABLED)
+                        .eq(SysMenuEntity::getStatus, EnabledStatusEnum.ENABLED)
         ).stream().collect(Collectors.toMap(SysMenuEntity::getId, SysMenuEntity::getParentId, StreamFunction.ignoredThrowingMerger()));
 
         // 3. 超级管理员直接返回所有菜单

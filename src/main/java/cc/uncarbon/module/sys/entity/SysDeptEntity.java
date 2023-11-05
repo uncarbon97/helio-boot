@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.entity;
 
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.framework.crud.entity.HelioBaseEntity;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
@@ -48,6 +48,6 @@ public class SysDeptEntity extends HelioBaseEntity<Long> {
 
 	@ApiModelProperty(value = "状态")
 	@TableField(value = "status")
-	private GenericStatusEnum status;
+	private EnabledStatusEnum status;
 
 }

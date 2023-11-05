@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.model.request;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
-import cc.uncarbon.module.sys.enums.GenderEnum;
+import cc.uncarbon.framework.core.enums.GenderEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.model.response;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.module.sys.enums.SysMenuTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
@@ -59,7 +59,7 @@ public class SysMenuBO implements Serializable {
     private Integer sort;
 
     @ApiModelProperty(value = "状态")
-    private GenericStatusEnum status;
+    private EnabledStatusEnum status;
 
     @ApiModelProperty(value = "组件")
     private String component;

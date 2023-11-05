@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.request;
 
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +37,7 @@ public class AdminUpdateSysTenantDTO implements Serializable {
 
     @ApiModelProperty(value = "状态", required = true)
     @NotNull(message = "状态不能为空")
-    private GenericStatusEnum status;
+    private EnabledStatusEnum status;
 
     @ApiModelProperty(value = "备注")
     private String remark;

@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.request;
 
-import cc.uncarbon.module.sys.enums.GenericStatusEnum;
+import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +40,6 @@ public class AdminInsertOrUpdateSysDeptDTO implements Serializable {
     private Integer sort;
 
     @ApiModelProperty(value = "状态")
-    private GenericStatusEnum status;
+    private EnabledStatusEnum status;
 
 }
