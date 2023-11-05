@@ -10,7 +10,9 @@ public interface SysConstant {
 
     /**
      * 后台管理接口路由前缀
+     * @deprecated since 1.9.0, because its meaning is no longer so fitting; replaced by AdminApiConstant#API_URL_PREFIX
      */
+    @Deprecated
     String SYS_MODULE_CONTEXT_PATH = "/sys";
 
     /**

@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.model.response;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
-import cc.uncarbon.module.sys.enums.GenderEnum;
+import cc.uncarbon.framework.core.enums.GenderEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;

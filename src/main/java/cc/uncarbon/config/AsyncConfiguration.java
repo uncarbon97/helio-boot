@@ -6,6 +6,7 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -26,6 +27,11 @@ public class AsyncConfiguration implements AsyncConfigurer {
     private final TaskExecutionProperties taskExecutionProperties;
 
 
+    /**
+     * 创建默认线程池
+     * 加 @Primary 注解以确保依赖注入时，获取到的是这个Bean
+     */
+    @Primary
     @Bean(name = "taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
         final String threadNamePrefix = "taskExecutor-";

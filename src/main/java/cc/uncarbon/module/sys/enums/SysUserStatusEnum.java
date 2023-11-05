@@ -14,7 +14,6 @@ import lombok.Getter;
 public enum SysUserStatusEnum implements HelioBaseEnum<Integer> {
 
     BANNED(0, "封禁"),
-
     ENABLED(1, "正常"),
 
     ;

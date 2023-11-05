@@ -1,9 +1,8 @@
-package cc.uncarbon.module.app.web;
+package cc.uncarbon.module.appapi.web;
 
 
-import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.response.ApiResult;
-import cc.uncarbon.module.app.constant.AppConstant;
+import cc.uncarbon.module.appapi.constant.AppApiConstant;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 @Api(value = "APP鉴权接口", tags = {"APP鉴权接口"})
-@RequestMapping(AppConstant.APP_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/auth")
+@RequestMapping(AppApiConstant.HTTP_API_URL_PREFIX + "/api/v1")
 @RestController
 public class AppAuthController {
 
@@ -26,7 +25,7 @@ public class AppAuthController {
      */
 
     @ApiOperation(value = "登录")
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ApiResult<?> login() {
         /*
         编码时请参考AdminAuthController#login

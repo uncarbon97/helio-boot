@@ -1,9 +1,10 @@
-package cc.uncarbon.module.sys.web.sys;
+package cc.uncarbon.module.adminapi.web.sys;
 
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDeptDTO;
@@ -26,7 +27,11 @@ import java.util.List;
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "部门管理接口", tags = {"部门管理接口"})
-@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/sys/depts")
+@RequestMapping(value = {
+        // 兼容旧的API路由前缀
+        SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
+        AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
+})
 @RestController
 public class AdminSysDeptController {
 
@@ -37,14 +42,14 @@ public class AdminSysDeptController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "列表")
-    @GetMapping
+    @GetMapping(value = "/sys/depts")
     public ApiResult<List<SysDeptBO>> list() {
         return ApiResult.data(sysDeptService.adminList());
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "详情")
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/sys/depts/{id}")
     public ApiResult<SysDeptBO> getById(@PathVariable Long id) {
         return ApiResult.data(sysDeptService.getOneById(id, true));
     }
@@ -52,7 +57,7 @@ public class AdminSysDeptController {
     @SysLog(value = "新增部门")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
-    @PostMapping
+    @PostMapping(value = "/sys/depts")
     public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
         sysDeptService.adminInsert(dto);
 
@@ -62,7 +67,7 @@ public class AdminSysDeptController {
     @SysLog(value = "编辑部门")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/sys/depts/{id}")
     public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
         dto.setId(id);
         sysDeptService.adminUpdate(dto);
@@ -73,7 +78,7 @@ public class AdminSysDeptController {
     @SysLog(value = "删除部门")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
-    @DeleteMapping
+    @DeleteMapping(value = "/sys/depts")
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysDeptService.adminDelete(dto.getIds());
 

@@ -1,8 +1,9 @@
-package cc.uncarbon.module.sys.web.sys;
+package cc.uncarbon.module.adminapi.web.sys;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysMenuDTO;
@@ -25,7 +26,11 @@ import java.util.List;
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Slf4j
 @Api(value = "后台菜单管理接口", tags = {"后台菜单管理接口"})
-@RequestMapping(SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1 + "/sys/menus")
+@RequestMapping(value = {
+        // 兼容旧的API路由前缀
+        SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
+        AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
+})
 @RestController
 public class AdminSysMenuController {
 
@@ -36,14 +41,14 @@ public class AdminSysMenuController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "列表")
-    @GetMapping
+    @GetMapping(value = "/sys/menus")
     public ApiResult<List<SysMenuBO>> list() {
         return ApiResult.data(sysMenuService.adminList());
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "详情")
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/sys/menus/{id}")
     public ApiResult<SysMenuBO> getById(@PathVariable Long id) {
         return ApiResult.data(sysMenuService.getOneById(id, true));
     }
@@ -51,7 +56,7 @@ public class AdminSysMenuController {
     @SysLog(value = "新增后台菜单")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
-    @PostMapping
+    @PostMapping(value = "/sys/menus")
     public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         sysMenuService.adminInsert(dto);
 
@@ -61,7 +66,7 @@ public class AdminSysMenuController {
     @SysLog(value = "编辑后台菜单")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/sys/menus/{id}")
     public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         dto.setId(id);
         sysMenuService.adminUpdate(dto);
@@ -72,7 +77,7 @@ public class AdminSysMenuController {
     @SysLog(value = "删除后台菜单")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
-    @DeleteMapping
+    @DeleteMapping(value = "/sys/menus")
     public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysMenuService.adminDelete(dto.getIds());
 
@@ -80,13 +85,13 @@ public class AdminSysMenuController {
     }
 
     @ApiOperation(value = "取侧边菜单")
-    @GetMapping("/side")
+    @GetMapping("/sys/menus/side")
     public ApiResult<List<SysMenuBO>> adminListSideMenu() {
         return ApiResult.data(sysMenuService.adminListSideMenu());
     }
 
     @ApiOperation(value = "取所有可见菜单")
-    @GetMapping("/all")
+    @GetMapping("/sys/menus/all")
     public ApiResult<List<SysMenuBO>> adminListVisibleMenu() {
         return ApiResult.data(sysMenuService.adminListVisibleMenu());
     }
