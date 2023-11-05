@@ -8,12 +8,12 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>1.9.0-SNAPSHOT</version>
+        <version>1.9.0</version>
     </parent>
 
     <artifactId>helio-boot</artifactId>
     <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
-    <version>1.9.0-SNAPSHOT</version>
+    <version>1.9.0</version>
 
     <properties>
         <!-- 这里写其他第三方依赖 -->
