@@ -3,97 +3,89 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
         <version>1.9.0</version>
+        <relativePath/>
     </parent>
 
+    <groupId>cc.uncarbon.module</groupId>
     <artifactId>helio-boot</artifactId>
-    <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
-    <version>1.9.0</version>
+    <description>Helio 单体脚手架</description>
+    <version>1.10.0</version>
 
     <properties>
         <!-- 这里写其他第三方依赖 -->
         <!-- 文件上传 -->
         <spring-file-storage.version>0.6.1</spring-file-storage.version>
         <minio.version>8.4.3</minio.version>
+
+        <!-- 引入 HTTP-API 模块 -->
+        <!-- 后台管理 HTTP-API -->
+        <admin-api.version>1.10.0</admin-api.version>
+        <!-- C端 HTTP-API -->
+        <app-api.version>1.10.0</app-api.version>
     </properties>
 
-    <dependencies>
-        <!-- 脚手架 starters -->
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-core</artifactId>
-        </dependency>
+    <modules>
+        <module>bootstrap</module>
+        <module>api/admin-api</module>
+        <module>api/app-api</module>
+        <module>service-module/sys</module>
+        <module>service-module/oss</module>
+    </modules>
 
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-aop</artifactId>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <!-- 引入 HTTP-API 模块 -->
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>admin-api</artifactId>
+                <version>${admin-api.version}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-crud</artifactId>
-        </dependency>
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>app-api</artifactId>
+                <version>${app-api.version}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-knife4j</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.xiaoymin</groupId>
-                    <artifactId>knife4j-micro-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>sys</artifactId>
+                <version>${app-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>sys-facade</artifactId>
+                <version>${app-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>sys-service</artifactId>
+                <version>${app-api.version}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-redis</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-satoken</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>cc.uncarbon.framework</groupId>
-            <artifactId>helio-starter-web</artifactId>
-        </dependency>
-
-        <!-- 这里写其他第三方依赖 -->
-        <!-- 对象存储工具类 https://gitee.com/XYW1171736840/spring-file-storage -->
-        <dependency>
-            <groupId>cn.xuyanwu</groupId>
-            <artifactId>spring-file-storage</artifactId>
-            <version>${spring-file-storage.version}</version>
-            <exclusions>
-                <!-- helio-core 就带了 hutool，不需要重复引入 -->
-                <exclusion>
-                    <groupId>cn.hutool</groupId>
-                    <artifactId>hutool-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- MinIO 依赖包 -->
-        <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>${minio.version}</version>
-        </dependency>
-
-    </dependencies>
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>oss</artifactId>
+                <version>${app-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>oss-facade</artifactId>
+                <version>${app-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cc.uncarbon.module</groupId>
+                <artifactId>oss-service</artifactId>
+                <version>${app-api.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <!-- 支持 mybatis XML 放置在 java 包下 -->
@@ -110,23 +102,6 @@
         </resources>
 
         <plugins>
-            <!-- Spring Boot 打包插件 -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-                <configuration>
-                    <fork>true</fork>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- 编译时，跳过单元测试 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -1,0 +1,36 @@
+spring:
+  application:
+    # 微服务应用名
+    name: oss-service
+  cloud:
+    nacos:
+      discovery:
+        # 由于“Dubbo 应用级服务发现与 Spring Cloud 互通的特性”，HTTP 端口会以 rest 协议被注册到 Nacos 上，增加后缀以规避重名
+        service: ${spring.application.name}-rest
+        # 注册中心地址
+        server-addr: ${NACOS_DISCOVERY_SERVER_ADDR:127.0.0.1:8848}
+        # 注册中心命名空间
+        namespace: ${NACOS_DISCOVERY_NAMESPACE:}
+        # 注册中心分组
+        group: ${NACOS_DISCOVERY_GROUP:DEFAULT_GROUP}
+      config:
+        # 配置中心地址
+        server-addr: ${NACOS_CONFIG_SERVER_ADDR:127.0.0.1:8848}
+        # 配置中心命名空间
+        namespace: ${NACOS_CONFIG_NAMESPACE:}
+        # 配置中心分组
+        group: ${NACOS_CONFIG_GROUP:DEFAULT_GROUP}
+        # 配置文件扩展名
+        file-extension: yml
+        # 共享配置文件
+        shared-configs:
+          - dataId: COMMON.yml
+            refresh: false
+          - dataId: DATASOURCE.yml
+            refresh: false
+          - dataId: REDIS.yml
+            refresh: false
+          - dataId: SA-TOKEN.yml
+            refresh: false
+          - dataId: DUBBO.yml
+            refresh: false

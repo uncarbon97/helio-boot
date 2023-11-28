@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>cc.uncarbon.module</groupId>
+        <artifactId>helio-boot</artifactId>
+        <version>1.10.0</version>
+    </parent>
+
+    <artifactId>bootstrap</artifactId>
+    <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
+    <!-- 全新项目可从 1.0.0 开始计数 -->
+    <version>1.10.0</version>
+
+    <properties>
+        <!-- 引入 HTTP-API 模块 -->
+        <!-- 后台管理 HTTP-API -->
+        <admin-api.version>1.10.0</admin-api.version>
+        <!-- C端 HTTP-API -->
+        <app-api.version>1.10.0</app-api.version>
+    </properties>
+
+    <dependencies>
+        <!-- 引入 HTTP-API 模块 -->
+        <dependency>
+            <groupId>cc.uncarbon.module</groupId>
+            <artifactId>admin-api</artifactId>
+            <version>${admin-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cc.uncarbon.module</groupId>
+            <artifactId>app-api</artifactId>
+            <version>${app-api.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot 打包插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <fork>true</fork>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
