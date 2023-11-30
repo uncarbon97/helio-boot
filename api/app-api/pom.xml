@@ -9,6 +9,7 @@
         <groupId>cc.uncarbon.module</groupId>
         <artifactId>helio-boot</artifactId>
         <version>1.10.0</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>app-api</artifactId>

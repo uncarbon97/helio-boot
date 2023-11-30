@@ -9,7 +9,6 @@
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
         <version>1.9.0</version>
-        <relativePath/>
     </parent>
 
     <groupId>cc.uncarbon.module</groupId>

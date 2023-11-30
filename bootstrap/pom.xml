@@ -12,11 +12,16 @@
     </parent>
 
     <artifactId>bootstrap</artifactId>
-    <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
-    <!-- 全新项目可从 1.0.0 开始计数 -->
-    <version>1.10.0</version>
+    <version>${products.version}</version>
 
     <properties>
+        <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
+        <!-- 全新项目可从 1.0.0 开始计数 -->
+        <products.version>1.10.0</products.version>
+
+        <!-- 制品文件名 -->
+        <products.filename>helio-boot</products.filename>
+
         <!-- 引入 HTTP-API 模块 -->
         <!-- 后台管理 HTTP-API -->
         <admin-api.version>1.10.0</admin-api.version>
@@ -36,6 +41,13 @@
             <groupId>cc.uncarbon.module</groupId>
             <artifactId>app-api</artifactId>
             <version>${app-api.version}</version>
+        </dependency>
+
+        <!-- 引入单元测试支持 -->
+        <dependency>
+            <groupId>cc.uncarbon.framework</groupId>
+            <artifactId>helio-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -58,5 +70,6 @@
                 </executions>
             </plugin>
         </plugins>
+        <finalName>${products.filename}-${version}</finalName>
     </build>
 </project>
