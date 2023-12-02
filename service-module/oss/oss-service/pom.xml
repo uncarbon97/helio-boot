@@ -60,13 +60,14 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-        <!-- 对象存储工具类 https://gitee.com/XYW1171736840/spring-file-storage -->
+        <!-- 这里写其他第三方依赖 -->
+        <!-- 对象存储工具类 https://gitee.com/dromara/x-file-storage -->
         <dependency>
-            <groupId>cn.xuyanwu</groupId>
-            <artifactId>spring-file-storage</artifactId>
-            <version>${spring-file-storage.version}</version>
+            <groupId>org.dromara.x-file-storage</groupId>
+            <artifactId>x-file-storage-spring</artifactId>
+            <version>${x-file-storage.version}</version>
             <exclusions>
-                <!-- helio-core 就带了 hutool，不需要重复引入 -->
+                <!-- hutool版本冲突，用 helio-core 的版本 -->
                 <exclusion>
                     <groupId>cn.hutool</groupId>
                     <artifactId>hutool-core</artifactId>

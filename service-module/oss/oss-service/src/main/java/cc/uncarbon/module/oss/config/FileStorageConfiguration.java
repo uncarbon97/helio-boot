@@ -1,6 +1,6 @@
 package cc.uncarbon.module.oss.config;
 
-import cn.xuyanwu.spring.file.storage.EnableFileStorage;
+import org.dromara.x.file.storage.spring.EnableFileStorage;
 import org.springframework.context.annotation.Configuration;
 
 
