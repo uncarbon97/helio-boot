@@ -29,8 +29,19 @@ spring:
     password:
     # Redis数据库序号
     database: 1
-  file-storage:
-    # 文档链接: https://spring-file-storage.xuyanwu.cn/#/%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8?id=%e9%85%8d%e7%bd%ae
+
+knife4j:
+  # 生产环境务必设为true
+  production: false
+
+mybatis-plus:
+  configuration:
+    # 生产环境下建议去除该配置项，不在控制台打印SQL
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+dromara:
+  x-file-storage:
+    # 文档：https://x-file-storage.xuyanwu.cn/
     # 默认使用 minio-1 存储平台
     default-platform: minio-1
     # 缩略图后缀
@@ -52,12 +63,3 @@ spring:
         bucket-name: helio
         domain: http://127.0.0.1:9000/helio/ # 访问域名，注意“/”结尾，例如：http://minio.abc.com/abc/
         base-path: / # 基础路径
-
-knife4j:
-  # 生产环境务必设为true
-  production: false
-
-mybatis-plus:
-  configuration:
-    # 生产环境下建议去除该配置项，不在控制台打印SQL
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
