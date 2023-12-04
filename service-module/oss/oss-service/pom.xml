@@ -14,18 +14,12 @@
     <artifactId>oss-service</artifactId>
 
     <properties>
-        <!-- 引入其他微服务模块 -->
+        <!-- 引入其他服务模块 -->
         <sys.version>1.10.0</sys.version>
-
-
-        <!-- 这里写其他第三方依赖 -->
-        <!-- 文件上传 -->
-        <spring-file-storage.version>0.6.1</spring-file-storage.version>
-        <minio.version>8.4.3</minio.version>
     </properties>
 
     <dependencies>
-        <!-- 实现业务微服务 -->
+        <!-- 实现业务服务 -->
         <dependency>
             <groupId>cc.uncarbon.module</groupId>
             <artifactId>oss-facade</artifactId>
@@ -33,7 +27,7 @@
         </dependency>
 
 
-        <!-- 引入其他微服务模块 -->
+        <!-- 引入其他服务模块 -->
         <dependency>
             <groupId>cc.uncarbon.module</groupId>
             <artifactId>sys-facade</artifactId>
@@ -60,26 +54,16 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-        <!-- 这里写其他第三方依赖 -->
         <!-- 对象存储工具类 https://gitee.com/dromara/x-file-storage -->
         <dependency>
             <groupId>org.dromara.x-file-storage</groupId>
             <artifactId>x-file-storage-spring</artifactId>
-            <version>${x-file-storage.version}</version>
-            <exclusions>
-                <!-- hutool版本冲突，用 helio-core 的版本 -->
-                <exclusion>
-                    <groupId>cn.hutool</groupId>
-                    <artifactId>hutool-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- MinIO 依赖包 -->
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
-            <version>${minio.version}</version>
         </dependency>
     </dependencies>
 </project>

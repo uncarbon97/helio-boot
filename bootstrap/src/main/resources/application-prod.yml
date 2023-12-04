@@ -37,8 +37,8 @@ knife4j:
 dromara:
   x-file-storage:
     # 文档：https://x-file-storage.xuyanwu.cn/
-    # 默认使用 minio-1 存储平台
-    default-platform: minio-1
+    # 默认使用 local-plus-1 存储平台
+    default-platform: local-plus-1
     # 缩略图后缀
     thumbnail-suffix: ".min.jpg"
     local-plus: # 本地存储升级版，不使用的情况下可以不写

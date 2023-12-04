@@ -17,14 +17,15 @@
     </properties>
 
     <dependencies>
-        <!-- 实现业务微服务 -->
+        <!-- 实现业务服务 -->
         <dependency>
             <groupId>cc.uncarbon.module</groupId>
             <artifactId>sys-facade</artifactId>
             <version>1.10.0</version>
         </dependency>
 
-        <!-- 引入其他微服务模块 -->
+
+        <!-- 引入其他服务模块 -->
 
 
         <!-- 脚手架starter -->

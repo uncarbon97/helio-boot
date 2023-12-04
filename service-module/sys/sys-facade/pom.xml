@@ -14,6 +14,9 @@
     <artifactId>sys-facade</artifactId>
 
     <dependencies>
+        <!-- 引入其他服务模块 -->
+
+
         <!-- 脚手架starter -->
         <dependency>
             <groupId>cc.uncarbon.framework</groupId>

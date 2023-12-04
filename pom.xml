@@ -8,7 +8,7 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>1.9.0</version>
+        <version>1.10.0</version>
     </parent>
 
     <groupId>cc.uncarbon.module</groupId>
@@ -17,17 +17,10 @@
     <version>1.10.0</version>
 
     <properties>
-        <!-- 这里写其他第三方依赖 -->
+        <!-- 这里管理全局第三方依赖版本，避免冲突 -->
         <!-- 文件上传 -->
         <x-file-storage.version>2.0.0</x-file-storage.version>
         <minio.version>8.4.3</minio.version>
-
-
-        <!-- 引入 HTTP-API 模块 -->
-        <!-- 后台管理 HTTP-API -->
-        <admin-api.version>1.10.0</admin-api.version>
-        <!-- C端 HTTP-API -->
-        <app-api.version>1.10.0</app-api.version>
     </properties>
 
     <modules>
@@ -39,50 +32,28 @@
     </modules>
 
     <dependencyManagement>
+        <!-- 这里管理全局第三方依赖版本，避免冲突 -->
         <dependencies>
-            <!-- 引入 HTTP-API 模块 -->
+            <!-- 文件上传 -->
+            <!-- 对象存储工具类 https://gitee.com/dromara/x-file-storage -->
             <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>admin-api</artifactId>
-                <version>${admin-api.version}</version>
+                <groupId>org.dromara.x-file-storage</groupId>
+                <artifactId>x-file-storage-spring</artifactId>
+                <version>${x-file-storage.version}</version>
+                <exclusions>
+                    <!-- hutool版本冲突，用 helio-core 的版本 -->
+                    <exclusion>
+                        <groupId>cn.hutool</groupId>
+                        <artifactId>hutool-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
+            <!-- MinIO 依赖包 -->
             <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>app-api</artifactId>
-                <version>${app-api.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>sys</artifactId>
-                <version>${app-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>sys-facade</artifactId>
-                <version>${app-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>sys-service</artifactId>
-                <version>${app-api.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>oss</artifactId>
-                <version>${app-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>oss-facade</artifactId>
-                <version>${app-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cc.uncarbon.module</groupId>
-                <artifactId>oss-service</artifactId>
-                <version>${app-api.version}</version>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
