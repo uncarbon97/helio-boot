@@ -110,7 +110,11 @@ public class AdminSysUserController {
 
     @SysLog(value = "修改当前用户密码")
     @ApiOperation(value = "修改当前用户密码")
-    @PostMapping(value = "/sys/users/updatePassword")
+    @PostMapping(value = {
+            "/sys/users/me/password:update",
+            // 兼容旧的API路由
+            "/sys/users/updatePassword"
+    })
     public ApiResult<?> updatePassword(@RequestBody @Valid AdminUpdateCurrentSysUserPasswordDTO dto) {
         if (!dto.getConfirmNewPassword().equals(dto.getNewPassword())) {
             throw new BusinessException(400, "密码与确认密码不同，请检查");
@@ -138,7 +142,11 @@ public class AdminSysUserController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "kickOut")
     @ApiOperation(value = "踢某用户下线")
-    @PostMapping(value = "/sys/users/{userId}/kickOut")
+    @PostMapping(value = {
+            "/sys/users/{userId}:kick-out",
+            // 兼容旧的API路由
+            "/sys/users/{userId}/kickOut"
+    })
     public ApiResult<?> kickOut(@PathVariable Long userId) {
         AdminStpUtil.kickout(userId);
 
@@ -147,7 +155,11 @@ public class AdminSysUserController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "取指定用户关联角色ID")
-    @GetMapping(value = "/sys/users/{userId}/relatedRoleIds")
+    @GetMapping(value = {
+            "/sys/users/{userId}/roles",
+            // 兼容旧的API路由
+            "/sys/users/{userId}/relatedRoleIds"
+    })
     public ApiResult<Set<Long>> listRelatedRoleIds(@PathVariable Long userId) {
         return ApiResult.data(sysUserService.listRelatedRoleIds(userId));
     }
