@@ -1,10 +1,10 @@
 package cc.uncarbon.module.sys.service;
 
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysUserRoleRelationEntity;
 import cc.uncarbon.module.sys.mapper.SysUserRoleRelationMapper;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,18 +16,37 @@ import java.util.stream.Collectors;
 
 /**
  * 后台用户-角色关联
- * @author Uncarbon
  */
-@Slf4j
+@RequiredArgsConstructor
 @Service
-public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRoleRelationMapper, SysUserRoleRelationEntity> {
+@Slf4j
+public class SysUserRoleRelationService {
+
+    private final SysUserRoleRelationMapper sysUserRoleRelationMapper;
+
+
+    /**
+     * 后台管理-新增
+     * 注：本方法较为特殊，仅供SysTenantFacadeImpl调用
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Long adminInsert(Long tenantId, Long userId, Long roleId) {
+        SysUserRoleRelationEntity entity = new SysUserRoleRelationEntity()
+                .setUserId(userId).setRoleId(roleId);
+        entity.setTenantId(tenantId);
+
+        sysUserRoleRelationMapper.insert(entity);
+
+        return entity.getId();
+    }
+
 
     /**
      * 先清理用户ID所有关联关系, 再绑定用户ID与角色ID
      */
     @Transactional(rollbackFor = Exception.class)
     public void cleanAndBind(Long userId, Collection<Long> roleIds) {
-        this.remove(
+        sysUserRoleRelationMapper.delete(
                 new QueryWrapper<SysUserRoleRelationEntity>()
                         .lambda()
                         .eq(SysUserRoleRelationEntity::getUserId, userId)
@@ -36,7 +55,7 @@ public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRole
         if (CollUtil.isNotEmpty(roleIds)) {
             // 需要绑定角色
             roleIds.forEach(
-                    roleId -> this.save(
+                    roleId -> sysUserRoleRelationMapper.insert(
                             SysUserRoleRelationEntity.builder()
                                     .userId(userId)
                                     .roleId(roleId)
@@ -48,6 +67,7 @@ public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRole
 
     /**
      * 取拥有角色Ids
+     *
      * @param userId 用户ID
      * @return 失败返回空列表
      */
@@ -56,7 +76,7 @@ public class SysUserRoleRelationService extends HelioBaseServiceImpl<SysUserRole
             throw new IllegalArgumentException("userId不能为空");
         }
 
-        return this.list(
+        return sysUserRoleRelationMapper.selectList(
                 new QueryWrapper<SysUserRoleRelationEntity>()
                         .lambda()
                         .select(SysUserRoleRelationEntity::getRoleId)

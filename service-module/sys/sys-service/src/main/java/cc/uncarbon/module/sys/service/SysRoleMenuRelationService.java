@@ -1,6 +1,5 @@
 package cc.uncarbon.module.sys.service;
 
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysRoleMenuRelationEntity;
 import cc.uncarbon.module.sys.mapper.SysRoleMenuRelationMapper;
 import cn.hutool.core.collection.CollUtil;
@@ -18,13 +17,14 @@ import java.util.stream.Collectors;
 
 /**
  * 后台角色-可见菜单关联
- *
- * @author Uncarbon
  */
-@Slf4j
-@Service
 @RequiredArgsConstructor
-public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenuRelationMapper, SysRoleMenuRelationEntity> {
+@Service
+@Slf4j
+public class SysRoleMenuRelationService {
+
+    private final SysRoleMenuRelationMapper sysRoleMenuRelationMapper;
+
 
     /**
      * 根据角色Ids取菜单Ids
@@ -40,7 +40,7 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
         Set<Long> ret = new HashSet<>(roleIds.size() << 4);
         for (Long roleId : roleIds) {
             ret.addAll(
-                    this.list(
+                    sysRoleMenuRelationMapper.selectList(
                             new QueryWrapper<SysRoleMenuRelationEntity>()
                                     .lambda()
                                     .select(SysRoleMenuRelationEntity::getMenuId)
@@ -67,14 +67,14 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
 
         if (CollUtil.isEmpty(menuIds)) {
             // 清除绑定，直接删除所有关联关系就行
-            this.remove(menuIdsQuery);
+            sysRoleMenuRelationMapper.delete(menuIdsQuery);
             return;
         }
 
         /*
         先删除不再需要的关联关系
          */
-        this.remove(
+        sysRoleMenuRelationMapper.delete(
                 new QueryWrapper<SysRoleMenuRelationEntity>()
                         .lambda()
                         .eq(SysRoleMenuRelationEntity::getRoleId, roleId)
@@ -84,7 +84,8 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
         /*
         取出需要增量更新的部分
          */
-        Set<Long> existingMenuIds = this.list(menuIdsQuery).stream().map(SysRoleMenuRelationEntity::getMenuId)
+        Set<Long> existingMenuIds = sysRoleMenuRelationMapper.selectList(menuIdsQuery)
+                .stream().map(SysRoleMenuRelationEntity::getMenuId)
                 .collect(Collectors.toSet());
         menuIds.removeAll(existingMenuIds);
 
@@ -105,6 +106,6 @@ public class SysRoleMenuRelationService extends HelioBaseServiceImpl<SysRoleMenu
                             .build()
             );
         }
-        this.saveBatch(entityList);
+        entityList.forEach(sysRoleMenuRelationMapper::insert);
     }
 }

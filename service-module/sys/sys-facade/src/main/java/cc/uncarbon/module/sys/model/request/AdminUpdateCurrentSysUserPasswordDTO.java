@@ -14,7 +14,6 @@ import java.io.Serializable;
 
 /**
  * 后台管理-修改当前用户密码
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

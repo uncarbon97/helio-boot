@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * 文件上传下载门面
- *
- * @author Uncarbon
  */
 @Slf4j
 @Service

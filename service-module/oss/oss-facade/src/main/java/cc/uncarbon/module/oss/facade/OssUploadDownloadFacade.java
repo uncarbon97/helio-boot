@@ -8,8 +8,6 @@ import lombok.NonNull;
 
 /**
  * 文件上传下载门面
- *
- * @author Uncarbon
  */
 public interface OssUploadDownloadFacade {
 

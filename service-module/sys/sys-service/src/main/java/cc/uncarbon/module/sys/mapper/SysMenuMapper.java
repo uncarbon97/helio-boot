@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 后台菜单
- * @author Uncarbon
  */
 @Mapper
 public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {

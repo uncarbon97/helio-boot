@@ -9,8 +9,6 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * 后台用户
- *
- * @author Uncarbon
  */
 @Mapper
 public interface SysUserMapper extends BaseMapper<SysUserEntity> {

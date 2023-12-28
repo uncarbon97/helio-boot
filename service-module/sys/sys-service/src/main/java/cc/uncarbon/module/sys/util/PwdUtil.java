@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 /**
  * 密码加密工具类
  * 可以根据自己的业务需要, 修改加密算法(如加盐等)
- * @author Uncarbon
  */
 @UtilityClass
 public class PwdUtil {

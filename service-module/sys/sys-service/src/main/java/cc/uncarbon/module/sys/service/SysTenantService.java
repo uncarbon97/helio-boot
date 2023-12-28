@@ -4,11 +4,11 @@ import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysTenantMapper;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
+import cc.uncarbon.module.sys.model.request.AdminInsertSysTenantDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysTenantDTO;
 import cc.uncarbon.module.sys.model.request.AdminUpdateSysTenantDTO;
 import cc.uncarbon.module.sys.model.response.SysTenantBO;
@@ -29,13 +29,14 @@ import java.util.List;
 
 /**
  * 系统租户
- * @author Uncarbon
  */
-@Slf4j
-@Service
 @RequiredArgsConstructor
-public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysTenantEntity> {
+@Service
+@Slf4j
+public class SysTenantService {
 
+    private final SysTenantMapper sysTenantMapper;
+    // 比较尴尬，为避免循环依赖，只能这里引用SysUserMapper拿用户信息
     private final SysUserMapper sysUserMapper;
 
 
@@ -43,7 +44,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      * 后台管理-分页列表
      */
     public PageResult<SysTenantBO> adminList(PageParam pageParam, AdminListSysTenantDTO dto) {
-        Page<SysTenantEntity> entityPage = this.page(
+        Page<SysTenantEntity> entityPage = sysTenantMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<SysTenantEntity>()
                         .lambda()
@@ -78,12 +79,27 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      * @return null or BO
      */
     public SysTenantBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysTenantEntity entity = this.getById(id);
+        SysTenantEntity entity = sysTenantMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
 
         return this.entity2BO(entity);
+    }
+
+    /**
+     * 后台管理-新增
+     * 注：本方法较为特殊，仅供SysTenantFacadeImpl调用
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public SysTenantEntity adminInsert(AdminInsertSysTenantDTO dto) {
+        dto.setId(null);
+        SysTenantEntity entity = new SysTenantEntity();
+        BeanUtil.copyProperties(dto, entity);
+
+        sysTenantMapper.insert(entity);
+
+        return entity;
     }
 
     /**
@@ -97,7 +113,16 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
         SysTenantEntity entity = new SysTenantEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.updateById(entity);
+        sysTenantMapper.updateById(entity);
+    }
+
+    /**
+     * 后台管理-编辑
+     * 注：本方法较为特殊，仅供SysTenantFacadeImpl调用
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void adminUpdate(SysTenantEntity entity) {
+        sysTenantMapper.updateById(entity);
     }
 
     /**
@@ -106,14 +131,14 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除系统租户] >> 入参={}", ids);
-        this.removeByIds(ids);
+        sysTenantMapper.deleteBatchIds(ids);
     }
 
     /**
      * 根据租户ID(非主键ID)，得到租户实体
      */
     public SysTenantEntity getTenantEntityByTenantId(Long tenantId) {
-        return this.getOne(
+        return sysTenantMapper.selectOne(
                 new QueryWrapper<SysTenantEntity>()
                         .lambda()
                         .eq(SysTenantEntity::getTenantId, tenantId)
@@ -127,7 +152,7 @@ public class SysTenantService extends HelioBaseServiceImpl<SysTenantMapper, SysT
      * @param dto DTO
      */
     public void checkExistence(AdminUpdateSysTenantDTO dto) {
-        SysTenantEntity existingEntity = this.getOne(
+        SysTenantEntity existingEntity = sysTenantMapper.selectOne(
                 new QueryWrapper<SysTenantEntity>()
                         .lambda()
                         // 仅取主键ID

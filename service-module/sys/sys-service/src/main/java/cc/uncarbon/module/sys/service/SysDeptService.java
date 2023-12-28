@@ -2,10 +2,8 @@ package cc.uncarbon.module.sys.service;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.exception.BusinessException;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysDeptEntity;
-import cc.uncarbon.module.sys.entity.SysUserDeptRelationEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDeptMapper;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDeptDTO;
@@ -27,14 +25,13 @@ import java.util.List;
 
 /**
  * 部门
- *
- * @author Uncarbon
  */
 @RequiredArgsConstructor
-@Slf4j
 @Service
-public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptEntity> {
+@Slf4j
+public class SysDeptService {
 
+    private final SysDeptMapper sysDeptMapper;
     private final SysUserDeptRelationService sysUserDeptRelationService;
 
 
@@ -42,7 +39,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
      * 后台管理-列表
      */
     public List<SysDeptBO> adminList() {
-        List<SysDeptEntity> entityList = this.list(
+        List<SysDeptEntity> entityList = sysDeptMapper.selectList(
                 new QueryWrapper<SysDeptEntity>()
                         .lambda()
                         // 排序
@@ -70,7 +67,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
      * @return null or BO
      */
     public SysDeptBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysDeptEntity entity = this.getById(id);
+        SysDeptEntity entity = sysDeptMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -94,7 +91,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         SysDeptEntity entity = new SysDeptEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.save(entity);
+        sysDeptMapper.insert(entity);
 
         return entity.getId();
     }
@@ -114,7 +111,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
         SysDeptEntity entity = new SysDeptEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.updateById(entity);
+        sysDeptMapper.updateById(entity);
     }
 
     /**
@@ -123,7 +120,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除部门] >> 入参={}", ids);
-        this.removeByIds(ids);
+        sysDeptMapper.deleteBatchIds(ids);
     }
 
     /**
@@ -132,18 +129,11 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
      * @param userId 用户ID
      */
     public SysDeptBO getPlainDeptByUserId(Long userId) {
-        SysUserDeptRelationEntity relationEntity = sysUserDeptRelationService.getOne(
-                new QueryWrapper<SysUserDeptRelationEntity>()
-                        .lambda()
-                        .eq(SysUserDeptRelationEntity::getUserId, userId)
-                        .last(HelioConstant.CRUD.SQL_LIMIT_1)
-        );
-
-        if (relationEntity == null) {
+        List<Long> deptIds = sysUserDeptRelationService.getUserDeptIds(userId);
+        if (CollUtil.isEmpty(deptIds)) {
             return null;
         }
-
-        SysDeptEntity entity = this.getById(relationEntity.getDeptId());
+        SysDeptEntity entity = sysDeptMapper.selectById(CollUtil.getFirst(deptIds));
         return this.entity2BO(entity);
     }
 
@@ -203,7 +193,7 @@ public class SysDeptService extends HelioBaseServiceImpl<SysDeptMapper, SysDeptE
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysDeptDTO dto) {
-        SysDeptEntity existingEntity = this.getOne(
+        SysDeptEntity existingEntity = sysDeptMapper.selectOne(
                 new QueryWrapper<SysDeptEntity>()
                         .lambda()
                         // 仅取主键ID

@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 后台角色-可见菜单关联
- * @author Uncarbon
  */
 @Mapper
 public interface SysRoleMenuRelationMapper extends BaseMapper<SysRoleMenuRelationEntity> {

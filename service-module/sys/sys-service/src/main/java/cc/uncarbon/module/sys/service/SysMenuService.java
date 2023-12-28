@@ -5,7 +5,6 @@ import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.function.StreamFunction;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysMenuEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
@@ -34,24 +33,23 @@ import java.util.stream.Collectors;
 
 /**
  * 后台菜单
- *
- * @author Uncarbon
  */
 @RequiredArgsConstructor
-@Slf4j
 @Service
-public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuEntity> {
+@Slf4j
+public class SysMenuService {
+
+    private final SysMenuMapper sysMenuMapper;
+    private final SysRoleMenuRelationService sysRoleMenuRelationService;
 
     private static final Snowflake SNOWFLAKE = IdUtil.getSnowflake(0L, 0L);
-
-    private final SysRoleMenuRelationService sysRoleMenuRelationService;
 
 
     /**
      * 后台管理-列表
      */
     public List<SysMenuBO> adminList() {
-        List<SysMenuEntity> entityList = this.list(
+        List<SysMenuEntity> entityList = sysMenuMapper.selectList(
                 new QueryWrapper<SysMenuEntity>()
                         .lambda()
                         // 排序
@@ -79,7 +77,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
      * @return null or BO
      */
     public SysMenuBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysMenuEntity entity = this.getById(id);
+        SysMenuEntity entity = sysMenuMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -106,7 +104,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         SysMenuEntity entity = new SysMenuEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.save(entity);
+        sysMenuMapper.insert(entity);
 
         return entity.getId();
     }
@@ -126,7 +124,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         SysMenuEntity entity = new SysMenuEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.updateById(entity);
+        sysMenuMapper.updateById(entity);
     }
 
     /**
@@ -135,7 +133,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台菜单] >> 入参={}", ids);
-        this.removeByIds(ids);
+        sysMenuMapper.deleteBatchIds(ids);
     }
 
     /**
@@ -172,7 +170,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
 
                     if (SysConstant.SUPER_ADMIN_ROLE_ID.equals(roleId)) {
                         // 超级管理员读取所有权限，不管有没有被禁用
-                        permissions = this.list().stream()
+                        permissions = sysMenuMapper.selectList(null).stream()
                                 .map(SysMenuEntity::getPermission)
                                 .filter(StrUtil::isNotEmpty)
                                 .collect(Collectors.toSet())
@@ -184,7 +182,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
                         if (CollUtil.isEmpty(menuIds)) {
                             permissions = Collections.emptySet();
                         } else {
-                            permissions = this.list(
+                            permissions = sysMenuMapper.selectList(
                                             new QueryWrapper<SysMenuEntity>()
                                                     .lambda()
                                                     .select(SysMenuEntity::getPermission)
@@ -213,7 +211,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
             return Collections.emptySet();
         }
 
-        return this.list(
+        return sysMenuMapper.selectList(
                 new QueryWrapper<SysMenuEntity>()
                         .lambda()
                         .select(SysMenuEntity::getPermission)
@@ -307,7 +305,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         SysErrorEnum.NO_ROLE_AVAILABLE_FOR_CURRENT_USER.assertNotEmpty(roleIds);
 
         // 2. 得到所有可用的 菜单ID-上级菜单ID map，备用
-        Map<Long, Long> allMenuMap = this.list(
+        Map<Long, Long> allMenuMap = sysMenuMapper.selectList(
                 new QueryWrapper<SysMenuEntity>()
                         .lambda()
                         .select(SysMenuEntity::getId, SysMenuEntity::getParentId)
@@ -332,7 +330,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         Assert.notEmpty(ids);
         Assert.notEmpty(types);
 
-        List<SysMenuEntity> entityList = this.list(
+        List<SysMenuEntity> entityList = sysMenuMapper.selectList(
                 new QueryWrapper<SysMenuEntity>()
                         .lambda()
                         .in(SysMenuEntity::getId, ids)
@@ -356,7 +354,7 @@ public class SysMenuService extends HelioBaseServiceImpl<SysMenuMapper, SysMenuE
         if (StrUtil.isNotBlank(dto.getPermission())) {
             dto.setPermission(StrUtil.cleanBlank(dto.getPermission()));
 
-            SysMenuEntity existingEntity = this.getOne(
+            SysMenuEntity existingEntity = sysMenuMapper.selectOne(
                     new QueryWrapper<SysMenuEntity>()
                             .lambda()
                             // 仅取主键ID

@@ -7,8 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 数据字典
- *
- * @author Uncarbon
  */
 @Mapper
 public interface SysDataDictMapper extends BaseMapper<SysDataDictEntity> {

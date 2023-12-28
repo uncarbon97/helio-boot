@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 
 /**
  * 部门BO
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

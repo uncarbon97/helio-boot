@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 
 /**
  * 后台菜单BO
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder
