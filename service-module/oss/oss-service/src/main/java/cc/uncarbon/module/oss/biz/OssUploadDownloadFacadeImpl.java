@@ -7,7 +7,7 @@ import cc.uncarbon.module.oss.model.request.UploadFileAttributeDTO;
 import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
 import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cc.uncarbon.module.oss.service.OssFileInfoService;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +75,7 @@ public class OssUploadDownloadFacadeImpl implements OssUploadDownloadFacade {
         byte[] fileBytes = null;
         if (
                 OssFileInfoService.isLocalPlatform(ossFileInfo.getStoragePlatform())
-                || StrUtil.isEmpty(ossFileInfo.getDirectUrl())
+                || CharSequenceUtil.isEmpty(ossFileInfo.getDirectUrl())
         ) {
             FileInfo fileInfo = OssFileInfoService.toFileInfo(ossFileInfo);
             try {

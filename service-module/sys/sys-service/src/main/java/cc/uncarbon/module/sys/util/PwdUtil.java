@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.util;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.crypto.SecureUtil;
 import lombok.experimental.UtilityClass;
 
@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class PwdUtil {
     public static String encrypt(String str, String salt) {
-        if (StrUtil.isEmpty(str)){
+        if (CharSequenceUtil.isEmpty(str)){
             return "";
         }
 

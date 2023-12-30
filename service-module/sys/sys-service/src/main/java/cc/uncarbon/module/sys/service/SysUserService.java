@@ -22,9 +22,9 @@ import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +71,7 @@ public class SysUserService {
                 new QueryWrapper<SysUserEntity>()
                         .lambda()
                         // 手机号
-                        .like(StrUtil.isNotBlank(dto.getPhoneNo()), SysUserEntity::getPhoneNo, StrUtil.cleanBlank(dto.getPhoneNo()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getPhoneNo()), SysUserEntity::getPhoneNo, CharSequenceUtil.cleanBlank(dto.getPhoneNo()))
                         // 排序
                         .orderByDesc(SysUserEntity::getCreatedAt)
         );
@@ -167,7 +167,7 @@ public class SysUserService {
         /*
         如果启用了多租户功能，并且前端指定了租户ID，则先查库确认租户是否有效
 
-        注意：数据源级多租户，登录前【必须】主动指定租户ID，如: dto.setTenantId(101L);
+        注意：数据源级多租户，登录前【必须】主动指定租户ID，如: dto.setTenantId(101L)
          */
         // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
         TenantContext tenantContext = new TenantContext();

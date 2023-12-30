@@ -14,7 +14,7 @@ import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
 import cc.uncarbon.module.sys.model.response.SysRoleBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +49,9 @@ public class SysRoleService {
                 new QueryWrapper<SysRoleEntity>()
                         .lambda()
                         // 名称
-                        .like(StrUtil.isNotBlank(dto.getTitle()), SysRoleEntity::getTitle, StrUtil.cleanBlank(dto.getTitle()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getTitle()), SysRoleEntity::getTitle, CharSequenceUtil.cleanBlank(dto.getTitle()))
                         // 值
-                        .like(StrUtil.isNotBlank(dto.getValue()), SysRoleEntity::getValue, StrUtil.cleanBlank(dto.getValue()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getValue()), SysRoleEntity::getValue, CharSequenceUtil.cleanBlank(dto.getValue()))
                         // 排序
                         .orderByDesc(SysRoleEntity::getCreatedAt)
         );

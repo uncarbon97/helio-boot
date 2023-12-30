@@ -3,18 +3,18 @@ package cc.uncarbon.module.adminapi.web.oss;
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cc.uncarbon.module.oss.facade.OssUploadDownloadFacade;
 import cc.uncarbon.module.oss.model.request.UploadFileAttributeDTO;
 import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
 import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cc.uncarbon.module.oss.model.response.OssFileUploadResultVO;
 import cc.uncarbon.module.sys.constant.SysConstant;
-import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.Header;
 import io.swagger.annotations.Api;
@@ -115,7 +115,7 @@ public class AdminOssUploadDownloadController {
          */
         if (
                 ossUploadDownloadFacade.isLocalPlatform(ossFileInfo.getStoragePlatform())
-                        || StrUtil.isEmpty(ossFileInfo.getDirectUrl())
+                        || CharSequenceUtil.isEmpty(ossFileInfo.getDirectUrl())
         ) {
             ret.setUrl(
                     // 默认接口风格为 RESTful，下载即为最后拼接“/{文件ID}”

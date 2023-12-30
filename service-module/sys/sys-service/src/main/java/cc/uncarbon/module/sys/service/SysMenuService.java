@@ -17,6 +17,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -267,7 +268,7 @@ public class SysMenuService {
                         .setPath(bo.getComponent())
                 ;
                 // 防止用户忘记加了, 主动补充/
-                if (StrUtil.isNotBlank(bo.getPath()) && !bo.getPath().startsWith(StrPool.SLASH)) {
+                if (CharSequenceUtil.isNotBlank(bo.getPath()) && !bo.getPath().startsWith(StrPool.SLASH)) {
                     bo.setPath(StrPool.SLASH + bo.getPath());
                 }
                 break;
@@ -351,8 +352,8 @@ public class SysMenuService {
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysMenuDTO dto) {
-        if (StrUtil.isNotBlank(dto.getPermission())) {
-            dto.setPermission(StrUtil.cleanBlank(dto.getPermission()));
+        if (CharSequenceUtil.isNotBlank(dto.getPermission())) {
+            dto.setPermission(CharSequenceUtil.cleanBlank(dto.getPermission()));
 
             SysMenuEntity existingEntity = sysMenuMapper.selectOne(
                     new QueryWrapper<SysMenuEntity>()

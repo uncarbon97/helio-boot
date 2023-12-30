@@ -13,6 +13,7 @@ import java.util.Locale;
  * 基础单元测试
  * @author Uncarbon
  */
+@SuppressWarnings("squid:S2699")
 @SpringBootTest(classes = HelioBootApplication.class)
 class BasicUnitTest {
 

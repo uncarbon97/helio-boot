@@ -3,9 +3,9 @@ package cc.uncarbon.module.sys.extension.impl;
 import cc.uncarbon.module.sys.extension.SysLogAspectExtension;
 import cc.uncarbon.module.sys.model.response.IPLocationBO;
 import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
@@ -17,7 +17,7 @@ public class DefaultSysLogAspectExtension implements SysLogAspectExtension {
 
     @Override
     public IPLocationBO queryIPLocation(String ip) {
-        if (StrUtil.contains(ip, StrPool.COLON)) {
+        if (CharSequenceUtil.contains(ip, StrPool.COLON)) {
             // 仅根据冒号简易判断；暂不支持IPv6地址
             return IPLocationBO.unknown();
         }
@@ -49,7 +49,7 @@ public class DefaultSysLogAspectExtension implements SysLogAspectExtension {
                 JSONObject repJson = JSONUtil.parseObj(repStr);
                 String pro = repJson.getStr("pro");
                 String err = repJson.getStr("err");
-                if (StrUtil.isEmpty(pro) || "noprovince".equals(err)) {
+                if (CharSequenceUtil.isEmpty(pro) || "noprovince".equals(err)) {
                     // 可能是非中国内地IP
                     String regionName = repJson.getStr("addr");
                     return IPLocationBO.unknown().setRegionName(regionName);

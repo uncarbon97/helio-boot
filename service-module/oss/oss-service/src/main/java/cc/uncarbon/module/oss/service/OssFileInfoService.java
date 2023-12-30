@@ -14,8 +14,8 @@ import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.NonNull;
@@ -53,11 +53,11 @@ public class OssFileInfoService {
                 new QueryWrapper<OssFileInfoEntity>()
                         .lambda()
                         // 原始文件名
-                        .like(StrUtil.isNotBlank(dto.getOriginalFilename()), OssFileInfoEntity::getOriginalFilename, StrUtil.cleanBlank(dto.getOriginalFilename()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getOriginalFilename()), OssFileInfoEntity::getOriginalFilename, CharSequenceUtil.cleanBlank(dto.getOriginalFilename()))
                         // 扩展名
-                        .eq(StrUtil.isNotBlank(dto.getExtendName()), OssFileInfoEntity::getExtendName, StrUtil.cleanBlank(dto.getExtendName()))
+                        .eq(CharSequenceUtil.isNotBlank(dto.getExtendName()), OssFileInfoEntity::getExtendName, CharSequenceUtil.cleanBlank(dto.getExtendName()))
                         // 文件类别
-                        .eq(StrUtil.isNotBlank(dto.getClassified()), OssFileInfoEntity::getClassified, StrUtil.cleanBlank(dto.getClassified()))
+                        .eq(CharSequenceUtil.isNotBlank(dto.getClassified()), OssFileInfoEntity::getClassified, CharSequenceUtil.cleanBlank(dto.getClassified()))
                         // 时间区间
                         .between(ObjectUtil.isNotNull(dto.getBeginAt()) && ObjectUtil.isNotNull(dto.getEndAt()), OssFileInfoEntity::getCreatedAt, dto.getBeginAt(), dto.getEndAt())
                         // 排序
@@ -185,7 +185,7 @@ public class OssFileInfoService {
      * @param storagePlatform 存储平台名
      */
     public static boolean isLocalPlatform(String storagePlatform) {
-        return StrUtil.startWith(storagePlatform, OssConstant.PLATFORM_PREFIX_LOCAL);
+        return CharSequenceUtil.startWith(storagePlatform, OssConstant.PLATFORM_PREFIX_LOCAL);
     }
 
     /*

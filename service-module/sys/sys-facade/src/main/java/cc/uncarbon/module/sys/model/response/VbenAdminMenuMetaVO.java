@@ -3,7 +3,6 @@ package cc.uncarbon.module.sys.model.response;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 
 import java.io.Serializable;
 

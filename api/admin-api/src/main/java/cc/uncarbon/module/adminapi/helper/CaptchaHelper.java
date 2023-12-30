@@ -2,7 +2,7 @@ package cc.uncarbon.module.adminapi.helper;
 
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.ShearCaptcha;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -48,13 +48,13 @@ public class CaptchaHelper {
      * @return 是否正确
      */
     public boolean validate(String uuid, String captchaAnswer, boolean removeWhenEquals) {
-        if (StrUtil.hasBlank(uuid, captchaAnswer)) {
+        if (CharSequenceUtil.hasBlank(uuid, captchaAnswer)) {
             return false;
         }
 
         String cacheKey = String.format(CACHE_KEY_CAPTCHA_ANSWER, uuid);
         String answerInRedis = stringRedisTemplate.opsForValue().get(cacheKey);
-        boolean equals = StrUtil.equalsIgnoreCase(answerInRedis, captchaAnswer);
+        boolean equals = CharSequenceUtil.equalsIgnoreCase(answerInRedis, captchaAnswer);
         if (equals && removeWhenEquals) {
             stringRedisTemplate.delete(cacheKey);
         }
