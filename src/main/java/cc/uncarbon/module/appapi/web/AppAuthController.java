@@ -26,7 +26,7 @@ public class AppAuthController {
 
     @ApiOperation(value = "登录")
     @PostMapping("/auth/login")
-    public ApiResult<?> login() {
+    public ApiResult<Void> login() {
         /*
         编码时请参考AdminAuthController#login
          */

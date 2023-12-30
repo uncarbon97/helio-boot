@@ -13,8 +13,8 @@ import cc.uncarbon.module.sys.model.request.AdminListSysTenantDTO;
 import cc.uncarbon.module.sys.model.request.AdminUpdateSysTenantDTO;
 import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class SysTenantService {
                 new QueryWrapper<SysTenantEntity>()
                         .lambda()
                         // 租户名
-                        .like(StrUtil.isNotBlank(dto.getTenantName()), SysTenantEntity::getTenantName, StrUtil.cleanBlank(dto.getTenantName()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getTenantName()), SysTenantEntity::getTenantName, CharSequenceUtil.cleanBlank(dto.getTenantName()))
                         // 租户ID
                         .eq(ObjectUtil.isNotNull(dto.getTenantId()), SysTenantEntity::getTenantId, dto.getTenantId())
                         // 状态

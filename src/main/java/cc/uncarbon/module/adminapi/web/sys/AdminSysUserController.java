@@ -61,7 +61,7 @@ public class AdminSysUserController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping(value = "/sys/users")
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysUserDTO dto) {
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysUserDTO dto) {
         sysUserService.adminInsert(dto);
 
         return ApiResult.success();
@@ -71,7 +71,7 @@ public class AdminSysUserController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/sys/users/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysUserDTO dto) {
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysUserDTO dto) {
         dto.setId(id);
         sysUserService.adminUpdate(dto);
 
@@ -82,7 +82,7 @@ public class AdminSysUserController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/users")
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysUserService.adminDelete(dto.getIds());
 
         return ApiResult.success();
@@ -98,7 +98,7 @@ public class AdminSysUserController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "resetPassword")
     @ApiOperation(value = "重置某用户密码")
     @PutMapping(value = "/sys/users/{userId}/password")
-    public ApiResult<?> resetPassword(@PathVariable Long userId, @RequestBody @Valid AdminResetSysUserPasswordDTO dto) {
+    public ApiResult<Void> resetPassword(@PathVariable Long userId, @RequestBody @Valid AdminResetSysUserPasswordDTO dto) {
         dto.setUserId(userId);
         sysUserService.adminResetUserPassword(dto);
 
@@ -115,7 +115,7 @@ public class AdminSysUserController {
             // 兼容旧的API路由
             "/sys/users/updatePassword"
     })
-    public ApiResult<?> updatePassword(@RequestBody @Valid AdminUpdateCurrentSysUserPasswordDTO dto) {
+    public ApiResult<Void> updatePassword(@RequestBody @Valid AdminUpdateCurrentSysUserPasswordDTO dto) {
         if (!dto.getConfirmNewPassword().equals(dto.getNewPassword())) {
             throw new BusinessException(400, "密码与确认密码不同，请检查");
         }
@@ -130,7 +130,7 @@ public class AdminSysUserController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "bindRoles")
     @ApiOperation(value = "绑定用户与角色关联关系")
     @PutMapping(value = "/sys/users/{userId}/roles")
-    public ApiResult<?> bindRoles(@PathVariable Long userId, @RequestBody AdminBindUserRoleRelationDTO dto) {
+    public ApiResult<Void> bindRoles(@PathVariable Long userId, @RequestBody AdminBindUserRoleRelationDTO dto) {
         dto.setUserId(userId);
         sysUserService.adminBindRoles(dto);
 
@@ -147,7 +147,7 @@ public class AdminSysUserController {
             // 兼容旧的API路由
             "/sys/users/{userId}/kickOut"
     })
-    public ApiResult<?> kickOut(@PathVariable Long userId) {
+    public ApiResult<Void> kickOut(@PathVariable Long userId) {
         AdminStpUtil.kickout(userId);
 
         return ApiResult.success();

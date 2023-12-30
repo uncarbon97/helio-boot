@@ -12,7 +12,7 @@ import cc.uncarbon.module.sys.model.request.AdminListSysDataDictDTO;
 import cc.uncarbon.module.sys.model.response.SysDataDictBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class SysDataDictService {
                 new QueryWrapper<SysDataDictEntity>()
                         .lambda()
                         // 参数描述
-                        .like(StrUtil.isNotBlank(dto.getDescription()), SysDataDictEntity::getDescription, StrUtil.cleanBlank(dto.getDescription()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getDescription()), SysDataDictEntity::getDescription, CharSequenceUtil.cleanBlank(dto.getDescription()))
                         // 排序
                         .orderByDesc(SysDataDictEntity::getCreatedAt)
         );

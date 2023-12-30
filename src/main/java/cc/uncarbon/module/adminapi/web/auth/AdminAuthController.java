@@ -91,7 +91,7 @@ public class AdminAuthController {
     @SaCheckLogin(type = AdminStpUtil.TYPE)
     @ApiOperation(value = "登出")
     @PostMapping(value = "/auth/logout")
-    public ApiResult<?> logout() {
+    public ApiResult<Void> logout() {
         AdminStpUtil.logout();
         UserContextHolder.clear();
         TenantContextHolder.clear();
@@ -110,7 +110,7 @@ public class AdminAuthController {
         // uuid 为空则抛出异常
         SysErrorEnum.UUID_CANNOT_BE_BLANK.assertNotBlank(uuid);
 
-        // 核验方法：captchaHelper.validate;
+        // 核验方法：captchaHelper.validate
         AbstractCaptcha captcha = captchaHelper.generate(uuid);
 
         // 写入响应流

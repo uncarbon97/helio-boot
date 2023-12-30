@@ -70,8 +70,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return (ex, method, params) -> {
-            log.error("[异步任务线程池] 执行异步任务【{}】时出错 >> 堆栈\t\n", method, ex);
-        };
+        return (ex, method, params) ->
+                log.error("[异步任务线程池] 执行异步任务【{}】时出错 >> 堆栈\t\n", method, ex);
     }
 }

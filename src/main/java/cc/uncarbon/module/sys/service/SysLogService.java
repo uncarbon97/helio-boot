@@ -11,8 +11,8 @@ import cc.uncarbon.module.sys.model.request.AdminListSysLogDTO;
 import cc.uncarbon.module.sys.model.response.SysLogBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +33,11 @@ import java.util.List;
 @Slf4j
 public class SysLogService {
 
+    /**
+     * UA可以接受的最大长度
+     */
+    public static final int USER_AGENT_MAX_LENGTH = 255;
+
     private final SysLogMapper sysLogMapper;
 
 
@@ -50,9 +55,9 @@ public class SysLogService {
                                 SysLogEntity::getIpLocationRegionName, SysLogEntity::getIpLocationProvinceName,
                                 SysLogEntity::getIpLocationCityName, SysLogEntity::getIpLocationDistrictName)
                         // 用户账号
-                        .like(StrUtil.isNotBlank(dto.getUsername()), SysLogEntity::getUsername, StrUtil.cleanBlank(dto.getUsername()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getUsername()), SysLogEntity::getUsername, CharSequenceUtil.cleanBlank(dto.getUsername()))
                         // 操作内容
-                        .like(StrUtil.isNotBlank(dto.getOperation()), SysLogEntity::getOperation, StrUtil.cleanBlank(dto.getOperation()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getOperation()), SysLogEntity::getOperation, CharSequenceUtil.cleanBlank(dto.getOperation()))
                         // 状态
                         .eq(ObjectUtil.isNotNull(dto.getStatus()), SysLogEntity::getStatus, dto.getStatus())
                         // 时间区间
@@ -100,11 +105,10 @@ public class SysLogService {
         SysLogEntity entity = new SysLogEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        int USER_AGENT_MAX_LENGTH = 255;
-        if (StrUtil.length(entity.getUserAgent()) > USER_AGENT_MAX_LENGTH) {
+        if (CharSequenceUtil.length(entity.getUserAgent()) > USER_AGENT_MAX_LENGTH) {
             // 超长度截断
             entity.setUserAgent(
-                    StrUtil.subPre(entity.getUserAgent(), USER_AGENT_MAX_LENGTH)
+                    CharSequenceUtil.subPre(entity.getUserAgent(), USER_AGENT_MAX_LENGTH)
             );
         }
 

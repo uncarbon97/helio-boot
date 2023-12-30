@@ -58,7 +58,7 @@ public class AdminSysDeptController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping(value = "/sys/depts")
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
         sysDeptService.adminInsert(dto);
 
         return ApiResult.success();
@@ -68,7 +68,7 @@ public class AdminSysDeptController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/sys/depts/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDeptDTO dto) {
         dto.setId(id);
         sysDeptService.adminUpdate(dto);
 
@@ -79,7 +79,7 @@ public class AdminSysDeptController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/depts")
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysDeptService.adminDelete(dto.getIds());
 
         return ApiResult.success();

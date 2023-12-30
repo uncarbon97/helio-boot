@@ -71,7 +71,7 @@ public class AdminSysDataDictController {
             // 兼容旧的API路由
             "/sys/dataDicts"
     })
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
         sysDataDictService.adminInsert(dto);
 
         return ApiResult.success();
@@ -85,7 +85,7 @@ public class AdminSysDataDictController {
             // 兼容旧的API路由
             "/sys/dataDicts/{id}"
     })
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
         dto.setId(id);
         sysDataDictService.adminUpdate(dto);
 
@@ -100,7 +100,7 @@ public class AdminSysDataDictController {
             // 兼容旧的API路由
             "/sys/dataDicts"
     })
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysDataDictService.adminDelete(dto.getIds());
 
         return ApiResult.success();

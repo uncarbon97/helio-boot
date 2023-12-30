@@ -12,7 +12,7 @@ import cc.uncarbon.module.sys.model.request.AdminListSysParamDTO;
 import cc.uncarbon.module.sys.model.response.SysParamBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -46,9 +46,9 @@ public class SysParamService {
                 new QueryWrapper<SysParamEntity>()
                         .lambda()
                         // 键名
-                        .like(StrUtil.isNotBlank(dto.getName()), SysParamEntity::getName, StrUtil.cleanBlank(dto.getName()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getName()), SysParamEntity::getName, CharSequenceUtil.cleanBlank(dto.getName()))
                         // 描述
-                        .like(StrUtil.isNotBlank(dto.getDescription()), SysParamEntity::getDescription, StrUtil.cleanBlank(dto.getDescription()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getDescription()), SysParamEntity::getDescription, CharSequenceUtil.cleanBlank(dto.getDescription()))
                         // 排序
                         .orderByDesc(SysParamEntity::getCreatedAt)
         );

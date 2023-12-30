@@ -63,7 +63,7 @@ public class AdminSysTenantController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping(value = "/sys/tenants")
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertSysTenantDTO dto) {
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertSysTenantDTO dto) {
         sysTenantFacade.adminInsert(dto);
 
         return ApiResult.success();
@@ -73,7 +73,7 @@ public class AdminSysTenantController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/sys/tenants/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminUpdateSysTenantDTO dto) {
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminUpdateSysTenantDTO dto) {
         dto.setId(id);
         sysTenantService.adminUpdate(dto);
 
@@ -84,7 +84,7 @@ public class AdminSysTenantController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/tenants")
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysTenantService.adminDelete(dto.getIds());
 
         return ApiResult.success();
