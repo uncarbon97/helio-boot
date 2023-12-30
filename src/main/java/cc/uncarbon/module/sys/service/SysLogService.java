@@ -3,7 +3,6 @@ package cc.uncarbon.module.sys.service;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysLogEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysLogMapper;
@@ -29,16 +28,19 @@ import java.util.List;
 /**
  * 系统日志
  */
-@Slf4j
-@Service
 @RequiredArgsConstructor
-public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEntity> {
+@Service
+@Slf4j
+public class SysLogService {
+
+    private final SysLogMapper sysLogMapper;
+
 
     /**
      * 后台管理-分页列表
      */
     public PageResult<SysLogBO> adminList(PageParam pageParam, AdminListSysLogDTO dto) {
-        Page<SysLogEntity> entityPage = this.page(
+        Page<SysLogEntity> entityPage = sysLogMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<SysLogEntity>()
                         .lambda()
@@ -80,7 +82,7 @@ public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEnti
      * @return null or BO
      */
     public SysLogBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysLogEntity entity = this.getById(id);
+        SysLogEntity entity = sysLogMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -106,7 +108,7 @@ public class SysLogService extends HelioBaseServiceImpl<SysLogMapper, SysLogEnti
             );
         }
 
-        this.save(entity);
+        sysLogMapper.insert(entity);
 
         return entity.getId();
     }

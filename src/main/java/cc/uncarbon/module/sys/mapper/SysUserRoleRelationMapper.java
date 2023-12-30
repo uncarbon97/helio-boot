@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 后台用户-角色关联
- * @author Uncarbon
  */
 @Mapper
 public interface SysUserRoleRelationMapper extends BaseMapper<SysUserRoleRelationEntity> {

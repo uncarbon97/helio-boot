@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 /**
  * 后台菜单子项详情 for VbenAdmin
- * @author Uncarbon
  */
 @AllArgsConstructor
 @Data

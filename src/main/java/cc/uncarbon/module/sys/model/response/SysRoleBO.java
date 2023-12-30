@@ -17,7 +17,6 @@ import java.util.Collection;
 
 /**
  * 后台角色BO
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

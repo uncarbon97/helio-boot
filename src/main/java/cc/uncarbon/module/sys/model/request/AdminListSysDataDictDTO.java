@@ -12,8 +12,6 @@ import java.io.Serializable;
 
 /**
  * 后台管理-分页列表数据字典
- *
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

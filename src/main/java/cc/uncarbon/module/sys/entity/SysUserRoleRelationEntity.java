@@ -14,7 +14,6 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * 后台用户-角色关联
- * @author Uncarbon
  */
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)

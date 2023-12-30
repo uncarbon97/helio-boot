@@ -13,7 +13,6 @@ import java.io.Serializable;
 
 /**
  * 后台管理-分页列表系统租户
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 后台用户-部门关联
- * @author Uncarbon
  */
 @Mapper
 public interface SysUserDeptRelationMapper extends BaseMapper<SysUserDeptRelationEntity> {

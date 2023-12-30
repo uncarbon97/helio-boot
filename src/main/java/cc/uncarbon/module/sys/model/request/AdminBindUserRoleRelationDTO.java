@@ -13,7 +13,6 @@ import java.util.Set;
 
 /**
  * 后台管理-绑定用户与角色关联关系
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

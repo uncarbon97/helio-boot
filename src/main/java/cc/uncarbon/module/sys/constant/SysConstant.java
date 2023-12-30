@@ -3,8 +3,6 @@ package cc.uncarbon.module.sys.constant;
 
 /**
  * 系统管理常量
- *
- * @author Uncarbon
  */
 public interface SysConstant {
 

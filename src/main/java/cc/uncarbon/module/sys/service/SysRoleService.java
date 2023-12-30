@@ -5,7 +5,6 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.function.StreamFunction;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysRoleEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysRoleMapper;
@@ -30,15 +29,14 @@ import java.util.stream.Collectors;
 /**
  * 后台角色
  */
-@Slf4j
-@Service
 @RequiredArgsConstructor
-public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleEntity> {
+@Service
+@Slf4j
+public class SysRoleService {
 
+    private final SysRoleMapper sysRoleMapper;
     private final SysUserRoleRelationService sysUserRoleRelationService;
-
     private final SysRoleMenuRelationService sysRoleMenuRelationService;
-
     private final SysMenuService sysMenuService;
 
 
@@ -46,7 +44,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      * 后台管理-分页列表
      */
     public PageResult<SysRoleBO> adminList(PageParam pageParam, AdminListSysRoleDTO dto) {
-        Page<SysRoleEntity> entityPage = this.page(
+        Page<SysRoleEntity> entityPage = sysRoleMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<SysRoleEntity>()
                         .lambda()
@@ -79,7 +77,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      * @return null or BO
      */
     public SysRoleBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysRoleEntity entity = this.getById(id);
+        SysRoleEntity entity = sysRoleMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -101,7 +99,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         SysRoleEntity entity = new SysRoleEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.save(entity);
+        sysRoleMapper.insert(entity);
 
         return entity.getId();
     }
@@ -117,7 +115,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         SysRoleEntity entity = new SysRoleEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.updateById(entity);
+        sysRoleMapper.updateById(entity);
     }
 
     /**
@@ -126,7 +124,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台角色] >> 入参={}", ids);
-        this.removeByIds(ids);
+        sysRoleMapper.deleteBatchIds(ids);
     }
 
     /**
@@ -205,7 +203,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysRoleDTO dto) {
-        SysRoleEntity existingEntity = this.getOne(
+        SysRoleEntity existingEntity = sysRoleMapper.selectOne(
                 new QueryWrapper<SysRoleEntity>()
                         .lambda()
                         // 仅取主键ID
@@ -234,7 +232,7 @@ public class SysRoleService extends HelioBaseServiceImpl<SysRoleMapper, SysRoleE
         }
 
         // 根据角色Ids取 map
-        return this.list(
+        return sysRoleMapper.selectList(
                 new QueryWrapper<SysRoleEntity>()
                         .lambda()
                         .select(SysRoleEntity::getId, SysRoleEntity::getValue)

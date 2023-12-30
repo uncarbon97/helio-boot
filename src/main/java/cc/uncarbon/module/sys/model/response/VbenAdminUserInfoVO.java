@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 /**
  * 后台用户 for VbenAdmin
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

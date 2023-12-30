@@ -15,7 +15,6 @@ import java.io.Serializable;
 /**
  * 后台用户BO
  * 仅保留基本信息
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

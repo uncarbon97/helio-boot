@@ -12,8 +12,6 @@ import java.io.Serializable;
 
 /**
  * 下载文件结果 BO
- *
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @SuperBuilder

@@ -13,7 +13,6 @@ import java.io.Serializable;
 
 /**
  * 后台管理-新增/编辑系统参数
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

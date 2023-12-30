@@ -13,8 +13,6 @@ import java.io.Serializable;
 
 /**
  * 后台管理-新增/编辑数据字典
- *
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @Builder

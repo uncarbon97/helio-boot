@@ -4,7 +4,6 @@ import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysDataDictEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.mapper.SysDataDictMapper;
@@ -29,19 +28,20 @@ import java.util.List;
 
 /**
  * 数据字典
- *
- * @author Uncarbon
  */
-@Slf4j
-@Service
 @RequiredArgsConstructor
-public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, SysDataDictEntity> {
+@Service
+@Slf4j
+public class SysDataDictService {
+
+    private final SysDataDictMapper sysDataDictMapper;
+
 
     /**
      * 后台管理-分页列表
      */
     public PageResult<SysDataDictBO> adminList(PageParam pageParam, AdminListSysDataDictDTO dto) {
-        Page<SysDataDictEntity> entityPage = this.page(
+        Page<SysDataDictEntity> entityPage = sysDataDictMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<SysDataDictEntity>()
                         .lambda()
@@ -72,7 +72,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
      * @return null or BO
      */
     public SysDataDictBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysDataDictEntity entity = this.getById(id);
+        SysDataDictEntity entity = sysDataDictMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -92,7 +92,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
         SysDataDictEntity entity = new SysDataDictEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.save(entity);
+        sysDataDictMapper.insert(entity);
 
         return entity.getId();
     }
@@ -108,7 +108,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
         SysDataDictEntity entity = new SysDataDictEntity();
         BeanUtil.copyProperties(dto, entity);
 
-        this.updateById(entity);
+        sysDataDictMapper.updateById(entity);
     }
 
     /**
@@ -117,7 +117,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除数据字典] >> 入参={}", ids);
-        this.removeByIds(ids);
+        sysDataDictMapper.deleteBatchIds(ids);
     }
 
     /*
@@ -186,7 +186,7 @@ public class SysDataDictService extends HelioBaseServiceImpl<SysDataDictMapper, 
      * @param dto DTO
      */
     private void checkExistence(AdminInsertOrUpdateSysDataDictDTO dto) {
-        SysDataDictEntity existingEntity = this.getOne(
+        SysDataDictEntity existingEntity = sysDataDictMapper.selectOne(
                 new QueryWrapper<SysDataDictEntity>()
                         .lambda()
                         // 仅取主键ID
