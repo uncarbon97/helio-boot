@@ -4,6 +4,7 @@ package cc.uncarbon.module.adminapi.web.common;
 import cc.uncarbon.framework.core.enums.GenderEnum;
 import cc.uncarbon.framework.core.enums.YesOrNoEnum;
 import cc.uncarbon.framework.web.model.response.ApiResult;
+import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.adminapi.model.response.SelectOptionItemVO;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cc.uncarbon.module.sys.service.SysDeptService;
@@ -23,7 +24,7 @@ import java.util.List;
 // 约束：登录后才能使用   👇 后台管理对应的鉴权工具类
 @SaCheckLogin(type = AdminStpUtil.TYPE)
 @Api(value = "后台管理-下拉框数据源接口", tags = {"后台管理-下拉框数据源接口"})
-@RequestMapping("/api/v1")
+@RequestMapping(AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
