@@ -7,7 +7,7 @@ import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.model.response.SelectOptionItemVO;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cc.uncarbon.module.sys.service.SysDeptService;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaIgnore;
 import io.swagger.annotations.Api;

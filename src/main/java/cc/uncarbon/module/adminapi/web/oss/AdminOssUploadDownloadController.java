@@ -9,7 +9,7 @@ import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
 import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cc.uncarbon.module.oss.model.response.OssFileUploadResultVO;
 import cc.uncarbon.module.sys.constant.SysConstant;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.text.CharSequenceUtil;
