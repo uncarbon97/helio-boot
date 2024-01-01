@@ -880,8 +880,8 @@ CREATE TABLE "oss_file_info"
 (
     "id"                int8         NOT NULL,
     "tenant_id"         int8,
-    "revision"          int8         NOT NULL,
-    "del_flag"          int2         NOT NULL,
+    "revision"          int8         NOT NULL DEFAULT 1,
+    "del_flag"          int2         NOT NULL DEFAULT 0,
     "created_at"        timestamp(6) NOT NULL,
     "created_by"        varchar(255),
     "updated_at"        timestamp(6) NOT NULL,
