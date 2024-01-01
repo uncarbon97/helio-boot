@@ -14,7 +14,7 @@ import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysRoleDTO;
 import cc.uncarbon.module.sys.model.response.SysRoleBO;
 import cc.uncarbon.module.sys.service.SysRoleService;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.Api;
@@ -27,16 +27,16 @@ import javax.validation.Valid;
 import java.util.Set;
 
 
-@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
-@Slf4j
 @Api(value = "后台角色管理接口", tags = {"后台角色管理接口"})
 @RequestMapping(value = {
         // 兼容旧的API路由前缀
         SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
         AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
 })
+@RequiredArgsConstructor
 @RestController
+@Slf4j
 public class AdminSysRoleController {
 
     private static final String PERMISSION_PREFIX = "SysRole:";
@@ -64,7 +64,7 @@ public class AdminSysRoleController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping(value = "/sys/roles")
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
         sysRoleService.adminInsert(dto);
 
         return ApiResult.success();
@@ -74,7 +74,7 @@ public class AdminSysRoleController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/sys/roles/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
         dto.setId(id);
         sysRoleService.adminUpdate(dto);
 
@@ -85,7 +85,7 @@ public class AdminSysRoleController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/roles")
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysRoleService.adminDelete(dto.getIds());
 
         // 角色删除时，删除对应缓存键
@@ -98,7 +98,7 @@ public class AdminSysRoleController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + "bindMenus")
     @ApiOperation(value = "绑定角色与菜单关联关系")
     @PutMapping(value = "/sys/roles/{id}/menus")
-    public ApiResult<?> bindMenus(@PathVariable Long id, @RequestBody @Valid AdminBindRoleMenuRelationDTO dto) {
+    public ApiResult<Void> bindMenus(@PathVariable Long id, @RequestBody @Valid AdminBindRoleMenuRelationDTO dto) {
         dto.setRoleId(id);
         Set<String> newPermissions = sysRoleService.adminBindMenus(dto);
 

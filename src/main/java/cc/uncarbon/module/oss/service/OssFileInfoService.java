@@ -4,7 +4,6 @@ import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.oss.constant.OssConstant;
 import cc.uncarbon.module.oss.entity.OssFileInfoEntity;
 import cc.uncarbon.module.oss.enums.OssErrorEnum;
@@ -15,15 +14,15 @@ import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.xuyanwu.spring.file.storage.FileInfo;
-import cn.xuyanwu.spring.file.storage.FileStorageService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.x.file.storage.core.FileInfo;
+import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,14 +34,13 @@ import java.util.List;
 
 /**
  * 上传文件信息
- *
- * @author Uncarbon
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OssFileInfoService extends HelioBaseServiceImpl<OssFileInfoMapper, OssFileInfoEntity> {
+public class OssFileInfoService {
 
+    private final OssFileInfoMapper ossFileInfoMapper;
     private final FileStorageService fileStorageService;
 
 
@@ -50,16 +48,16 @@ public class OssFileInfoService extends HelioBaseServiceImpl<OssFileInfoMapper, 
      * 后台管理-分页列表
      */
     public PageResult<OssFileInfoBO> adminList(PageParam pageParam, AdminListOssFileInfoDTO dto) {
-        Page<OssFileInfoEntity> entityPage = this.page(
+        Page<OssFileInfoEntity> entityPage = ossFileInfoMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<OssFileInfoEntity>()
                         .lambda()
                         // 原始文件名
-                        .like(StrUtil.isNotBlank(dto.getOriginalFilename()), OssFileInfoEntity::getOriginalFilename, StrUtil.cleanBlank(dto.getOriginalFilename()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getOriginalFilename()), OssFileInfoEntity::getOriginalFilename, CharSequenceUtil.cleanBlank(dto.getOriginalFilename()))
                         // 扩展名
-                        .eq(StrUtil.isNotBlank(dto.getExtendName()), OssFileInfoEntity::getExtendName, StrUtil.cleanBlank(dto.getExtendName()))
+                        .eq(CharSequenceUtil.isNotBlank(dto.getExtendName()), OssFileInfoEntity::getExtendName, CharSequenceUtil.cleanBlank(dto.getExtendName()))
                         // 文件类别
-                        .eq(StrUtil.isNotBlank(dto.getClassified()), OssFileInfoEntity::getClassified, StrUtil.cleanBlank(dto.getClassified()))
+                        .eq(CharSequenceUtil.isNotBlank(dto.getClassified()), OssFileInfoEntity::getClassified, CharSequenceUtil.cleanBlank(dto.getClassified()))
                         // 时间区间
                         .between(ObjectUtil.isNotNull(dto.getBeginAt()) && ObjectUtil.isNotNull(dto.getEndAt()), OssFileInfoEntity::getCreatedAt, dto.getBeginAt(), dto.getEndAt())
                         // 排序
@@ -87,7 +85,7 @@ public class OssFileInfoService extends HelioBaseServiceImpl<OssFileInfoMapper, 
      * @return null or BO
      */
     public OssFileInfoBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        OssFileInfoEntity entity = this.getById(id);
+        OssFileInfoEntity entity = ossFileInfoMapper.selectById(id);
         if (throwIfInvalidId) {
             OssErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -103,20 +101,20 @@ public class OssFileInfoService extends HelioBaseServiceImpl<OssFileInfoMapper, 
         log.info("[后台管理-删除上传文件信息] >> ids={}", ids);
 
         // 1. 删除原始文件
-        List<OssFileInfoEntity> entityList = this.listByIds(ids);
+        List<OssFileInfoEntity> entityList = ossFileInfoMapper.selectByIds(ids);
         for (OssFileInfoEntity entity : entityList) {
             fileStorageService.delete(toFileInfo(entity));
         }
 
         // 2. 删除文件记录
-        this.removeByIds(ids);
+        ossFileInfoMapper.deleteBatchIds(ids);
     }
 
     /**
      * 根据 MD5 取文件信息
      */
     public OssFileInfoBO getOneByMd5(String md5) {
-        OssFileInfoEntity entity = this.getOne(
+        OssFileInfoEntity entity = ossFileInfoMapper.selectOne(
                 new QueryWrapper<OssFileInfoEntity>()
                         .lambda()
                         .eq(OssFileInfoEntity::getMd5, md5)
@@ -149,7 +147,7 @@ public class OssFileInfoService extends HelioBaseServiceImpl<OssFileInfoMapper, 
             // 非本地存储，保存对象存储直链
             entity.setDirectUrl(fileInfo.getUrl());
         }
-        this.save(entity);
+        ossFileInfoMapper.insert(entity);
 
         return this.entity2BO(entity);
     }
@@ -187,7 +185,7 @@ public class OssFileInfoService extends HelioBaseServiceImpl<OssFileInfoMapper, 
      * @param storagePlatform 存储平台名
      */
     public static boolean isLocalPlatform(String storagePlatform) {
-        return StrUtil.startWith(storagePlatform, OssConstant.PLATFORM_PREFIX_LOCAL);
+        return CharSequenceUtil.startWith(storagePlatform, OssConstant.PLATFORM_PREFIX_LOCAL);
     }
 
     /*

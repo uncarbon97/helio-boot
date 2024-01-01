@@ -12,7 +12,7 @@ import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysDataDictDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysDataDictDTO;
 import cc.uncarbon.module.sys.model.response.SysDataDictBO;
 import cc.uncarbon.module.sys.service.SysDataDictService;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.Api;
@@ -24,16 +24,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 
-@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
-@Slf4j
 @Api(value = "数据字典管理接口", tags = {"数据字典管理接口"})
 @RequestMapping(value = {
         // 兼容旧的API路由前缀
         SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
         AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
 })
+@RequiredArgsConstructor
 @RestController
+@Slf4j
 public class AdminSysDataDictController {
 
     private static final String PERMISSION_PREFIX = "SysDataDict:" ;
@@ -43,14 +43,22 @@ public class AdminSysDataDictController {
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "分页列表")
-    @GetMapping(value = "/sys/dataDicts")
+    @GetMapping(value = {
+            "/sys/data-dicts",
+            // 兼容旧的API路由
+            "/sys/dataDicts"
+    })
     public ApiResult<PageResult<SysDataDictBO>> list(PageParam pageParam, AdminListSysDataDictDTO dto) {
         return ApiResult.data(sysDataDictService.adminList(pageParam, dto));
     }
 
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.RETRIEVE)
     @ApiOperation(value = "详情")
-    @GetMapping(value = "/sys/dataDicts/{id}")
+    @GetMapping(value = {
+            "/sys/data-dicts/{id}",
+            // 兼容旧的API路由
+            "/sys/dataDicts/{id}"
+    })
     public ApiResult<SysDataDictBO> getById(@PathVariable Long id) {
         return ApiResult.data(sysDataDictService.getOneById(id, true));
     }
@@ -58,8 +66,12 @@ public class AdminSysDataDictController {
     @SysLog(value = "新增数据字典")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
-    @PostMapping(value = "/sys/dataDicts")
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
+    @PostMapping(value = {
+            "/sys/data-dicts",
+            // 兼容旧的API路由
+            "/sys/dataDicts"
+    })
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
         sysDataDictService.adminInsert(dto);
 
         return ApiResult.success();
@@ -68,8 +80,12 @@ public class AdminSysDataDictController {
     @SysLog(value = "编辑数据字典")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
-    @PutMapping(value = "/sys/dataDicts/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
+    @PutMapping(value = {
+            "/sys/data-dicts/{id}",
+            // 兼容旧的API路由
+            "/sys/dataDicts/{id}"
+    })
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysDataDictDTO dto) {
         dto.setId(id);
         sysDataDictService.adminUpdate(dto);
 
@@ -79,8 +95,12 @@ public class AdminSysDataDictController {
     @SysLog(value = "删除数据字典")
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
-    @DeleteMapping(value = "/sys/dataDicts")
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    @DeleteMapping(value = {
+            "/sys/data-dicts",
+            // 兼容旧的API路由
+            "/sys/dataDicts"
+    })
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysDataDictService.adminDelete(dto.getIds());
 
         return ApiResult.success();

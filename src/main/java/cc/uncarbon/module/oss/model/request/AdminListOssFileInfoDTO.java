@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 
 /**
  * 后台管理-分页列表上传文件信息 DTO
- *
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @SuperBuilder

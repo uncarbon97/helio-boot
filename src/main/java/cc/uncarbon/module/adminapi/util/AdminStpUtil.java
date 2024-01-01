@@ -1,4 +1,4 @@
-package cc.uncarbon.module.sys.util;
+package cc.uncarbon.module.adminapi.util;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.fun.SaFunction;

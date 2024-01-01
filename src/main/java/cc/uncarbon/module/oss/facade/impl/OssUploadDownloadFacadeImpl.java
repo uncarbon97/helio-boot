@@ -7,20 +7,18 @@ import cc.uncarbon.module.oss.model.request.UploadFileAttributeDTO;
 import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
 import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cc.uncarbon.module.oss.service.OssFileInfoService;
-import cn.hutool.core.util.StrUtil;
-import cn.xuyanwu.spring.file.storage.FileInfo;
-import cn.xuyanwu.spring.file.storage.FileStorageService;
-import cn.xuyanwu.spring.file.storage.exception.FileStorageRuntimeException;
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.x.file.storage.core.FileInfo;
+import org.dromara.x.file.storage.core.FileStorageService;
+import org.dromara.x.file.storage.core.exception.FileStorageRuntimeException;
 import org.springframework.stereotype.Service;
 
 
 /**
  * 文件上传下载门面
- *
- * @author Uncarbon
  */
 @Slf4j
 @Service
@@ -77,7 +75,7 @@ public class OssUploadDownloadFacadeImpl implements OssUploadDownloadFacade {
         byte[] fileBytes = null;
         if (
                 OssFileInfoService.isLocalPlatform(ossFileInfo.getStoragePlatform())
-                || StrUtil.isEmpty(ossFileInfo.getDirectUrl())
+                || CharSequenceUtil.isEmpty(ossFileInfo.getDirectUrl())
         ) {
             FileInfo fileInfo = OssFileInfoService.toFileInfo(ossFileInfo);
             try {

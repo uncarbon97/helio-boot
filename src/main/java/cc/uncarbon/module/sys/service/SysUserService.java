@@ -8,7 +8,6 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.core.props.HelioProperties;
-import cc.uncarbon.framework.crud.service.impl.HelioBaseServiceImpl;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
@@ -23,9 +22,9 @@ import cc.uncarbon.module.sys.util.PwdUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -41,26 +40,19 @@ import java.util.stream.Collectors;
 
 /**
  * 后台用户
- *
- * @author Uncarbon
  */
-@Slf4j
-@Service
 @RequiredArgsConstructor
-public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserEntity> {
+@Service
+@Slf4j
+public class SysUserService {
 
+    private final SysUserMapper sysUserMapper;
     private final SysRoleService sysRoleService;
-
     private final SysDeptService sysDeptService;
-
     private final SysMenuService sysMenuService;
-
     private final SysTenantService sysTenantService;
-
     private final SysUserDeptRelationService sysUserDeptRelationService;
-
     private final SysUserRoleRelationService sysUserRoleRelationService;
-
     private final HelioProperties helioProperties;
 
     private boolean isTenantEnabled;
@@ -74,12 +66,12 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 后台管理-分页列表
      */
     public PageResult<SysUserBO> adminList(PageParam pageParam, AdminListSysUserDTO dto) {
-        Page<SysUserEntity> entityPage = this.page(
+        Page<SysUserEntity> entityPage = sysUserMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<SysUserEntity>()
                         .lambda()
                         // 手机号
-                        .like(StrUtil.isNotBlank(dto.getPhoneNo()), SysUserEntity::getPhoneNo, StrUtil.cleanBlank(dto.getPhoneNo()))
+                        .like(CharSequenceUtil.isNotBlank(dto.getPhoneNo()), SysUserEntity::getPhoneNo, CharSequenceUtil.cleanBlank(dto.getPhoneNo()))
                         // 排序
                         .orderByDesc(SysUserEntity::getCreatedAt)
         );
@@ -105,7 +97,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * @return null or BO
      */
     public SysUserBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
-        SysUserEntity entity = this.getById(id);
+        SysUserEntity entity = sysUserMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
@@ -134,7 +126,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
                 .setPwd(PwdUtil.encrypt(dto.getPasswordOfNewUser(), salt))
         ;
 
-        this.save(entity);
+        sysUserMapper.insert(entity);
 
         sysUserDeptRelationService.cleanAndBind(entity.getId(), dto.getDeptId());
 
@@ -156,7 +148,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
 
         sysUserDeptRelationService.cleanAndBind(dto.getId(), dto.getDeptId());
 
-        this.updateById(updateEntity);
+        sysUserMapper.updateById(updateEntity);
     }
 
     /**
@@ -165,7 +157,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台用户] >> 入参={}", ids);
-        this.removeByIds(ids);
+        sysUserMapper.deleteBatchIds(ids);
     }
 
     /**
@@ -175,7 +167,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
         /*
         如果启用了多租户功能，并且前端指定了租户ID，则先查库确认租户是否有效
 
-        注意：数据源级多租户，登录前【必须】主动指定租户ID，如: dto.setTenantId(101L);
+        注意：数据源级多租户，登录前【必须】主动指定租户ID，如: dto.setTenantId(101L)
          */
         // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
         TenantContext tenantContext = new TenantContext();
@@ -251,7 +243,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 后台管理-重置某用户密码
      */
     public void adminResetUserPassword(AdminResetSysUserPasswordDTO dto) {
-        SysUserEntity sysUserEntity = this.getById(dto.getUserId());
+        SysUserEntity sysUserEntity = sysUserMapper.selectById(dto.getUserId());
 
         SysUserEntity templateEntity = new SysUserEntity();
         templateEntity
@@ -259,14 +251,14 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
                 .setId(dto.getUserId())
         ;
 
-        this.updateById(templateEntity);
+        sysUserMapper.updateById(templateEntity);
     }
 
     /**
      * 后台管理-修改当前用户密码
      */
     public void adminUpdateCurrentUserPassword(AdminUpdateCurrentSysUserPasswordDTO dto) {
-        SysUserEntity sysUserEntity = this.getById(UserContextHolder.getUserId());
+        SysUserEntity sysUserEntity = sysUserMapper.selectById(UserContextHolder.getUserId());
         if (sysUserEntity == null || !sysUserEntity.getPwd().equals(PwdUtil.encrypt(dto.getOldPassword(), sysUserEntity.getSalt()))) {
             throw new BusinessException(SysErrorEnum.INCORRECT_OLD_PASSWORD);
         }
@@ -276,7 +268,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
                 .setId(UserContextHolder.getUserId())
         ;
 
-        this.updateById(sysUserEntity);
+        sysUserMapper.updateById(sysUserEntity);
     }
 
     /**
@@ -290,7 +282,7 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
      * 根据用户账号查询
      */
     public SysUserEntity getUserByPin(String pin) {
-        return this.getBaseMapper().getUserByPin(pin);
+        return sysUserMapper.getUserByPin(pin);
     }
 
     /**
@@ -416,6 +408,6 @@ public class SysUserService extends HelioBaseServiceImpl<SysUserMapper, SysUserE
                 .setLastLoginAt(lastLoginAt)
                 .setId(userId)
                 ;
-        this.updateById(entity);
+        sysUserMapper.updateById(entity);
     }
 }

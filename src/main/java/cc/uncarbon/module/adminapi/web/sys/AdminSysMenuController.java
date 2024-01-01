@@ -9,7 +9,7 @@ import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysMenuDTO;
 import cc.uncarbon.module.sys.model.response.SysMenuBO;
 import cc.uncarbon.module.sys.service.SysMenuService;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.Api;
@@ -22,16 +22,16 @@ import javax.validation.Valid;
 import java.util.List;
 
 
-@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
-@Slf4j
 @Api(value = "后台菜单管理接口", tags = {"后台菜单管理接口"})
 @RequestMapping(value = {
         // 兼容旧的API路由前缀
         SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
         AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
 })
+@RequiredArgsConstructor
 @RestController
+@Slf4j
 public class AdminSysMenuController {
 
     private static final String PERMISSION_PREFIX = "SysMenu:";
@@ -57,7 +57,7 @@ public class AdminSysMenuController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping(value = "/sys/menus")
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         sysMenuService.adminInsert(dto);
 
         return ApiResult.success();
@@ -67,7 +67,7 @@ public class AdminSysMenuController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/sys/menus/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysMenuDTO dto) {
         dto.setId(id);
         sysMenuService.adminUpdate(dto);
 
@@ -78,7 +78,7 @@ public class AdminSysMenuController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/menus")
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysMenuService.adminDelete(dto.getIds());
 
         return ApiResult.success();

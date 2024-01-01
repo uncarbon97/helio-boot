@@ -4,7 +4,6 @@ import cc.uncarbon.framework.core.context.UserContext;
 import cc.uncarbon.framework.core.context.UserContextHolder;
 import cc.uncarbon.framework.web.util.IPUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
-import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.enums.SysLogStatusEnum;
 import cc.uncarbon.module.sys.extension.SysLogAspectExtension;
 import cc.uncarbon.module.sys.extension.impl.DefaultSysLogAspectExtension;
@@ -16,6 +15,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
@@ -53,11 +53,18 @@ import java.util.stream.Collectors;
 public class SysLogAspect {
 
     /**
+     * 敏感字段名
+     */
+    private static final String[] SENSITIVE_FIELDS = {
+            "password", "oldPassword", "newPassword", "confirmNewPassword", "passwordOfNewUser",
+            "randomPassword", "tenantAdminPassword"};
+
+    /**
      * 用于数据脱敏的Bean复制选项
      */
     private static final CopyOptions MASKING_COPY_OPTIONS = new CopyOptions()
             .setIgnoreNullValue(false)
-            .setIgnoreProperties(SysConstant.SENSITIVE_FIELDS);
+            .setIgnoreProperties(SENSITIVE_FIELDS);
 
     /**
      * 用于数据脱敏后JSON字符串的序列化配置
@@ -147,7 +154,7 @@ public class SysLogAspect {
                     .setUserId(UserContextHolder.getUserId())
                     .setUsername(UserContextHolder.getUserName())
                     // 记录请求方法
-                    .setMethod(StrUtil.builder(
+                    .setMethod(CharSequenceUtil.builder(
                             joinPoint.getTarget().getClass().getName(),
                             "#",
                             joinPoint.getSignature().getName()
@@ -164,7 +171,7 @@ public class SysLogAspect {
             String params = Arrays.stream(joinPoint.getArgs()).map(
                     item -> {
                         if (ClassUtil.isBasicType(item.getClass())) {
-                            // 基元类型 OR 其包装类型，保存在DB时保持原样
+                            // 基元类型 OR 其包装类型，且拿不到参数名，保存在DB时保持原样
                             return StrUtil.toStringOrNull(item);
                         }
 
@@ -174,8 +181,8 @@ public class SysLogAspect {
                         return JSONUtil.toJsonStr(afterMasked, TO_JSON_STR_JSON_CONFIG);
                     }
             ).collect(Collectors.joining(StrPool.LF));
-            if (StrUtil.length(params) > MAX_STRING_SAVE_LENGTH) {
-                params = StrUtil.subPre(params, MAX_STRING_SAVE_LENGTH);
+            if (CharSequenceUtil.length(params) > MAX_STRING_SAVE_LENGTH) {
+                params = CharSequenceUtil.subPre(params, MAX_STRING_SAVE_LENGTH);
             }
             dto.setParams(params);
 
@@ -254,7 +261,7 @@ public class SysLogAspect {
             https://gitee.com/uncarbon97/helio-boot/issues/I5KN1X
              */
             String ip = UserContextHolder.getClientIP();
-            if (StrUtil.isEmpty(ip)) {
+            if (CharSequenceUtil.isEmpty(ip)) {
                 // 兜底处理，直接从request中拿
                 ip = IPUtil.getClientIPAddress(request, 0);
             }

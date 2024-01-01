@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 后台角色
- * @author Uncarbon
  */
 @Mapper
 public interface SysRoleMapper extends BaseMapper<SysRoleEntity> {

@@ -15,8 +15,6 @@ import java.io.Serializable;
 
 /**
  * 后台管理-新增/编辑上传文件信息 DTO
- *
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @SuperBuilder

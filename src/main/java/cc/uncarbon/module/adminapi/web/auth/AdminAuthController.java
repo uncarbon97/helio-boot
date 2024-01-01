@@ -18,7 +18,7 @@ import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginVO;
 import cc.uncarbon.module.sys.service.SysUserService;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.captcha.AbstractCaptcha;
 import io.swagger.annotations.Api;
@@ -33,15 +33,15 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 
-@RequiredArgsConstructor
-@Slf4j
 @Api(value = "后台管理-鉴权接口", tags = {"后台管理-鉴权接口"})
 @RequestMapping(value = {
         // 兼容旧的API路由前缀
         SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
         AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
 })
+@RequiredArgsConstructor
 @RestController
+@Slf4j
 public class AdminAuthController {
 
     private final SysUserService sysUserService;
@@ -91,7 +91,7 @@ public class AdminAuthController {
     @SaCheckLogin(type = AdminStpUtil.TYPE)
     @ApiOperation(value = "登出")
     @PostMapping(value = "/auth/logout")
-    public ApiResult<?> logout() {
+    public ApiResult<Void> logout() {
         AdminStpUtil.logout();
         UserContextHolder.clear();
         TenantContextHolder.clear();
@@ -110,7 +110,7 @@ public class AdminAuthController {
         // uuid 为空则抛出异常
         SysErrorEnum.UUID_CANNOT_BE_BLANK.assertNotBlank(uuid);
 
-        // 核验方法：captchaHelper.validate;
+        // 核验方法：captchaHelper.validate
         AbstractCaptcha captcha = captchaHelper.generate(uuid);
 
         // 写入响应流

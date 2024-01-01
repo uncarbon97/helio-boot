@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * 上传文件属性 DTO
- *
- * @author Uncarbon
  */
 @Accessors(chain = true)
 @AllArgsConstructor

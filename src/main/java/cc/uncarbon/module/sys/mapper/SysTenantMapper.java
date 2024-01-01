@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 系统租户
- * @author Uncarbon
  */
 @Mapper
 public interface SysTenantMapper extends BaseMapper<SysTenantEntity> {

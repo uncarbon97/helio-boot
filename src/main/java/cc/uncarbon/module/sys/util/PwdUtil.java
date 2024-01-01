@@ -1,18 +1,17 @@
 package cc.uncarbon.module.sys.util;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.crypto.SecureUtil;
 import lombok.experimental.UtilityClass;
 
 /**
  * 密码加密工具类
  * 可以根据自己的业务需要, 修改加密算法(如加盐等)
- * @author Uncarbon
  */
 @UtilityClass
 public class PwdUtil {
     public static String encrypt(String str, String salt) {
-        if (StrUtil.isEmpty(str)){
+        if (CharSequenceUtil.isEmpty(str)){
             return "";
         }
 

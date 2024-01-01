@@ -12,7 +12,7 @@ import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysParamDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysParamDTO;
 import cc.uncarbon.module.sys.model.response.SysParamBO;
 import cc.uncarbon.module.sys.service.SysParamService;
-import cc.uncarbon.module.sys.util.AdminStpUtil;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.annotations.Api;
@@ -24,16 +24,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 
-@RequiredArgsConstructor
 @SaCheckLogin(type = AdminStpUtil.TYPE)
-@Slf4j
 @Api(value = "系统参数管理接口", tags = {"系统参数管理接口"})
 @RequestMapping(value = {
         // 兼容旧的API路由前缀
         SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
         AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
 })
+@RequiredArgsConstructor
 @RestController
+@Slf4j
 public class AdminSysParamController {
 
     private static final String PERMISSION_PREFIX = "SysParam:";
@@ -59,7 +59,7 @@ public class AdminSysParamController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.CREATE)
     @ApiOperation(value = "新增")
     @PostMapping(value = "/sys/params")
-    public ApiResult<?> insert(@RequestBody @Valid AdminInsertOrUpdateSysParamDTO dto) {
+    public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysParamDTO dto) {
         sysParamService.adminInsert(dto);
 
         return ApiResult.success();
@@ -69,7 +69,7 @@ public class AdminSysParamController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.UPDATE)
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/sys/params/{id}")
-    public ApiResult<?> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysParamDTO dto) {
+    public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysParamDTO dto) {
         dto.setId(id);
         sysParamService.adminUpdate(dto);
 
@@ -80,7 +80,7 @@ public class AdminSysParamController {
     @SaCheckPermission(type = AdminStpUtil.TYPE, value = PERMISSION_PREFIX + HelioConstant.Permission.DELETE)
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/params")
-    public ApiResult<?> delete(@RequestBody @Valid IdsDTO<Long> dto) {
+    public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysParamService.adminDelete(dto.getIds());
 
         return ApiResult.success();

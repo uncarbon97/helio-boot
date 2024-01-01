@@ -59,7 +59,7 @@ public class CustomInterceptorConfiguration implements WebMvcConfigurer {
          */
         registry
                 .addInterceptor(new SaInterceptor(
-                        (handler) -> StpUtil.checkLogin()
+                        handler -> StpUtil.checkLogin()
                 ))
                 .addPathPatterns(AppApiConstant.HTTP_API_URL_PREFIX + "/**")
                 .excludePathPatterns(helioProperties.getSecurity().getExcludeRoutes());

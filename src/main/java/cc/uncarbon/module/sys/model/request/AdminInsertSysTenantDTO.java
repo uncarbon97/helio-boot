@@ -14,7 +14,6 @@ import javax.validation.constraints.Pattern;
 
 /**
  * 后台管理-新增系统租户
- * @author Uncarbon
  */
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
