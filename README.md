@@ -29,64 +29,62 @@ JDK compatibility: 1.8 - 17
 
 ## 目录结构
 ```
-├─attachments   附件
-│  └─db 数据库变更脚本
+├─attachments                  附件
+│  └─db                         数据库变更脚本
 │      ├─MySQL
-│      │  └─upgrade Helio升级时数据库变更脚本
+│      │  └─upgrade             Helio升级时MySQL变更脚本
 │      └─PostgreSQL
-│          └─upgrade Helio升级时数据库变更脚本
+│         └─upgrade             Helio升级时PostgreSQL变更脚本
 └─src
-    ├─main  主要代码
+    ├─main                      主要代码
     │  ├─java
     │  │  └─cc
     │  │      └─uncarbon
-    │  │          ├─aspect  自定义切面
-    │  │          ├─config  配置类
-    │  │          ├─helper  助手类
-    │  │          ├─interceptor Web拦截器
-    │  │          └─module  业务代码模块
-    │  │              ├─adminapi    admin-api，用于后台管理的HTTP-API
-    │  │              │  ├─constant 常量
-    │  │              │  └─web  即：Controller
-    │  │              │      ├─auth 登录登出接口
-    │  │              │      ├─oss  对象存储接口
-    │  │              │      └─sys  预置系统管理接口（如：后台用户、后台角色、后台菜单等）
-    │  │              ├─appapi  app-api，用于C端的HTTP-API【只是一个骨架，并没有业务实现】
-    │  │              │  ├─constant 常量
-    │  │              │  └─web  即：Controller
-    │  │              ├─oss 对象存储服务
-    │  │              │  ├─config   配置类
-    │  │              │  ├─constant 常量
-    │  │              │  ├─entity   实体
-    │  │              │  ├─enums    枚举
-    │  │              │  ├─facade   门面
-    │  │              │  │  └─impl  门面实现类
-    │  │              │  ├─mapper   Mybatis Mapper
-    │  │              │  ├─model    抽象模型
+    │  │          ├─aspect       自定义切面
+    │  │          ├─config       配置类
+    │  │          ├─helper       助手类
+    │  │          ├─interceptor  Web拦截器
+    │  │          └─module       业务代码模块
+    │  │              ├─adminapi     admin-api，用于后台管理的HTTP-API
+    │  │              │  ├─constant  常量
+    │  │              │  ├─model     抽象模型
+    │  │              │  ├─util      静态工具类
+    │  │              │  └─web       即：Controller
+    │  │              │      ├─auth    登录登出接口
+    │  │              │      ├─common  常用通用接口
+    │  │              │      ├─oss     对象存储接口
+    │  │              │      └─sys     预置系统管理接口（如：后台用户、后台角色、后台菜单等）
+    │  │              ├─appapi       app-api，用于C端的HTTP-API【只是一个骨架，并没有业务实现】
+    │  │              │  ├─constant  常量
+    │  │              │  └─web       即：Controller
+    │  │              ├─oss          对象存储服务
+    │  │              │  ├─config    配置类
+    │  │              │  ├─constant  常量
+    │  │              │  ├─entity    实体
+    │  │              │  ├─enums     枚举
+    │  │              │  ├─facade    门面
+    │  │              │  │  └─impl   门面实现类
+    │  │              │  ├─mapper    Mybatis Mapper
+    │  │              │  ├─model     抽象模型
     │  │              │  │  ├─request   用于请求的
     │  │              │  │  └─response  用于响应的
     │  │              │  └─service  服务类
-    │  │              └─sys 预置系统管理服务
-    │  │                  ├─annotation  自定义注解
-    │  │                  ├─constant    常量
-    │  │                  ├─entity  实体
-    │  │                  ├─enums   枚举
-    │  │                  ├─extension   自定义扩展
-    │  │                  │  └─impl 自定义扩展实现类
-    │  │                  ├─facade  门面
-    │  │                  │  └─impl 门面实现类
-    │  │                  ├─mapper  Mybatis Mapper
-    │  │                  │  └─xml  Mybatis Mapper XML
-    │  │                  ├─model   抽象模型
+    │  │              └─sys          预置系统管理服务
+    │  │                  ├─annotation 自定义注解
+    │  │                  ├─constant   常量
+    │  │                  ├─entity     实体
+    │  │                  ├─enums      枚举
+    │  │                  ├─extension  自定义扩展
+    │  │                  │  └─impl    自定义扩展实现类
+    │  │                  ├─facade     门面
+    │  │                  │  └─impl    门面实现类
+    │  │                  ├─mapper     Mybatis Mapper
+    │  │                  │  └─xml     Mybatis Mapper XML
+    │  │                  ├─model      抽象模型
     │  │                  │  ├─request  用于请求的
     │  │                  │  └─response 用于响应的
-    │  │                  ├─service 服务类
-    │  │                  └─util    静态工具类
-    │  └─resources  资源，包含符合Spring Boot标准的YAML配置文件、Logback配置文件等
-    │      └─i18n 国际化文案定义
-    └─test  单元测试代码
-        └─java
-            └─cc
-                └─uncarbon
-                    └─test
+    │  │                  ├─service    服务类
+    │  │                  └─util       静态工具类
+    │  └─resources                资源，包含符合Spring Boot标准的YAML配置文件、Logback配置文件等
+    │      └─i18n                 国际化文案定义
 ```
