@@ -18,7 +18,7 @@
     <properties>
         <!-- 这里写其他第三方依赖 -->
         <!-- 文件上传 -->
-        <x-file-storage.version>2.0.0</x-file-storage.version>
+        <x-file-storage.version>2.1.0</x-file-storage.version>
         <minio.version>8.4.3</minio.version>
     </properties>
 
