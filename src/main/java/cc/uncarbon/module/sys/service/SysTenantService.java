@@ -193,8 +193,7 @@ public class SysTenantService {
         // 可以在此处为BO填充字段
         if (ObjectUtil.isNotNull(entity.getTenantAdminUserId())) {
             bo
-                    .setTenantAdminUser(sysUserMapper.getBaseInfoByUserId(entity.getTenantAdminUserId()))
-            ;
+                    .setTenantAdminUser(sysUserMapper.getBaseInfoByUserId(entity.getTenantAdminUserId()));
         }
 
         return bo;
@@ -227,8 +226,7 @@ public class SysTenantService {
                 .setCurrent(entityPage.getCurrent())
                 .setSize(entityPage.getSize())
                 .setTotal(entityPage.getTotal())
-                .setRecords(this.entityList2BOs(entityPage.getRecords()))
-                ;
+                .setRecords(this.entityList2BOs(entityPage.getRecords()));
     }
 
 }

@@ -4,7 +4,7 @@ package cc.uncarbon.module.sys.constant;
 /**
  * 系统管理常量
  */
-public class SysConstant {
+public final class SysConstant {
     private SysConstant() {
     }
 

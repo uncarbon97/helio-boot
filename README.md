@@ -3,7 +3,7 @@
 ## 项目介绍
 `helio-boot`基于 Spring Boot 2.7.x，是一款预置SaaS、RBAC能力的单体项目脚手架，适合初学者学习 JavaWeb 开发的良好实践
 
-JDK compatibility: 1.8 - 17
+JDK compatibility: 1.8 - 21
 
 【[前端演示站](https://helio-demo.uncarbon.cc/)】
 【[官方文档](https://helio.uncarbon.cc/)】 
@@ -33,7 +33,7 @@ JDK compatibility: 1.8 - 17
 |----------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | library 图书管理系统 | [Gitee](https://gitee.com/uncarbon97/helio-boot/tree/demo%2Flibrary/) | [Gitee](https://gitee.com/uncarbon97/helio-admin-vue-vben/tree/demo%2Flibrary/) | attachments/db/MySQL/helio_boot.sql<br>attachments/db/demo/library_MySQL.sql |
 
-## 目录结构
+## 源码包结构
 ```
 ├─attachments                  附件
 │  └─db                         数据库变更脚本

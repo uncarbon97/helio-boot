@@ -1,6 +1,6 @@
 package cc.uncarbon.module.oss.constant;
 
-public class OssConstant {
+public final class OssConstant {
     private OssConstant() {
     }
 

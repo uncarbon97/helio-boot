@@ -30,6 +30,10 @@ public enum SysErrorEnum implements HelioBaseEnum<Integer> {
 
     UUID_CANNOT_BE_BLANK(400, "UUID不能为空"),
 
+    CANNOT_UPDATE_SELF_DEPT(403, "不能编辑自己的部门"),
+
+    CANNOT_UPDATE_SELF_ROLE(403, "不能编辑自己的角色"),
+
     ;
     private final Integer value;
     private final String label;

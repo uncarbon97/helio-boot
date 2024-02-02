@@ -244,8 +244,7 @@ public class OssFileInfoService {
                 .setCurrent(entityPage.getCurrent())
                 .setSize(entityPage.getSize())
                 .setTotal(entityPage.getTotal())
-                .setRecords(this.entityList2BOs(entityPage.getRecords()))
-                ;
+                .setRecords(this.entityList2BOs(entityPage.getRecords()));
     }
 
 }

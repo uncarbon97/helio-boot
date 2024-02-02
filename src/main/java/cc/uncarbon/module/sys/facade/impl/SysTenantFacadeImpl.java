@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 系统租户防腐层，用于解决循环依赖
+ * 系统租户解耦层，用于解决循环依赖
  */
 @RequiredArgsConstructor
 @Service
@@ -55,9 +55,7 @@ public class SysTenantFacadeImpl implements SysTenantFacade {
                         .build()
         );
 
-        /*
-        3. 创建一个新用户
-         */
+        // 3. 创建一个新用户
         Long newUserId = sysUserService.adminInsert(
                 AdminInsertOrUpdateSysUserDTO.builder()
                         .tenantId(newTenantId)
@@ -69,18 +67,13 @@ public class SysTenantFacadeImpl implements SysTenantFacade {
                         .build()
         );
 
-        /*
-        4. 将新用户绑定至新角色上
-         */
+        // 4. 将新用户绑定至新角色上
         sysUserRoleRelationService.adminInsert(newTenantId, newUserId, newRoleId);
 
-        /*
-        5. 把管理员账号更新进库
-         */
+        // 5. 把管理员账号更新进库
         SysTenantEntity update = new SysTenantEntity().setTenantAdminUserId(newUserId);
         update.setId(newTenantEntityId);
         sysTenantService.adminUpdate(update);
-
         return newTenantId;
     }
 

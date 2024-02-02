@@ -123,8 +123,7 @@ public class SysUserService {
         entity
                 .setSalt(salt)
                 .setPin(dto.getUsername())
-                .setPwd(PwdUtil.encrypt(dto.getPasswordOfNewUser(), salt))
-        ;
+                .setPwd(PwdUtil.encrypt(dto.getPasswordOfNewUser(), salt));
 
         sysUserMapper.insert(entity);
 
@@ -166,7 +165,6 @@ public class SysUserService {
     public SysUserLoginBO adminLogin(SysUserLoginDTO dto) {
         /*
         如果启用了多租户功能，并且前端指定了租户ID，则先查库确认租户是否有效
-
         注意：数据源级多租户，登录前【必须】主动指定租户ID，如: dto.setTenantId(101L)
          */
         // ConcurrentHashMap 的 value 不能为 null，还是 new 一个吧
@@ -221,8 +219,7 @@ public class SysUserService {
                 .setRoles(new ArrayList<>(roleMap.values()))
                 .setPermissions(permissions)
                 .setRoleIdPermissionMap(roleIdPermissionMap)
-                .setTenantContext(tenantContext)
-        ;
+                .setTenantContext(tenantContext);
 
         return ret;
     }
@@ -248,8 +245,7 @@ public class SysUserService {
         SysUserEntity templateEntity = new SysUserEntity();
         templateEntity
                 .setPwd(PwdUtil.encrypt(dto.getRandomPassword(), sysUserEntity.getSalt()))
-                .setId(dto.getUserId())
-        ;
+                .setId(dto.getUserId());
 
         sysUserMapper.updateById(templateEntity);
     }
@@ -265,8 +261,7 @@ public class SysUserService {
 
         sysUserEntity
                 .setPwd(PwdUtil.encrypt(dto.getConfirmNewPassword(), sysUserEntity.getSalt()))
-                .setId(UserContextHolder.getUserId())
-        ;
+                .setId(UserContextHolder.getUserId());
 
         sysUserMapper.updateById(sysUserEntity);
     }
@@ -324,8 +319,7 @@ public class SysUserService {
         if (dept != null) {
             bo
                     .setDeptId(dept.getId())
-                    .setDeptTitle(dept.getTitle())
-            ;
+                    .setDeptTitle(dept.getTitle());
         }
 
         return bo;
@@ -362,8 +356,7 @@ public class SysUserService {
                 .setCurrent(entityPage.getCurrent())
                 .setSize(entityPage.getSize())
                 .setTotal(entityPage.getTotal())
-                .setRecords(this.entityList2BOs(entityPage.getRecords()))
-                ;
+                .setRecords(this.entityList2BOs(entityPage.getRecords()));
     }
 
     /**
@@ -398,16 +391,14 @@ public class SysUserService {
         return TenantContext.builder()
                 .tenantId(tenantEntity.getTenantId())
                 .tenantName(tenantEntity.getTenantName())
-                .build()
-        ;
+                .build();
     }
 
     private void updateLastLoginAt(Long userId, LocalDateTime lastLoginAt) {
         SysUserEntity entity = new SysUserEntity();
         entity
                 .setLastLoginAt(lastLoginAt)
-                .setId(userId)
-                ;
+                .setId(userId);
         sysUserMapper.updateById(entity);
     }
 }
