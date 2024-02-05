@@ -101,7 +101,7 @@ public class OssFileInfoService {
         log.info("[后台管理-删除上传文件信息] >> ids={}", ids);
 
         // 1. 删除原始文件
-        List<OssFileInfoEntity> entityList = ossFileInfoMapper.selectByIds(ids);
+        List<OssFileInfoEntity> entityList = ossFileInfoMapper.selectBatchIds(ids);
         for (OssFileInfoEntity entity : entityList) {
             fileStorageService.delete(toFileInfo(entity));
         }

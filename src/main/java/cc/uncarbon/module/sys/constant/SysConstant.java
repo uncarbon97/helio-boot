@@ -30,4 +30,15 @@ public final class SysConstant {
      */
     public static final Long SUPER_ADMIN_ROLE_ID = 1L;
 
+    /**
+     * 超级管理员角色值（固定）
+     */
+    public static final String SUPER_ADMIN_ROLE_VALUE = "SuperAdmin";
+
+    /**
+     * 租户管理员角色值
+     * 为了外显美观没有在前面增加Tenant字样
+     */
+    public static final String TENANT_ADMIN_ROLE_VALUE = "Admin";
+
 }

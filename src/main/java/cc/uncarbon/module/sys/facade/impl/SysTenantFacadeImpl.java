@@ -1,5 +1,6 @@
 package cc.uncarbon.module.sys.facade.impl;
 
+import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.facade.SysTenantFacade;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
@@ -51,7 +52,7 @@ public class SysTenantFacadeImpl implements SysTenantFacade {
                 AdminInsertOrUpdateSysRoleDTO.builder()
                         .tenantId(newTenantId)
                         .title(dto.getTenantName() + "管理员")
-                        .value("Admin")
+                        .value(SysConstant.TENANT_ADMIN_ROLE_VALUE)
                         .build()
         );
 

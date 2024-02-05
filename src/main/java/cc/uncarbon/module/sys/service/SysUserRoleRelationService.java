@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -82,5 +83,24 @@ public class SysUserRoleRelationService {
                         .select(SysUserRoleRelationEntity::getRoleId)
                         .eq(SysUserRoleRelationEntity::getUserId, userId)
         ).stream().map(SysUserRoleRelationEntity::getRoleId).collect(Collectors.toSet());
+    }
+
+    /**
+     * 取角色IDs关联的用户IDs
+     *
+     * @param roleIds 角色IDs
+     * @return 空集合or用户IDs
+     */
+    public Set<Long> listUserIdsByRoleIds(Collection<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptySet();
+        }
+
+        return sysUserRoleRelationMapper.selectList(
+                new QueryWrapper<SysUserRoleRelationEntity>()
+                        .lambda()
+                        .select(SysUserRoleRelationEntity::getUserId)
+                        .in(SysUserRoleRelationEntity::getRoleId, roleIds)
+        ).stream().map(SysUserRoleRelationEntity::getUserId).collect(Collectors.toSet());
     }
 }

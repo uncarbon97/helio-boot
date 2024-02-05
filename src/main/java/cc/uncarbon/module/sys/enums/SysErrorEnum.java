@@ -30,9 +30,31 @@ public enum SysErrorEnum implements HelioBaseEnum<Integer> {
 
     UUID_CANNOT_BE_BLANK(400, "UUID不能为空"),
 
-    CANNOT_UPDATE_SELF_DEPT(403, "不能编辑自己的部门"),
+    /*
+    以下7个枚举用于后台角色管理的越权检查
+     */
+    BEYOND_AUTHORITY(401, "不得越权"),
 
-    CANNOT_UPDATE_SELF_ROLE(403, "不能编辑自己的角色"),
+    ROLE_VALUE_CANNOT_BE(403, "角色值 {} 不能用于新增或编辑，请选用其他值"),
+
+    CANNOT_DELETE_SUPER_ADMIN_ROLE(403, "不能删除超级管理员角色"),
+
+    CANNOT_DELETE_TENANT_ADMIN_ROLE(403, "为减少脏数据，不建议直接删除租户管理员角色，需通过【删除租户】关联删除"),
+
+    CANNOT_DELETE_SELF_ROLE(403, "不能删除自身角色"),
+
+    CANNOT_BIND_MENUS_FOR_SUPER_ADMIN_ROLE(403, "不能为超级管理员角色，绑定角色与菜单关联关系"),
+
+    CANNOT_BIND_MENUS_FOR_SELF(403, "不能为自身角色，绑定角色与菜单关联关系"),
+
+    /*
+    以下3个枚举用于后台用户管理的越权检查
+    */
+    CANNOT_OPERATE_SELF_USER(403, "不能对自身进行此操作"),
+
+    CANNOT_OPERATE_THIS_USER(403, "不能该用户进行此操作"),
+
+    CANNOT_UNBIND_SELF_TENANT_ADMIN_ROLE(403, "自身的管理员角色不能被取消"),
 
     ;
     private final Integer value;

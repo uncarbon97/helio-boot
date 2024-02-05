@@ -8,11 +8,13 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.core.props.HelioProperties;
+import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.entity.SysUserEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
+import cc.uncarbon.module.sys.model.interior.UserRoleContainer;
 import cc.uncarbon.module.sys.model.request.*;
 import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cc.uncarbon.module.sys.model.response.SysUserBO;
@@ -29,6 +31,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,12 +69,15 @@ public class SysUserService {
      * 后台管理-分页列表
      */
     public PageResult<SysUserBO> adminList(PageParam pageParam, AdminListSysUserDTO dto) {
+        Set<Long> invisibleUserIds = determineInvisibleUserIds();
         Page<SysUserEntity> entityPage = sysUserMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
                 new QueryWrapper<SysUserEntity>()
                         .lambda()
                         // 手机号
                         .like(CharSequenceUtil.isNotBlank(dto.getPhoneNo()), SysUserEntity::getPhoneNo, CharSequenceUtil.cleanBlank(dto.getPhoneNo()))
+                        // 不显示特定用户
+                        .notIn(CollUtil.isNotEmpty(invisibleUserIds), SysUserEntity::getId, invisibleUserIds)
                         // 排序
                         .orderByDesc(SysUserEntity::getCreatedAt)
         );
@@ -115,6 +121,8 @@ public class SysUserService {
         log.info("[后台管理-新增后台用户] >> 入参={}", dto);
         this.checkExistence(dto);
 
+        // 暂未对传入的部门ID，做数据越权检查
+
         dto.setId(null);
         SysUserEntity entity = new SysUserEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -138,6 +146,7 @@ public class SysUserService {
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminInsertOrUpdateSysUserDTO dto) {
         log.info("[后台管理-编辑后台用户] >> 入参={}", dto);
+        preUpdateCheck(dto.getId(), dto.getStatus());
         this.checkExistence(dto);
 
         SysUserEntity updateEntity = new SysUserEntity();
@@ -156,6 +165,7 @@ public class SysUserService {
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台用户] >> 入参={}", ids);
+        preDeleteCheck(ids);
         sysUserMapper.deleteBatchIds(ids);
     }
 
@@ -240,6 +250,7 @@ public class SysUserService {
      * 后台管理-重置某用户密码
      */
     public void adminResetUserPassword(AdminResetSysUserPasswordDTO dto) {
+        preUpdateCheck(dto.getUserId(), null);
         SysUserEntity sysUserEntity = sysUserMapper.selectById(dto.getUserId());
 
         SysUserEntity templateEntity = new SysUserEntity();
@@ -270,6 +281,7 @@ public class SysUserService {
      * 后台管理-绑定用户与角色关联关系
      */
     public void adminBindRoles(AdminBindUserRoleRelationDTO dto) {
+        preBindUserRoleRelationCheck(dto);
         sysUserRoleRelationService.cleanAndBind(dto.getUserId(), dto.getRoleIds());
     }
 
@@ -373,6 +385,16 @@ public class SysUserService {
     }
 
     /**
+     * 确定不可见用户IDs
+     * 租户管理员：列表中不显示超级管理员用户
+     * 普通用户：列表中不显示超级管理员、租户管理员用户
+     */
+    private Set<Long> determineInvisibleUserIds() {
+        Set<Long> invisibleRoleIds = sysRoleService.determineInvisibleRoleIds();
+        return sysUserRoleRelationService.listUserIdsByRoleIds(invisibleRoleIds);
+    }
+
+    /**
      * 检查并获取租户上下文 bean，无效或被禁用则直接抛出异常
      * @param tenantId 租户ID
      * @return TenantContext
@@ -401,4 +423,118 @@ public class SysUserService {
                 .setId(userId);
         sysUserMapper.updateById(entity);
     }
+
+    /**
+     * 编辑后台用户信息前检查
+     * @param specifiedUserId 被操作用户ID
+     * @param statusEnum 用户状态枚举，可以为null
+     */
+    private void preUpdateCheck(Long specifiedUserId, @Nullable SysUserStatusEnum statusEnum) {
+        UserRoleContainer currentUser = sysRoleService.getCurrentUserRoleContainer();
+        if (currentUser.isSuperAdmin()) {
+            // 超级管理员除禁用自己外为所欲为
+            if (statusEnum == SysUserStatusEnum.BANNED && Objects.equals(specifiedUserId, UserContextHolder.getUserId())) {
+                throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_SELF_USER);
+            }
+            return;
+        }
+
+        if (Objects.equals(specifiedUserId, UserContextHolder.getUserId())) {
+            // 不能动自身用户
+            throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_SELF_USER);
+        }
+
+        // 目标是超级管理员or租户管理员时，均不能编辑
+        UserRoleContainer specifiedUser = sysRoleService.getSpecifiedUserRoleContainer(specifiedUserId);
+        if (specifiedUser.isSuperAdmin() || specifiedUser.isTenantAdmin()) {
+            throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
+        }
+
+        // 暂未实现角色层级，一律平级
+    }
+
+    /**
+     * 删除后台用户前检查
+     */
+    private void preDeleteCheck(Collection<Long> ids) {
+        if (CollUtil.contains(ids, UserContextHolder.getUserId())) {
+            // 不能动自身用户
+            throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_SELF_USER);
+        }
+
+        // 目标是超级管理员时，不能删除
+        List<UserRoleContainer> specifiedUsers = ids.stream().map(sysRoleService::getSpecifiedUserRoleContainer).collect(Collectors.toList());
+        if (specifiedUsers.stream().anyMatch(UserRoleContainer::isSuperAdmin)) {
+            throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
+        }
+
+        // 只有超级管理员可以删租户管理员用户
+        UserRoleContainer currentUser = sysRoleService.getCurrentUserRoleContainer();
+        if (specifiedUsers.stream().anyMatch(UserRoleContainer::isTenantAdmin) && !currentUser.isSuperAdmin()) {
+            throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
+        }
+
+        // 暂未实现角色层级，一律平级
+    }
+
+    /**
+     * 绑定后台用户与角色关联关系前检查
+     * 防止越权访问漏洞
+     */
+    private void preBindUserRoleRelationCheck(AdminBindUserRoleRelationDTO dto) {
+        UserRoleContainer currentUser = sysRoleService.getCurrentUserRoleContainer();
+        // 是否对自己操作
+        boolean selfFlag = Objects.equals(dto.getUserId(), UserContextHolder.getUserId());
+        if (currentUser.isSuperAdmin()) {
+            // 超级管理员不能去掉自己的超级管理员角色
+            if (selfFlag && !CollUtil.contains(dto.getRoleIds(), SysConstant.SUPER_ADMIN_ROLE_ID)) {
+                throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_SELF_USER);
+            }
+            // 也不能赋予其他人超级管理员角色
+            if (!selfFlag && CollUtil.contains(dto.getRoleIds(), SysConstant.SUPER_ADMIN_ROLE_ID)) {
+                throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
+            }
+            return;
+        }
+
+        if (selfFlag) {
+            // 不能动自身用户
+            throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_SELF_USER);
+        }
+
+        // 目标已经是超级管理员or租户管理员时，均不能绑定
+        UserRoleContainer specifiedUser = sysRoleService.getSpecifiedUserRoleContainer(dto.getUserId());
+        if (specifiedUser.isSuperAdmin() || specifiedUser.isTenantAdmin()) {
+            throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
+        }
+
+        // 超级管理员之外的用户，都需要校验自身角色范围是否满足输入值
+        currentUserNotSuperAdmin(dto, currentUser);
+    }
+
+    /**
+     * 绑定后台用户与角色关联关系前检查
+     * 超级管理员之外的用户，都需要校验自身角色范围是否满足输入值
+     * 拆分子方法以减少柯式复杂度
+     */
+    private void currentUserNotSuperAdmin(AdminBindUserRoleRelationDTO dto, UserRoleContainer currentUser) {
+        if (CollUtil.isNotEmpty(dto.getRoleIds()) && !currentUser.isSuperAdmin()) {
+            boolean overRoles = !CollUtil.containsAll(currentUser.getCurrentUserRoleIds(), dto.getRoleIds());
+            if (overRoles && currentUser.isNotAnyAdmin()) {
+                // 普通用户超自身权限授予了
+                throw new BusinessException(SysErrorEnum.BEYOND_AUTHORITY);
+            }
+
+            if (currentUser.isTenantAdmin()) {
+                // 超自身权限，但作为租户管理员有额外情况
+                Set<Long> invisibleRoleIds = sysRoleService.determineInvisibleRoleIds();
+                // 除非超越了可见角色IDs授予 or 想要授予用户租户管理员角色，否则不管
+                invisibleRoleIds.addAll(currentUser.getCurrentUserRoleIds());
+                if (CollUtil.containsAny(invisibleRoleIds, dto.getRoleIds())) {
+                    throw new BusinessException(SysErrorEnum.BEYOND_AUTHORITY);
+                }
+            }
+        }
+    }
+
 }
