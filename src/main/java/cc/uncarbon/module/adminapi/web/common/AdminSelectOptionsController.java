@@ -5,6 +5,7 @@ import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.adminapi.model.response.SelectOptionItemVO;
 import cc.uncarbon.module.adminapi.util.AdminStpUtil;
+import cc.uncarbon.module.sys.model.response.SysRoleBO;
 import cc.uncarbon.module.sys.service.SysRoleService;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.swagger.annotations.Api;
@@ -36,9 +37,11 @@ public class AdminSelectOptionsController {
      */
 
     @ApiOperation(value = "后台角色下拉框")
-    @GetMapping(value = "/select-options/roles")
+    @GetMapping(value = "/select-options/roles")    
     public ApiResult<List<SelectOptionItemVO>> roles() {
-        return ApiResult.data(sysRoleService.adminSelectOptions());
+        return ApiResult.data(
+                SelectOptionItemVO.listOf(sysRoleService.adminSelectOptions(), SysRoleBO::getId, SysRoleBO::getTitle)
+        );
     }
 
 }

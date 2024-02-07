@@ -56,6 +56,8 @@ public enum SysErrorEnum implements HelioBaseEnum<Integer> {
 
     CANNOT_UNBIND_SELF_TENANT_ADMIN_ROLE(403, "自身的管理员角色不能被取消"),
 
+    NEED_DELETE_EXISTING_TENANT_ADMIN_ROLE(500, "租户ID {} 对应的租户管理员角色已存在，请使用超级管理员账号删除"),
+
     ;
     private final Integer value;
     private final String label;

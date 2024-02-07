@@ -6,7 +6,6 @@ import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.core.function.StreamFunction;
 import cc.uncarbon.framework.core.page.PageParam;
 import cc.uncarbon.framework.core.page.PageResult;
-import cc.uncarbon.module.adminapi.model.response.SelectOptionItemVO;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysRoleEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
@@ -89,7 +88,7 @@ public class SysRoleService {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
 
-        return this.entity2BO(entity);
+        return this.entity2BO(entity, true);
     }
 
     /**
@@ -156,7 +155,7 @@ public class SysRoleService {
     /**
      * 后台管理-下拉框数据
      */
-    public List<SelectOptionItemVO> adminSelectOptions() {
+    public List<SysRoleBO> adminSelectOptions() {
         Set<Long> invisibleRoleIds = determineInvisibleRoleIds();
         List<SysRoleEntity> entityList = sysRoleMapper.selectList(
                 new QueryWrapper<SysRoleEntity>()
@@ -168,7 +167,8 @@ public class SysRoleService {
                         // 排序
                         .orderByAsc(SysRoleEntity::getId)
         );
-        return SelectOptionItemVO.listOf(entityList, SysRoleEntity::getId, SysRoleEntity::getTitle);
+        // 无需填充菜单IDs
+        return entityList2BOs(entityList, false);
     }
 
     /**
@@ -254,9 +254,10 @@ public class SysRoleService {
      * 实体转 BO
      *
      * @param entity 实体
+     * @param fillMenuIds 是否根据实体ID，查询关联菜单IDs并填充到BO
      * @return BO
      */
-    private SysRoleBO entity2BO(SysRoleEntity entity) {
+    private SysRoleBO entity2BO(SysRoleEntity entity, boolean fillMenuIds) {
         if (entity == null) {
             return null;
         }
@@ -265,7 +266,9 @@ public class SysRoleService {
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        bo.setMenuIds(sysRoleMenuRelationService.listMenuIdsByRoleIds(Collections.singleton(bo.getId())));
+        if (fillMenuIds) {
+            bo.setMenuIds(sysRoleMenuRelationService.listMenuIdsByRoleIds(Collections.singleton(bo.getId())));
+        }
         return bo;
     }
 
@@ -273,13 +276,14 @@ public class SysRoleService {
      * 实体 List 转 BO List
      *
      * @param entityList 实体 List
+     * @param fillMenuIds 是否根据实体ID，查询关联菜单IDs并填充到BO
      * @return BO List
      */
-    private List<SysRoleBO> entityList2BOs(List<SysRoleEntity> entityList) {
+    private List<SysRoleBO> entityList2BOs(List<SysRoleEntity> entityList, boolean fillMenuIds) {
         // 深拷贝
         List<SysRoleBO> ret = new ArrayList<>(entityList.size());
         entityList.forEach(
-                entity -> ret.add(this.entity2BO(entity))
+                entity -> ret.add(this.entity2BO(entity, fillMenuIds))
         );
 
         return ret;
@@ -296,7 +300,8 @@ public class SysRoleService {
                 .setCurrent(entityPage.getCurrent())
                 .setSize(entityPage.getSize())
                 .setTotal(entityPage.getTotal())
-                .setRecords(this.entityList2BOs(entityPage.getRecords()));
+                // 需填充菜单IDs
+                .setRecords(this.entityList2BOs(entityPage.getRecords(), true));
     }
 
     /**
@@ -318,6 +323,19 @@ public class SysRoleService {
         if (existingEntity != null && !existingEntity.getId().equals(dto.getId())) {
             throw new BusinessException(400, "已存在相同后台角色，请重新输入");
         }
+
+        if (dto.creatingNewTenantAdmin()) {
+            long qty = sysRoleMapper.selectCount(
+                    new QueryWrapper<SysRoleEntity>()
+                            .lambda()
+                            // 租户ID相同
+                            .eq(SysRoleEntity::getTenantId, dto.getTenantId())
+                            // 值相同
+                            .eq(SysRoleEntity::getValue, dto.getValue())
+                            .last(HelioConstant.CRUD.SQL_LIMIT_1)
+            );
+            SysErrorEnum.NEED_DELETE_EXISTING_TENANT_ADMIN_ROLE.assertTrue(qty <= 0L, dto.getTenantId());
+        }
     }
 
     /**
@@ -328,7 +346,7 @@ public class SysRoleService {
             // 角色值不能为SuperAdmin
             throw new BusinessException(SysErrorEnum.ROLE_VALUE_CANNOT_BE, SysConstant.SUPER_ADMIN_ROLE_VALUE);
         }
-        if (Objects.isNull(dto.getTenantId()) && SysConstant.TENANT_ADMIN_ROLE_VALUE.equalsIgnoreCase(dto.getValue())) {
+        if (dto.creatingNewTenantAdmin()) {
             // 除非是新增租户时关联新增租户管理员角色，否则角色值不能为Admin
             throw new BusinessException(SysErrorEnum.ROLE_VALUE_CANNOT_BE, SysConstant.TENANT_ADMIN_ROLE_VALUE);
         }
