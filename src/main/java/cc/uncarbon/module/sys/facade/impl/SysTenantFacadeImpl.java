@@ -6,14 +6,22 @@ import cc.uncarbon.module.sys.facade.SysTenantFacade;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertSysTenantDTO;
+import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cc.uncarbon.module.sys.service.SysRoleService;
 import cc.uncarbon.module.sys.service.SysTenantService;
 import cc.uncarbon.module.sys.service.SysUserRoleRelationService;
 import cc.uncarbon.module.sys.service.SysUserService;
+import cn.hutool.core.collection.CollUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 系统租户解耦层，用于解决循环依赖
@@ -76,6 +84,21 @@ public class SysTenantFacadeImpl implements SysTenantFacade {
         update.setId(newTenantEntityId);
         sysTenantService.adminUpdate(update);
         return newTenantId;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void adminDelete(Collection<Long> ids) {
+        // 确定租户IDs
+        List<SysTenantBO> sysTenantInfos = sysTenantService.listByIds(ids, false);
+        if (CollUtil.isEmpty(sysTenantInfos)) {
+            return;
+        }
+        Set<Long> tenantIds = sysTenantInfos.stream().map(SysTenantBO::getTenantId).collect(Collectors.toSet());
+
+        // 删除租户管理员角色、租户
+        sysRoleService.adminDeleteTenantRoles(tenantIds, Collections.singleton(SysConstant.TENANT_ADMIN_ROLE_VALUE));
+        sysTenantService.adminDelete(ids);
     }
 
 }

@@ -85,7 +85,7 @@ public class AdminSysTenantController {
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/tenants")
     public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
-        sysTenantService.adminDelete(dto.getIds());
+        sysTenantFacade.adminDelete(dto.getIds());
 
         return ApiResult.success();
     }

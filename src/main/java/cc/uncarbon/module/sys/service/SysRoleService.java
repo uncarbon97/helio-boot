@@ -62,7 +62,7 @@ public class SysRoleService {
                         .orderByDesc(SysRoleEntity::getCreatedAt)
         );
 
-        return this.entityPage2BOPage(entityPage);
+        return this.entityPage2BOPage(entityPage, true);
     }
 
     /**
@@ -172,6 +172,27 @@ public class SysRoleService {
     }
 
     /**
+     * 后台管理-删除指定租户的特定角色
+     * @param tenantIds 租户IDs，非主键ID，不能为空
+     * @param roleValues 角色值集合，可以为空
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void adminDeleteTenantRoles(Collection<Long> tenantIds, Collection<String> roleValues) {
+        if (CollUtil.isEmpty(tenantIds)) {
+            return;
+        }
+
+        sysRoleMapper.delete(
+                new QueryWrapper<SysRoleEntity>()
+                        .lambda()
+                        // 租户ID
+                        .in(SysRoleEntity::getTenantId, tenantIds)
+                        // 值相符
+                        .in(CollUtil.isNotEmpty(roleValues), SysRoleEntity::getValue, roleValues)
+        );
+    }
+
+    /**
      * 取用户ID拥有角色对应的 角色ID-角色名 map
      *
      * @param userId 用户ID
@@ -237,7 +258,7 @@ public class SysRoleService {
                         .lambda()
                         // 仅取主键ID
                         .select(SysRoleEntity::getId)
-                        // 值相同
+                        // 值相符
                         .eq(SysRoleEntity::getValue, SysConstant.TENANT_ADMIN_ROLE_VALUE)
         ).stream().map(SysRoleEntity::getId).collect(Collectors.toSet());
         ret.add(SysConstant.SUPER_ADMIN_ROLE_ID);
@@ -293,15 +314,16 @@ public class SysRoleService {
      * 实体分页转 BO 分页
      *
      * @param entityPage 实体分页
+     * @param fillMenuIds 是否根据实体ID，查询关联菜单IDs并填充到BO
      * @return BO 分页
      */
-    private PageResult<SysRoleBO> entityPage2BOPage(Page<SysRoleEntity> entityPage) {
+    private PageResult<SysRoleBO> entityPage2BOPage(Page<SysRoleEntity> entityPage, boolean fillMenuIds) {
         return new PageResult<SysRoleBO>()
                 .setCurrent(entityPage.getCurrent())
                 .setSize(entityPage.getSize())
                 .setTotal(entityPage.getTotal())
                 // 需填充菜单IDs
-                .setRecords(this.entityList2BOs(entityPage.getRecords(), true));
+                .setRecords(this.entityList2BOs(entityPage.getRecords(), fillMenuIds));
     }
 
     /**
