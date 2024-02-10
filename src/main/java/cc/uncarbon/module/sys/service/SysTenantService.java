@@ -60,7 +60,7 @@ public class SysTenantService {
                         .orderByDesc(SysTenantEntity::getCreatedAt)
         );
 
-        return this.entityPage2BOPage(entityPage, false);
+        return this.entityPage2BOPage(entityPage, true);
     }
 
     /**
