@@ -12,6 +12,7 @@
     </parent>
 
     <artifactId>helio-boot</artifactId>
+    <description>Helio 单模块版单体脚手架</description>
     <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
     <version>1.11.0</version>
 

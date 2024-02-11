@@ -1,7 +1,9 @@
 # helio-boot
 
 ## 项目介绍
-`helio-boot`基于 Spring Boot 2.7.x，是一款预置SaaS、RBAC能力的单体项目脚手架，适合初学者学习 JavaWeb 开发的良好实践
+基于 Spring Boot 2.7.x，是一款预置SaaS、RBAC能力的单体项目脚手架，适合初学者学习 JavaWeb 开发的良好实践  
+单Maven模块，定位为快速开发脚手架  
+多模块版请移步至helio-boot-modular项目
 
 JDK compatibility: 1.8 - 21
 
