@@ -86,7 +86,8 @@ mybatis-plus:
 logging:
   level:
     # 指定日志级别，开发、测试环境建议为 DEBUG，生产环境建议为 INFO
-    cc.uncarbon: DEBUG
+    cc.uncarbon.framework: DEBUG
+    cc.uncarbon.module: DEBUG
 
 # 详细配置文档：https://sa-token.cc/doc.html#/use/config
 sa-token:
