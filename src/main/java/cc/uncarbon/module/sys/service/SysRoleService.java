@@ -215,7 +215,7 @@ public class SysRoleService {
     }
 
     /**
-     * 取当前用户关联角色容器
+     * 取当前用户关联角色信息
      * 仅内部使用
      */
     protected UserRoleContainer getCurrentUserRoleContainer() {
@@ -223,7 +223,7 @@ public class SysRoleService {
     }
 
     /**
-     * 取指定用户关联角色容器
+     * 取指定用户关联角色信息
      * 仅内部使用
      */
     protected UserRoleContainer getSpecifiedUserRoleContainer(Long specifiedUserId) {
@@ -368,8 +368,8 @@ public class SysRoleService {
             // 角色值不能为SuperAdmin
             throw new BusinessException(SysErrorEnum.ROLE_VALUE_CANNOT_BE, SysConstant.SUPER_ADMIN_ROLE_VALUE);
         }
-        if (dto.creatingNewTenantAdmin()) {
-            // 除非是新增租户时关联新增租户管理员角色，否则角色值不能为Admin
+        if (SysConstant.TENANT_ADMIN_ROLE_VALUE.equalsIgnoreCase(dto.getValue()) && !dto.creatingNewTenantAdmin()) {
+            // 除非是新增租户时，同时新增租户管理员角色，否则角色值不能为Admin
             throw new BusinessException(SysErrorEnum.ROLE_VALUE_CANNOT_BE, SysConstant.TENANT_ADMIN_ROLE_VALUE);
         }
 
@@ -404,7 +404,7 @@ public class SysRoleService {
         }
 
         UserRoleContainer currentUser = getCurrentUserRoleContainer();
-        if (CollUtil.containsAny(currentUser.getCurrentUserRoleIds(), ids)) {
+        if (CollUtil.containsAny(currentUser.getRelatedRoleIds(), ids)) {
             throw new BusinessException(SysErrorEnum.CANNOT_DELETE_SELF_ROLE);
         }
     }
@@ -419,7 +419,7 @@ public class SysRoleService {
             throw new BusinessException(SysErrorEnum.CANNOT_BIND_MENUS_FOR_SUPER_ADMIN_ROLE);
         }
 
-        if (CollUtil.contains(currentUser.getCurrentUserRoleIds(), dto.getRoleId())) {
+        if (CollUtil.contains(currentUser.getRelatedRoleIds(), dto.getRoleId())) {
             // 不能动自身角色
             throw new BusinessException(SysErrorEnum.CANNOT_BIND_MENUS_FOR_SELF);
         }
@@ -432,7 +432,7 @@ public class SysRoleService {
 
         if (CollUtil.isNotEmpty(dto.getMenuIds()) && !currentUser.isSuperAdmin()) {
             // 超级管理员之外的角色，都需要校验自身菜单范围是否满足输入值
-            Set<Long> visibleMenuIds = sysRoleMenuRelationService.listMenuIdsByRoleIds(currentUser.getCurrentUserRoleIds());
+            Set<Long> visibleMenuIds = sysRoleMenuRelationService.listMenuIdsByRoleIds(currentUser.getRelatedRoleIds());
             if (!CollUtil.containsAll(visibleMenuIds, dto.getMenuIds())) {
                 // 可能存在超自身权限赋权
                 throw new BusinessException(SysErrorEnum.BEYOND_AUTHORITY);

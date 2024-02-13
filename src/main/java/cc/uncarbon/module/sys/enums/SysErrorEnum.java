@@ -33,7 +33,7 @@ public enum SysErrorEnum implements HelioBaseEnum<Integer> {
     /*
     以下7个枚举用于后台角色管理的越权检查
      */
-    BEYOND_AUTHORITY(401, "不得越权"),
+    BEYOND_AUTHORITY(401, "不得超越自身权限"),
 
     ROLE_VALUE_CANNOT_BE(403, "角色值 {} 不能用于新增或编辑，请选用其他值"),
 

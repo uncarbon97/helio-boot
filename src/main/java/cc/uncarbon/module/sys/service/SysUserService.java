@@ -14,9 +14,9 @@ import cc.uncarbon.module.sys.entity.SysUserEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.mapper.SysUserMapper;
+import cc.uncarbon.module.sys.model.interior.UserDeptContainer;
 import cc.uncarbon.module.sys.model.interior.UserRoleContainer;
 import cc.uncarbon.module.sys.model.request.*;
-import cc.uncarbon.module.sys.model.response.SysDeptBO;
 import cc.uncarbon.module.sys.model.response.SysUserBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
 import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,6 +70,23 @@ public class SysUserService {
      * 后台管理-分页列表
      */
     public PageResult<SysUserBO> adminList(PageParam pageParam, AdminListSysUserDTO dto) {
+        // 预处理：根据【手动选择的部门】筛选用户
+        Set<Long> deptUserIds = Collections.emptySet();
+        if (dto.needFilterBySelectedDeptId()) {
+            deptUserIds = sysUserDeptRelationService.listUserIdsByDeptIds(Collections.singleton(dto.getSelectedDeptId()));
+            if (CollUtil.isEmpty(deptUserIds)) {
+                // 【手动选择的部门】没有任何用户ID，直接返回空列表
+                return new PageResult<>(pageParam);
+            }
+        }
+
+        // 预处理：根据【只能看到本部门及下级部门原则】筛选用户
+        Set<Long> visibleUserIds = determineVisibleDeptUserIds();
+        if (Objects.equals(CollUtil.getFirst(visibleUserIds), BigInteger.ZERO.longValue())) {
+            // 其实啥也看不到……
+            return new PageResult<>(pageParam);
+        }
+
         Set<Long> invisibleUserIds = determineInvisibleUserIds();
         Page<SysUserEntity> entityPage = sysUserMapper.selectPage(
                 new Page<>(pageParam.getPageNum(), pageParam.getPageSize()),
@@ -76,13 +94,17 @@ public class SysUserService {
                         .lambda()
                         // 手机号
                         .like(CharSequenceUtil.isNotBlank(dto.getPhoneNo()), SysUserEntity::getPhoneNo, CharSequenceUtil.cleanBlank(dto.getPhoneNo()))
+                        // 根据【手动选择的部门ID】筛选用户
+                        .in(CollUtil.isNotEmpty(deptUserIds), SysUserEntity::getId, deptUserIds)
+                        // 根据【只能看到本部门及下级部门原则】筛选用户
+                        .in(CollUtil.isNotEmpty(visibleUserIds), SysUserEntity::getId, visibleUserIds)
                         // 不显示特定用户
                         .notIn(CollUtil.isNotEmpty(invisibleUserIds), SysUserEntity::getId, invisibleUserIds)
                         // 排序
                         .orderByDesc(SysUserEntity::getCreatedAt)
         );
 
-        return this.entityPage2BOPage(entityPage);
+        return this.entityPage2BOPage(entityPage, true);
     }
 
     /**
@@ -103,12 +125,14 @@ public class SysUserService {
      * @return null or BO
      */
     public SysUserBO getOneById(Long id, boolean throwIfInvalidId) throws BusinessException {
+        dataScopeCheck(Collections.singleton(id));
+
         SysUserEntity entity = sysUserMapper.selectById(id);
         if (throwIfInvalidId) {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
 
-        return this.entity2BO(entity);
+        return this.entity2BO(entity, true);
     }
 
     /**
@@ -121,7 +145,13 @@ public class SysUserService {
         log.info("[后台管理-新增后台用户] >> 入参={}", dto);
         this.checkExistence(dto);
 
-        // 暂未对传入的部门ID，做数据越权检查
+        if (Objects.nonNull(dto.getDeptId())) {
+            // 对传入的部门ID，做数据越权检查
+            UserDeptContainer deptContainer = sysDeptService.getCurrentUserDeptContainer(true);
+            if (deptContainer.hasVisibleDepts() && !CollUtil.contains(deptContainer.getVisibleDeptIds(), dto.getDeptId())) {
+                throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
+            }
+        }
 
         dto.setId(null);
         SysUserEntity entity = new SysUserEntity();
@@ -149,14 +179,14 @@ public class SysUserService {
         preUpdateCheck(dto.getId(), dto.getStatus());
         this.checkExistence(dto);
 
-        SysUserEntity updateEntity = new SysUserEntity();
-        BeanUtil.copyProperties(dto, updateEntity);
+        SysUserEntity entity = new SysUserEntity();
+        BeanUtil.copyProperties(dto, entity);
         // 手动处理异名字段
-        updateEntity.setPin(dto.getUsername());
+        entity.setPin(dto.getUsername());
 
         sysUserDeptRelationService.cleanAndBind(dto.getId(), dto.getDeptId());
 
-        sysUserMapper.updateById(updateEntity);
+        sysUserMapper.updateById(entity);
     }
 
     /**
@@ -213,7 +243,7 @@ public class SysUserService {
         this.updateLastLoginAt(sysUserEntity.getId(), LocalDateTimeUtil.now());
 
         // 取账号完整信息
-        SysUserBO sysUserBO = this.entity2BO(sysUserEntity);
+        SysUserBO sysUserBO = this.entity2BO(sysUserEntity, false);
         Map<Long, String> roleMap = sysRoleService.getRoleMapByUserId(sysUserBO.getId());
 
         Map<Long, Set<String>> roleIdPermissionMap = sysMenuService.getRoleIdPermissionMap(roleMap.keySet());
@@ -315,9 +345,10 @@ public class SysUserService {
      * 实体转 BO
      *
      * @param entity 实体
+     * @param fillDeptInfo 是否根据实体部门ID，查询关联部门信息并填充到BO
      * @return BO
      */
-    private SysUserBO entity2BO(SysUserEntity entity) {
+    private SysUserBO entity2BO(SysUserEntity entity, boolean fillDeptInfo) {
         if (entity == null) {
             return null;
         }
@@ -327,13 +358,11 @@ public class SysUserService {
 
         // 可以在此处为BO填充字段
         bo.setUsername(entity.getPin());
-        SysDeptBO dept = sysDeptService.getPlainDeptByUserId(bo.getId());
-        if (dept != null) {
-            bo
-                    .setDeptId(dept.getId())
-                    .setDeptTitle(dept.getTitle());
+        if (fillDeptInfo) {
+            Optional.ofNullable(sysDeptService.getSpecifiedUserDeptContainer(bo.getId(), false))
+                    .map(UserDeptContainer::primaryRelatedDept)
+                    .ifPresent(deptInfo -> bo.setDeptId(deptInfo.getId()).setDeptTitle(deptInfo.getTitle()));
         }
-
         return bo;
     }
 
@@ -341,9 +370,10 @@ public class SysUserService {
      * 实体 List 转 BO List
      *
      * @param entityList 实体 List
+     * @param fillDeptInfo 是否根据实体部门ID，查询关联部门信息并填充到BO
      * @return BO List
      */
-    private List<SysUserBO> entityList2BOs(List<SysUserEntity> entityList) {
+    private List<SysUserBO> entityList2BOs(List<SysUserEntity> entityList, boolean fillDeptInfo) {
         if (CollUtil.isEmpty(entityList)) {
             return Collections.emptyList();
         }
@@ -351,7 +381,7 @@ public class SysUserService {
         // 深拷贝
         List<SysUserBO> ret = new ArrayList<>(entityList.size());
         entityList.forEach(
-                entity -> ret.add(this.entity2BO(entity))
+                entity -> ret.add(this.entity2BO(entity, fillDeptInfo))
         );
 
         return ret;
@@ -361,14 +391,15 @@ public class SysUserService {
      * 实体分页转 BO 分页
      *
      * @param entityPage 实体分页
+     * @param fillDeptInfo 是否根据实体部门ID，查询关联部门信息并填充到BO
      * @return BO 分页
      */
-    private PageResult<SysUserBO> entityPage2BOPage(Page<SysUserEntity> entityPage) {
+    private PageResult<SysUserBO> entityPage2BOPage(Page<SysUserEntity> entityPage, boolean fillDeptInfo) {
         return new PageResult<SysUserBO>()
                 .setCurrent(entityPage.getCurrent())
                 .setSize(entityPage.getSize())
                 .setTotal(entityPage.getTotal())
-                .setRecords(this.entityList2BOs(entityPage.getRecords()));
+                .setRecords(this.entityList2BOs(entityPage.getRecords(), fillDeptInfo));
     }
 
     /**
@@ -385,6 +416,24 @@ public class SysUserService {
     }
 
     /**
+     * 确定本部门及下级部门用户IDs
+     * 返回空集合代表不限制
+     * 返回[0]或有元素集合，表示有限制
+     */
+    private Set<Long> determineVisibleDeptUserIds() {
+        Set<Long> visibleUserIds = Collections.emptySet();
+        UserDeptContainer deptContainer = sysDeptService.getCurrentUserDeptContainer(true);
+        if (deptContainer.hasVisibleDepts()) {
+            visibleUserIds = sysUserDeptRelationService.listUserIdsByDeptIds(deptContainer.getVisibleDeptIds());
+            if (CollUtil.isEmpty(visibleUserIds)) {
+                // 【可见部门】没有任何用户ID，直接返回[0]
+                return Collections.singleton(BigInteger.ZERO.longValue());
+            }
+        }
+        return visibleUserIds;
+    }
+
+    /**
      * 确定不可见用户IDs
      * 租户管理员：列表中不显示超级管理员用户
      * 普通用户：列表中不显示超级管理员、租户管理员用户
@@ -392,6 +441,18 @@ public class SysUserService {
     private Set<Long> determineInvisibleUserIds() {
         Set<Long> invisibleRoleIds = sysRoleService.determineInvisibleRoleIds();
         return sysUserRoleRelationService.listUserIdsByRoleIds(invisibleRoleIds);
+    }
+
+    /**
+     * 数据越权检查
+     */
+    private void dataScopeCheck(Collection<Long> userIds) {
+        Set<Long> visibleUserIds = determineVisibleDeptUserIds();
+        Set<Long> invisibleUserIds = determineInvisibleUserIds();
+        if (CollUtil.isNotEmpty(visibleUserIds) && !CollUtil.containsAll(visibleUserIds, userIds)
+                || CollUtil.isNotEmpty(invisibleUserIds) && CollUtil.containsAny(invisibleUserIds, userIds)) {
+            throw new BusinessException(SysErrorEnum.BEYOND_AUTHORITY);
+        }
     }
 
     /**
@@ -450,6 +511,7 @@ public class SysUserService {
             throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
         }
 
+        dataScopeCheck(Collections.singleton(specifiedUserId));
         // 暂未实现角色层级，一律平级
     }
 
@@ -474,6 +536,7 @@ public class SysUserService {
             throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
         }
 
+        dataScopeCheck(ids);
         // 暂未实现角色层级，一律平级
     }
 
@@ -515,11 +578,11 @@ public class SysUserService {
     /**
      * 绑定后台用户与角色关联关系前检查
      * 超级管理员之外的用户，都需要校验自身角色范围是否满足输入值
-     * 拆分子方法以减少柯式复杂度
+     * 拆分子方法以降低Cognitive Complexity
      */
     private void currentUserNotSuperAdmin(AdminBindUserRoleRelationDTO dto, UserRoleContainer currentUser) {
         if (CollUtil.isNotEmpty(dto.getRoleIds()) && !currentUser.isSuperAdmin()) {
-            boolean overRoles = !CollUtil.containsAll(currentUser.getCurrentUserRoleIds(), dto.getRoleIds());
+            boolean overRoles = !CollUtil.containsAll(currentUser.getRelatedRoleIds(), dto.getRoleIds());
             if (overRoles && currentUser.isNotAnyAdmin()) {
                 // 普通用户超自身权限授予了
                 throw new BusinessException(SysErrorEnum.BEYOND_AUTHORITY);
@@ -529,7 +592,7 @@ public class SysUserService {
                 // 超自身权限，但作为租户管理员有额外情况
                 Set<Long> invisibleRoleIds = sysRoleService.determineInvisibleRoleIds();
                 // 除非超越了可见角色IDs授予 or 想要授予用户租户管理员角色，否则不管
-                invisibleRoleIds.addAll(currentUser.getCurrentUserRoleIds());
+                invisibleRoleIds.addAll(currentUser.getRelatedRoleIds());
                 if (CollUtil.containsAny(invisibleRoleIds, dto.getRoleIds())) {
                     throw new BusinessException(SysErrorEnum.BEYOND_AUTHORITY);
                 }

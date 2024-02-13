@@ -13,14 +13,14 @@ import java.util.Set;
 public class UserRoleContainer {
 
     /**
-     * 当前用户的角色IDs
+     * 直接关联的角色IDs
      */
-    private final Set<Long> currentUserRoleIds;
+    private final Set<Long> relatedRoleIds;
 
     /**
-     * 当前用户的角色实例集合
+     * 直接关联的角色实例集合
      */
-    private final List<SysRoleEntity> currentUserRoles;
+    private final List<SysRoleEntity> relatedRoles;
 
     /**
      * 为超级管理员
@@ -38,11 +38,11 @@ public class UserRoleContainer {
     private final boolean notAnyAdmin;
 
 
-    public UserRoleContainer(Set<Long> currentUserRoleIds, List<SysRoleEntity> currentUserRoles) {
-        this.currentUserRoleIds = currentUserRoleIds;
-        this.currentUserRoles = currentUserRoles;
-        this.superAdmin = currentUserRoles.stream().anyMatch(SysRoleEntity::isSuperAdmin);
-        this.tenantAdmin = currentUserRoles.stream().anyMatch(SysRoleEntity::isTenantAdmin);
+    public UserRoleContainer(Set<Long> relatedRoleIds, List<SysRoleEntity> relatedRoles) {
+        this.relatedRoleIds = relatedRoleIds;
+        this.relatedRoles = relatedRoles;
+        this.superAdmin = relatedRoles.stream().anyMatch(SysRoleEntity::isSuperAdmin);
+        this.tenantAdmin = relatedRoles.stream().anyMatch(SysRoleEntity::isTenantAdmin);
         this.notAnyAdmin = !this.superAdmin && !this.tenantAdmin;
     }
 }

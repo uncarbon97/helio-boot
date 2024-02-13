@@ -4,6 +4,7 @@ import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.entity.SysTenantEntity;
 import cc.uncarbon.module.sys.enums.SysErrorEnum;
+import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.facade.SysTenantFacade;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysRoleDTO;
 import cc.uncarbon.module.sys.model.request.AdminInsertOrUpdateSysUserDTO;
@@ -75,6 +76,8 @@ public class SysTenantFacadeImpl implements SysTenantFacade {
                         .nickname(dto.getTenantName() + "管理员")
                         .email(dto.getTenantAdminEmail())
                         .phoneNo(dto.getTenantAdminPhoneNo())
+                        // 默认为正常状态
+                        .status(SysUserStatusEnum.ENABLED)
                         .build()
         );
 
