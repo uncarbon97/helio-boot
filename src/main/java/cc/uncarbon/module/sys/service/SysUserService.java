@@ -573,6 +573,8 @@ public class SysUserService {
 
         // 超级管理员之外的用户，都需要校验自身角色范围是否满足输入值
         currentUserNotSuperAdmin(dto, currentUser);
+
+        dataScopeCheck(Collections.singleton(dto.getUserId()));
     }
 
     /**
