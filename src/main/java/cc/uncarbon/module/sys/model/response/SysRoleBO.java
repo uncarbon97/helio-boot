@@ -38,10 +38,10 @@ public class SysRoleBO implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime updatedAt;
 
-    @ApiModelProperty(value = "名称")
+    @ApiModelProperty(value = "角色名")
     private String title;
 
-    @ApiModelProperty(value = "值")
+    @ApiModelProperty(value = "角色编码")
     private String value;
 
     @ApiModelProperty(value = "可见菜单Ids")

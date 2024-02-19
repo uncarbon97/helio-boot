@@ -20,7 +20,7 @@ import java.io.Serializable;
 @Data
 public class AdminListSysDataDictDTO implements Serializable {
 
-    @ApiModelProperty(value = "参数描述(关键词)")
+    @ApiModelProperty(value = "描述(关键词)")
     private String description;
 
 }

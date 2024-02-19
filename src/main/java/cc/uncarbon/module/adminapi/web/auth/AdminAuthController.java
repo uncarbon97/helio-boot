@@ -11,26 +11,23 @@ import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.helper.CaptchaHelper;
 import cc.uncarbon.helper.RolePermissionCacheHelper;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
+import cc.uncarbon.module.adminapi.model.interior.AdminCaptchaContainer;
+import cc.uncarbon.module.adminapi.model.response.AdminCaptchaVO;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
-import cc.uncarbon.module.sys.enums.SysErrorEnum;
 import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginVO;
 import cc.uncarbon.module.sys.service.SysUserService;
-import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.hutool.captcha.AbstractCaptcha;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 
 
 @Api(value = "后台管理-鉴权接口", tags = {"后台管理-鉴权接口"})
@@ -55,6 +52,9 @@ public class AdminAuthController {
     @ApiOperation(value = "登录")
     @PostMapping(value = "/auth/login")
     public ApiResult<SysUserLoginVO> login(@RequestBody @Valid SysUserLoginDTO dto) {
+        // 登录验证码核验；前端项目搜索关键词「 Helio: 登录验证码」
+        // AdminApiErrorEnum.CAPTCHA_VALIDATE_FAILED.assertTrue(captchaHelper.validate(dto.getCaptchaId(), dto.getCaptchaAnswer()))
+
         // RPC调用, 失败抛异常, 成功返回用户信息
         SysUserLoginBO userInfo = sysUserService.adminLogin(dto);
 
@@ -99,24 +99,12 @@ public class AdminAuthController {
         return ApiResult.success();
     }
 
-    @ApiOperation(value = "验证码图片")
-    @ApiImplicitParam(name = "uuid", value = "验证码图片UUID", required = true)
+    @ApiOperation(value = "获取验证码")
     @GetMapping(value = "/auth/captcha")
-    public void captcha(HttpServletResponse response, String uuid) throws IOException {
-        /*
-        由前端定义 UUID 其实并不算太好的办法，但是够简单
-        更复杂而安全的做法是：由后端生成一个 UUID，通过响应头返回给前端（这对前端有一定的技能技术要求）
-         */
-        // uuid 为空则抛出异常
-        SysErrorEnum.UUID_CANNOT_BE_BLANK.assertNotBlank(uuid);
-
+    public ApiResult<AdminCaptchaVO> captcha() {
         // 核验方法：captchaHelper.validate
-        AbstractCaptcha captcha = captchaHelper.generate(uuid);
-
-        // 写入响应流
-        response.setHeader("Cache-Control", "no-store, no-cache");
-        response.setContentType("image/png");
-        captcha.write(response.getOutputStream());
+        AdminCaptchaContainer captchaContainer = captchaHelper.generate();
+        return ApiResult.data(new AdminCaptchaVO(captchaContainer));
     }
 
 }

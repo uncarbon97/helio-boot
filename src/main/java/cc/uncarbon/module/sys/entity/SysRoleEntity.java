@@ -25,11 +25,11 @@ import lombok.experimental.SuperBuilder;
 @TableName(value = "sys_role")
 public class SysRoleEntity extends HelioBaseEntity<Long> {
 
-	@ApiModelProperty(value = "名称")
+	@ApiModelProperty(value = "角色名")
 	@TableField(value = "title")
 	private String title;
 
-	@ApiModelProperty(value = "值")
+	@ApiModelProperty(value = "角色编码")
 	@TableField(value = "value")
 	private String value;
 

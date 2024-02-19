@@ -46,10 +46,10 @@ public class SysDataDictBO implements Serializable {
     @ApiModelProperty(value = "帕斯卡式键名")
     private String pascalCaseKey;
 
-    @ApiModelProperty(value = "键值")
+    @ApiModelProperty(value = "数据值")
     private String value;
 
-    @ApiModelProperty(value = "参数描述")
+    @ApiModelProperty(value = "描述")
     private String description;
 
     @ApiModelProperty(value = "单位")

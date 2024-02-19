@@ -110,7 +110,6 @@ public class SysTenantService {
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminUpdateSysTenantDTO dto) {
         log.info("[后台管理-编辑系统租户] >> 入参={}", dto);
-        this.checkExistence(dto);
 
         SysTenantEntity entity = new SysTenantEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -153,7 +152,7 @@ public class SysTenantService {
      *
      * @param dto DTO
      */
-    public void checkExistence(AdminUpdateSysTenantDTO dto) {
+    public void checkExistence(AdminInsertSysTenantDTO dto) {
         SysTenantEntity existingEntity = sysTenantMapper.selectOne(
                 new QueryWrapper<SysTenantEntity>()
                         .lambda()

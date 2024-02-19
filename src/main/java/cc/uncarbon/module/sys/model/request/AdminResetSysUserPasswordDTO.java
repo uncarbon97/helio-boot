@@ -23,11 +23,11 @@ import java.io.Serializable;
 public class AdminResetSysUserPasswordDTO implements Serializable {
 
     @ApiModelProperty(value = "随机新密码", required = true)
-    @Size(min = 16, max = 64, message = "随机新密码须为16-64位")
+    @Size(min = 16, max = 64, message = "【随机新密码】最短16位，最长64位")
     @NotBlank(message = "随机新密码不能为空")
     private String randomPassword;
 
-    @ApiModelProperty(value = "用户ID", hidden  = true)
+    @ApiModelProperty(value = "用户ID", hidden = true)
     private Long userId;
 
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -29,12 +30,14 @@ public class AdminInsertOrUpdateSysRoleDTO implements Serializable {
     @ApiModelProperty(value = "所属租户ID", hidden = true, notes = "仅新增时使用")
     private Long tenantId;
 
-    @ApiModelProperty(value = "名称", required = true)
-    @NotBlank(message = "名称不能为空")
+    @ApiModelProperty(value = "角色名", required = true)
+    @Size(max = 50, message = "【角色名】最长50位")
+    @NotBlank(message = "角色名不能为空")
     private String title;
 
-    @ApiModelProperty(value = "值", required = true)
-    @NotBlank(message = "值不能为空")
+    @ApiModelProperty(value = "角色编码", required = true)
+    @Size(max = 100, message = "【角色编码】最长100位")
+    @NotBlank(message = "角色编码不能为空")
     private String value;
 
     /**
