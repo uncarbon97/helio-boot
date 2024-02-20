@@ -188,7 +188,7 @@ public class SysLogAspect {
      */
 
     /**
-     * 本切面上下文
+     * 本切面上下文，有点像对单次请求做个快照，用来缓解：servlet容器线程复用机制导致HttpServletRequest对象实例丢失的问题
      * 内部使用
      */
     @Getter
