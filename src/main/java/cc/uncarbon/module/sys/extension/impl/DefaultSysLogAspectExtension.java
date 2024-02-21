@@ -6,6 +6,7 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
@@ -31,6 +32,8 @@ public class DefaultSysLogAspectExtension implements SysLogAspectExtension {
                 .form("ip", ip)
                 .form("json", Boolean.TRUE.toString())
                 .charset(CharsetUtil.CHARSET_GBK)
+                // since 1.11.0，加个UA避免被当成恶意请求，造成查IP失败
+                .header(Header.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36")
                 .timeout(5000);
         try (HttpResponse httpResponse = httpRequest.execute()) {
             String repStr = httpResponse.body();
