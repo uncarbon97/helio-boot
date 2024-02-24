@@ -1,13 +1,14 @@
 package cc.uncarbon.module.sys.model.response;
 
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 
 /**

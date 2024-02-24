@@ -27,12 +27,12 @@ public class AdminUpdateCurrentSysUserPasswordDTO implements Serializable {
     private String oldPassword;
 
     @ApiModelProperty(value = "新密码", required = true)
-    @Size(min = 8, max = 20, message = "密码须为8-20位")
+    @Size(min = 8, max = 20, message = "【密码】长度须在 8 至 20 位之间")
     @NotBlank(message = "密码不能为空")
     private String newPassword;
 
     @ApiModelProperty(value = "确认新密码", required = true)
-    @Size(min = 8, max = 20, message = "确认密码须为8-20位")
+    @Size(min = 8, max = 20, message = "【确认密码】长度须在 8 至 20 位之间")
     @NotBlank(message = "确认密码不能为空")
     private String confirmNewPassword;
 

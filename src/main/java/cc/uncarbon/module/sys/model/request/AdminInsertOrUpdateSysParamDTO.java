@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 
@@ -25,14 +26,17 @@ public class AdminInsertOrUpdateSysParamDTO implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "键名", required = true)
+    @Size(max = 50, message = "【键名】最长50位")
     @NotBlank(message = "键名不能为空")
     private String name;
 
     @ApiModelProperty(value = "键值", required = true)
+    @Size(max = 255, message = "【键值】最长255位")
     @NotBlank(message = "键值不能为空")
     private String value;
 
     @ApiModelProperty(value = "描述", required = true)
+    @Size(max = 255, message = "【描述】最长255位")
     @NotBlank(message = "描述不能为空")
     private String description;
 

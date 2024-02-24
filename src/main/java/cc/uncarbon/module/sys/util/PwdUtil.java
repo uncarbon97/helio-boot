@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class PwdUtil {
     public static String encrypt(String str, String salt) {
-        if (CharSequenceUtil.isEmpty(str)){
+        if (CharSequenceUtil.isEmpty(str)) {
             return "";
         }
 

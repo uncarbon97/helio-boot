@@ -5,7 +5,8 @@
     <select id="getUserByPin" resultType="cc.uncarbon.module.sys.entity.SysUserEntity">
         SELECT *
         FROM sys_user
-        WHERE pin = #{pin}
+        WHERE del_flag = 0
+            AND pin = #{pin}
         LIMIT 1
     </select>
 
@@ -17,7 +18,8 @@
                , email
                , phone_no
         FROM sys_user
-        WHERE id = #{userId}
+        WHERE del_flag = 0
+            AND id = #{userId}
         LIMIT 1
     </select>
 

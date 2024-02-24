@@ -13,6 +13,7 @@ import cc.uncarbon.module.sys.model.request.AdminListSysTenantDTO;
 import cc.uncarbon.module.sys.model.request.AdminUpdateSysTenantDTO;
 import cc.uncarbon.module.sys.model.response.SysTenantBO;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -58,7 +60,7 @@ public class SysTenantService {
                         .orderByDesc(SysTenantEntity::getCreatedAt)
         );
 
-        return this.entityPage2BOPage(entityPage);
+        return this.entityPage2BOPage(entityPage, true);
     }
 
     /**
@@ -84,7 +86,7 @@ public class SysTenantService {
             SysErrorEnum.INVALID_ID.assertNotNull(entity);
         }
 
-        return this.entity2BO(entity);
+        return this.entity2BO(entity, true);
     }
 
     /**
@@ -108,7 +110,6 @@ public class SysTenantService {
     @Transactional(rollbackFor = Exception.class)
     public void adminUpdate(AdminUpdateSysTenantDTO dto) {
         log.info("[后台管理-编辑系统租户] >> 入参={}", dto);
-        this.checkExistence(dto);
 
         SysTenantEntity entity = new SysTenantEntity();
         BeanUtil.copyProperties(dto, entity);
@@ -151,7 +152,7 @@ public class SysTenantService {
      *
      * @param dto DTO
      */
-    public void checkExistence(AdminUpdateSysTenantDTO dto) {
+    public void checkExistence(AdminInsertSysTenantDTO dto) {
         SysTenantEntity existingEntity = sysTenantMapper.selectOne(
                 new QueryWrapper<SysTenantEntity>()
                         .lambda()
@@ -170,6 +171,18 @@ public class SysTenantService {
         }
     }
 
+    /**
+     * 根据主键IDs，取租户BOs
+     * @param fillTenantAdminUser 是否根据租户管理员用户ID，查询关联用户信息并填充到BO
+     */
+    public List<SysTenantBO> listByIds(Collection<Long> ids, boolean fillTenantAdminUser) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<SysTenantEntity> entityList = sysTenantMapper.selectBatchIds(ids);
+        return entityList2BOs(entityList, fillTenantAdminUser);
+    }
+
     /*
     ----------------------------------------------------------------
                         私有方法 private methods
@@ -180,9 +193,10 @@ public class SysTenantService {
      * 实体转 BO
      *
      * @param entity 实体
+     * @param fillTenantAdminUser 是否根据租户管理员用户ID，查询关联用户信息并填充到BO
      * @return BO
      */
-    private SysTenantBO entity2BO(SysTenantEntity entity) {
+    private SysTenantBO entity2BO(SysTenantEntity entity, boolean fillTenantAdminUser) {
         if (entity == null) {
             return null;
         }
@@ -191,10 +205,8 @@ public class SysTenantService {
         BeanUtil.copyProperties(entity, bo);
 
         // 可以在此处为BO填充字段
-        if (ObjectUtil.isNotNull(entity.getTenantAdminUserId())) {
-            bo
-                    .setTenantAdminUser(sysUserMapper.getBaseInfoByUserId(entity.getTenantAdminUserId()))
-            ;
+        if (fillTenantAdminUser && ObjectUtil.isNotNull(entity.getTenantAdminUserId())) {
+            bo.setTenantAdminUser(sysUserMapper.getBaseInfoByUserId(entity.getTenantAdminUserId()));
         }
 
         return bo;
@@ -204,13 +216,14 @@ public class SysTenantService {
      * 实体 List 转 BO List
      *
      * @param entityList 实体 List
+     * @param fillTenantAdminUser 是否根据租户管理员用户ID，查询关联用户信息并填充到BO
      * @return BO List
      */
-    private List<SysTenantBO> entityList2BOs(List<SysTenantEntity> entityList) {
+    private List<SysTenantBO> entityList2BOs(List<SysTenantEntity> entityList, boolean fillTenantAdminUser) {
         // 深拷贝
         List<SysTenantBO> ret = new ArrayList<>(entityList.size());
         entityList.forEach(
-                entity -> ret.add(this.entity2BO(entity))
+                entity -> ret.add(this.entity2BO(entity, fillTenantAdminUser))
         );
 
         return ret;
@@ -222,13 +235,12 @@ public class SysTenantService {
      * @param entityPage 实体分页
      * @return BO 分页
      */
-    private PageResult<SysTenantBO> entityPage2BOPage(Page<SysTenantEntity> entityPage) {
+    private PageResult<SysTenantBO> entityPage2BOPage(Page<SysTenantEntity> entityPage, boolean fillTenantAdminUser) {
         return new PageResult<SysTenantBO>()
                 .setCurrent(entityPage.getCurrent())
                 .setSize(entityPage.getSize())
                 .setTotal(entityPage.getTotal())
-                .setRecords(this.entityList2BOs(entityPage.getRecords()))
-                ;
+                .setRecords(this.entityList2BOs(entityPage.getRecords(), fillTenantAdminUser));
     }
 
 }

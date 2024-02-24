@@ -71,9 +71,7 @@ public class SysRoleMenuRelationService {
             return;
         }
 
-        /*
-        先删除不再需要的关联关系
-         */
+        // 先删除不再需要的关联关系
         sysRoleMenuRelationMapper.delete(
                 new QueryWrapper<SysRoleMenuRelationEntity>()
                         .lambda()
@@ -81,31 +79,24 @@ public class SysRoleMenuRelationService {
                         .notIn(SysRoleMenuRelationEntity::getMenuId, menuIds)
         );
 
-        /*
-        取出需要增量更新的部分
-         */
+        // 取出需要增量更新的部分
         Set<Long> existingMenuIds = sysRoleMenuRelationMapper.selectList(menuIdsQuery)
                 .stream().map(SysRoleMenuRelationEntity::getMenuId)
                 .collect(Collectors.toSet());
         menuIds.removeAll(existingMenuIds);
 
-        if (CollUtil.isEmpty(menuIds)) {
-            // 没有需要增量更新的部分
-            return;
+        if (CollUtil.isNotEmpty(menuIds)) {
+            // 批量插入需要增量更新的部分
+            List<SysRoleMenuRelationEntity> entityList = new ArrayList<>(menuIds.size());
+            for (Long menuId : menuIds) {
+                entityList.add(
+                        SysRoleMenuRelationEntity.builder()
+                                .roleId(roleId)
+                                .menuId(menuId)
+                                .build()
+                );
+            }
+            entityList.forEach(sysRoleMenuRelationMapper::insert);
         }
-
-        /*
-        批量插入需要增量更新的部分
-         */
-        List<SysRoleMenuRelationEntity> entityList = new ArrayList<>(menuIds.size());
-        for (Long menuId : menuIds) {
-            entityList.add(
-                    SysRoleMenuRelationEntity.builder()
-                            .roleId(roleId)
-                            .menuId(menuId)
-                            .build()
-            );
-        }
-        entityList.forEach(sysRoleMenuRelationMapper::insert);
     }
 }

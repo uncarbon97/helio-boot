@@ -6,6 +6,8 @@ import cc.uncarbon.framework.core.page.PageResult;
 import cc.uncarbon.framework.web.model.request.IdsDTO;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
+import cc.uncarbon.module.adminapi.event.KickOutSysUsersEvent;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.facade.SysTenantFacade;
@@ -13,10 +15,11 @@ import cc.uncarbon.module.sys.model.request.AdminInsertSysTenantDTO;
 import cc.uncarbon.module.sys.model.request.AdminListSysTenantDTO;
 import cc.uncarbon.module.sys.model.request.AdminUpdateSysTenantDTO;
 import cc.uncarbon.module.sys.model.response.SysTenantBO;
+import cc.uncarbon.module.sys.model.response.SysTenantKickOutUsersBO;
 import cc.uncarbon.module.sys.service.SysTenantService;
-import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.extra.spring.SpringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +78,12 @@ public class AdminSysTenantController {
     @PutMapping(value = "/sys/tenants/{id}")
     public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminUpdateSysTenantDTO dto) {
         dto.setId(id);
-        sysTenantService.adminUpdate(dto);
+        SysTenantKickOutUsersBO needKickOutUsers = sysTenantFacade.adminUpdate(dto);
+
+        // 强制登出所有租户用户
+        SpringUtil.publishEvent(new KickOutSysUsersEvent(
+                new KickOutSysUsersEvent.EventData(needKickOutUsers.getSysUserIds())
+        ));
 
         return ApiResult.success();
     }
@@ -85,7 +93,12 @@ public class AdminSysTenantController {
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/sys/tenants")
     public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
-        sysTenantService.adminDelete(dto.getIds());
+        SysTenantKickOutUsersBO needKickOutUsers = sysTenantFacade.adminDelete(dto.getIds());
+
+        // 强制登出所有租户用户
+        SpringUtil.publishEvent(new KickOutSysUsersEvent(
+                new KickOutSysUsersEvent.EventData(needKickOutUsers.getSysUserIds())
+        ));
 
         return ApiResult.success();
     }

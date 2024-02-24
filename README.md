@@ -1,9 +1,11 @@
 # helio-boot
 
 ## 项目介绍
-`helio-boot`基于 Spring Boot 2.7.x，是一款预置SaaS、RBAC能力的单体项目脚手架，适合初学者学习 JavaWeb 开发的良好实践
+基于 Spring Boot 2.7.x，是一款预置SaaS、RBAC能力的单体项目脚手架，适合初学者学习 JavaWeb 开发的良好实践  
+单Maven模块，定位为快速开发脚手架  
+多模块版请移步至[helio-boot-modular](https://github.com/uncarbon97/helio-boot-modular)项目
 
-JDK compatibility: 1.8 - 17
+JDK compatibility: 1.8 - 21
 
 【[前端演示站](https://helio-demo.uncarbon.cc/)】
 【[官方文档](https://helio.uncarbon.cc/)】 
@@ -16,24 +18,13 @@ JDK compatibility: 1.8 - 17
 
 基础支撑构件 [helio-starters](https://github.com/uncarbon97/helio-starters) 已推送至Maven中央仓库，加载时会自动拉取
 
-## 配套后台管理前端模板 && 代码生成器
+## 配套后台管理前端模板 & 代码生成器
 | 项目名                  | 简介                                                                          | Gitee                                                      | GitHub                                                       |
 |----------------------|-----------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------|
 | helio-generator      | 可一键生成单体or微服务版的前、后端代码，减少无谓的重复劳动                                              | [Gitee](https://gitee.com/uncarbon97/helio-generator)      | [GitHub](https://github.com/uncarbon97/helio-generator)      |
 | helio-admin-vue-vben | 基于[Vue vben admin](https://github.com/anncwb/vue-vben-admin) 改造适配的前端框架，开箱即用 | [Gitee](https://gitee.com/uncarbon97/helio-admin-vue-vben) | [GitHub](https://github.com/uncarbon97/helio-admin-vue-vben) |
 
-## 代码分支
-| 分支名        | 简介                                                                |
-|------------|-------------------------------------------------------------------|
-| single/1.x | 单Maven模块，定位为快速开发脚手架，适合初学者学习 JavaWeb 开发的良好实践                       | 
-| multi/1.x  | 按职责拆分为多Maven模块，依然是大单体，但命名及用途对标`helio-cloud`；适合多人协作、但不打算使用微服务架构的团队 |
-
-## 演示项目
-| 项目名            | 后端                                                                    | 前端                                                                              | 需导入数据库文件                                                                     |
-|----------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| library 图书管理系统 | [Gitee](https://gitee.com/uncarbon97/helio-boot/tree/demo%2Flibrary/) | [Gitee](https://gitee.com/uncarbon97/helio-admin-vue-vben/tree/demo%2Flibrary/) | attachments/db/MySQL/helio_boot.sql<br>attachments/db/demo/library_MySQL.sql |
-
-## 目录结构
+## 源码包结构
 ```
 ├─attachments                  附件
 │  └─db                         数据库变更脚本

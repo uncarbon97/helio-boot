@@ -36,7 +36,7 @@ import javax.validation.Valid;
 @Slf4j
 public class AdminSysDataDictController {
 
-    private static final String PERMISSION_PREFIX = "SysDataDict:" ;
+    private static final String PERMISSION_PREFIX = "SysDataDict:";
 
     private final SysDataDictService sysDataDictService;
 

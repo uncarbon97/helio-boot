@@ -97,13 +97,13 @@ public class SysLogAspect {
         HttpServletRequest request = SpringMVCUtil.getRequest();
         AspectContext aspectContext = new AspectContext(request);
 
-        if (!annotation.syncSave()) {
+        if (annotation.syncSave()) {
+            // 同步保存
+            saveSysLog(joinPoint, annotation, aspectContext, null, ret);
+        } else {
             // 异步保存
             saveSysLogAsync(joinPoint, annotation, aspectContext, null, ret);
-            return;
         }
-
-        saveSysLog(joinPoint, annotation, aspectContext, null, ret);
     }
 
     /**
@@ -119,13 +119,13 @@ public class SysLogAspect {
         HttpServletRequest request = SpringMVCUtil.getRequest();
         AspectContext aspectContext = new AspectContext(request);
 
-        if (!annotation.syncSave()) {
+        if (annotation.syncSave()) {
+            // 同步保存
+            saveSysLog(joinPoint, annotation, aspectContext, e, null);
+        } else {
             // 异步保存
             saveSysLogAsync(joinPoint, annotation, aspectContext, e, null);
-            return;
         }
-
-        saveSysLog(joinPoint, annotation, aspectContext, e, null);
     }
 
     /**
@@ -136,7 +136,8 @@ public class SysLogAspect {
      * @param e 异常实例，可以为null
      * @param ret 返回值，可以为null
      */
-    private void saveSysLog(final JoinPoint joinPoint, SysLog annotation, final AspectContext aspectContext, final Throwable e, Object ret) {
+    private void saveSysLog(final JoinPoint joinPoint, SysLog annotation, final AspectContext aspectContext,
+                            final Throwable e, Object ret) {
         try {
             // 指定本线程用户态
             UserContextHolder.setUserContext(aspectContext.getUserContext());
@@ -149,42 +150,8 @@ public class SysLogAspect {
                 extensionInstance = ReflectUtil.newInstance(extensionClazz);
             }
 
-            AdminInsertSysLogDTO dto = new AdminInsertSysLogDTO()
-                    // 记录操作人
-                    .setUserId(UserContextHolder.getUserId())
-                    .setUsername(UserContextHolder.getUserName())
-                    // 记录请求方法
-                    .setMethod(CharSequenceUtil.builder(
-                            joinPoint.getTarget().getClass().getName(),
-                            "#",
-                            joinPoint.getSignature().getName()
-                    ).toString())
-                    // 记录操作内容
-                    .setOperation(annotation.value())
-                    .setIp(aspectContext.getClientIP())
-                    // 默认置为成功
-                    .setStatus(SysLogStatusEnum.SUCCESS)
-                    .setUserAgent(aspectContext.getUserAgent());
-
-            // 记录请求参数
-            Map<Object, Object> afterMasked = new LinkedHashMap<>(32, 1);
-            String params = Arrays.stream(joinPoint.getArgs()).map(
-                    item -> {
-                        if (ClassUtil.isBasicType(item.getClass())) {
-                            // 基元类型 OR 其包装类型，且拿不到参数名，保存在DB时保持原样
-                            return StrUtil.toStringOrNull(item);
-                        }
-
-                        // 先去除敏感字段后再入库
-                        afterMasked.clear();
-                        BeanUtil.copyProperties(item, afterMasked, MASKING_COPY_OPTIONS);
-                        return JSONUtil.toJsonStr(afterMasked, TO_JSON_STR_JSON_CONFIG);
-                    }
-            ).collect(Collectors.joining(StrPool.LF));
-            if (CharSequenceUtil.length(params) > MAX_STRING_SAVE_LENGTH) {
-                params = CharSequenceUtil.subPre(params, MAX_STRING_SAVE_LENGTH);
-            }
-            dto.setParams(params);
+            AdminInsertSysLogDTO dto = buildInsertDTO(joinPoint, annotation, aspectContext);
+            setParamInDTO(joinPoint, dto);
 
             if (e != null) {
                 // 异常不为空，置状态为失败
@@ -221,16 +188,7 @@ public class SysLogAspect {
      */
 
     /**
-     * 异步保存系统日志
-     */
-    private void saveSysLogAsync(final JoinPoint joinPoint, SysLog annotation, final AspectContext aspectContext, final Throwable e, Object ret) {
-        taskExecutor.submit(
-                () -> this.saveSysLog(joinPoint, annotation, aspectContext, e, ret)
-        );
-    }
-
-    /**
-     * 本切面上下文
+     * 本切面上下文，有点像对单次请求做个快照，用来缓解：servlet容器线程复用机制导致HttpServletRequest对象实例丢失的问题
      * 内部使用
      */
     @Getter
@@ -254,7 +212,7 @@ public class SysLogAspect {
         /**
          * 从 HTTP Request 新建
          */
-        public AspectContext(HttpServletRequest request) {
+        AspectContext(HttpServletRequest request) {
             this.userContext = UserContextHolder.getUserContext();
             /*
             记录IP地址
@@ -269,6 +227,62 @@ public class SysLogAspect {
             // Spring框架已经做了简单的防注入过滤
             this.userAgent = request.getHeader(HttpHeaders.USER_AGENT);
         }
+    }
+
+    /**
+     * 异步保存系统日志
+     */
+    private void saveSysLogAsync(final JoinPoint joinPoint, SysLog annotation, final AspectContext aspectContext,
+                                 final Throwable e, Object ret) {
+        taskExecutor.submit(
+                () -> this.saveSysLog(joinPoint, annotation, aspectContext, e, ret)
+        );
+    }
+
+    /**
+     * 构造新增DTO
+     */
+    private static AdminInsertSysLogDTO buildInsertDTO(JoinPoint joinPoint, SysLog annotation, AspectContext aspectContext) {
+        return new AdminInsertSysLogDTO()
+                // 记录操作人
+                .setUserId(UserContextHolder.getUserId())
+                .setUsername(UserContextHolder.getUserName())
+                // 记录请求方法
+                .setMethod(CharSequenceUtil.builder(
+                        joinPoint.getTarget().getClass().getName(),
+                        "#",
+                        joinPoint.getSignature().getName()
+                ).toString())
+                // 记录操作内容
+                .setOperation(annotation.value())
+                .setIp(aspectContext.getClientIP())
+                // 默认置为成功
+                .setStatus(SysLogStatusEnum.SUCCESS)
+                .setUserAgent(aspectContext.getUserAgent());
+    }
+
+    /**
+     * 记录请求参数，设置dto的param字段
+     */
+    private static void setParamInDTO(JoinPoint joinPoint, AdminInsertSysLogDTO dto) {
+        Map<Object, Object> afterMasked = new LinkedHashMap<>(32, 1);
+        String params = Arrays.stream(joinPoint.getArgs()).map(
+                item -> {
+                    if (ClassUtil.isBasicType(item.getClass())) {
+                        // 基元类型 OR 其包装类型，且拿不到参数名，保存在DB时保持原样
+                        return StrUtil.toStringOrNull(item);
+                    }
+
+                    // 先去除敏感字段后再入库
+                    afterMasked.clear();
+                    BeanUtil.copyProperties(item, afterMasked, MASKING_COPY_OPTIONS);
+                    return JSONUtil.toJsonStr(afterMasked, TO_JSON_STR_JSON_CONFIG);
+                }
+        ).collect(Collectors.joining(StrPool.LF));
+        if (CharSequenceUtil.length(params) > MAX_STRING_SAVE_LENGTH) {
+            params = CharSequenceUtil.subPre(params, MAX_STRING_SAVE_LENGTH);
+        }
+        dto.setParams(params);
     }
 
 }

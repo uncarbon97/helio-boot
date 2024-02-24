@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 
@@ -27,11 +28,9 @@ public class AdminInsertOrUpdateSysMenuDTO implements Serializable {
     @ApiModelProperty(value = "主键ID", hidden = true, notes = "仅更新时使用")
     private Long id;
 
-    @ApiModelProperty(value = "所属租户ID", hidden = true, notes = "仅新增时使用")
-    private Long tenantId;
-
-    @ApiModelProperty(value = "名称", required = true)
-    @NotBlank(message = "名称不能为空")
+    @ApiModelProperty(value = "菜单名称", required = true)
+    @Size(max = 50, message = "【菜单名称】最长50位")
+    @NotBlank(message = "菜单名称不能为空")
     private String title;
 
     @ApiModelProperty(value = "上级菜单ID(无上级节点设置为0)")
@@ -42,12 +41,15 @@ public class AdminInsertOrUpdateSysMenuDTO implements Serializable {
     private SysMenuTypeEnum type;
 
     @ApiModelProperty(value = "组件")
+    @Size(max = 50, message = "【组件】最长50位")
     private String component;
 
     @ApiModelProperty(value = "权限标识")
+    @Size(max = 255, message = "【权限标识】最长255位")
     private String permission;
 
     @ApiModelProperty(value = "图标")
+    @Size(max = 255, message = "【图标】最长255位")
     private String icon;
 
     @ApiModelProperty(value = "排序")
@@ -57,6 +59,7 @@ public class AdminInsertOrUpdateSysMenuDTO implements Serializable {
     private EnabledStatusEnum status;
 
     @ApiModelProperty(value = "外链地址")
+    @Size(max = 255, message = "【外链地址】最长255位")
     private String externalLink;
 
 }

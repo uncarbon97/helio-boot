@@ -65,6 +65,7 @@ public class AdminSysRoleController {
     @ApiOperation(value = "新增")
     @PostMapping(value = "/sys/roles")
     public ApiResult<Void> insert(@RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
+        dto.setTenantId(null);
         sysRoleService.adminInsert(dto);
 
         return ApiResult.success();
@@ -75,7 +76,9 @@ public class AdminSysRoleController {
     @ApiOperation(value = "编辑")
     @PutMapping(value = "/sys/roles/{id}")
     public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid AdminInsertOrUpdateSysRoleDTO dto) {
-        dto.setId(id);
+        dto
+                .setTenantId(null)
+                .setId(id);
         sysRoleService.adminUpdate(dto);
 
         return ApiResult.success();

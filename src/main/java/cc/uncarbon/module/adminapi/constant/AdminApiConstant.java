@@ -4,7 +4,7 @@ package cc.uncarbon.module.adminapi.constant;
 /**
  * 后台管理接口常量
  */
-public class AdminApiConstant {
+public final class AdminApiConstant {
     private AdminApiConstant() {
     }
 

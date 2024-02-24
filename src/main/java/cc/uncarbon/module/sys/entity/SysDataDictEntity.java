@@ -36,11 +36,11 @@ public class SysDataDictEntity extends HelioBaseEntity<Long> {
 	@TableField(value = "pascal_case_key")
 	private String pascalCaseKey;
 
-	@ApiModelProperty(value = "键值")
+	@ApiModelProperty(value = "数据值")
 	@TableField(value = "value")
 	private String value;
 
-	@ApiModelProperty(value = "参数描述")
+	@ApiModelProperty(value = "描述")
 	@TableField(value = "description")
 	private String description;
 

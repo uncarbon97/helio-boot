@@ -36,14 +36,16 @@ public class AsyncConfiguration implements AsyncConfigurer {
     public ThreadPoolTaskExecutor taskExecutor() {
         final String threadNamePrefix = "taskExecutor-";
 
-        log.debug("[异步任务线程池] 创建默认线程池【taskExecutor】，该线程池参数可通过 spring.task.execution 调节 >> " +
-                        "corePoolSize核心线程池大小={}, maxPoolSize最大线程数={}, queueCapacity队列容量={}" +
-                        ", rejectedExecutionHandler拒绝策略={}",
-                taskExecutionProperties.getPool().getCoreSize(),
-                taskExecutionProperties.getPool().getMaxSize(),
-                taskExecutionProperties.getPool().getQueueCapacity(),
-                "CallerRunsPolicy"
-                );
+        if (log.isDebugEnabled()) {
+            log.debug("[异步任务线程池] 创建默认线程池【taskExecutor】，该线程池参数可通过 spring.task.execution 调节 >> "
+                            + "corePoolSize核心线程池大小={}, maxPoolSize最大线程数={}, queueCapacity队列容量={}"
+                            + ", rejectedExecutionHandler拒绝策略={}",
+                    taskExecutionProperties.getPool().getCoreSize(),
+                    taskExecutionProperties.getPool().getMaxSize(),
+                    taskExecutionProperties.getPool().getQueueCapacity(),
+                    "CallerRunsPolicy"
+            );
+        }
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         // 核心线程池大小，默认 8

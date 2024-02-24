@@ -9,6 +9,7 @@ import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.sys.annotation.SysLog;
 import cc.uncarbon.module.sys.constant.SysConstant;
+import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cc.uncarbon.module.sys.model.request.*;
 import cc.uncarbon.module.sys.model.response.SysUserBO;
 import cc.uncarbon.module.sys.model.response.VbenAdminUserInfoVO;
@@ -75,6 +76,11 @@ public class AdminSysUserController {
         dto.setId(id);
         sysUserService.adminUpdate(dto);
 
+        // 新状态是禁用，连带踢出登录
+        if (dto.getStatus() == SysUserStatusEnum.BANNED) {
+            kickOut(dto.getId());
+        }
+
         return ApiResult.success();
     }
 
@@ -84,6 +90,9 @@ public class AdminSysUserController {
     @DeleteMapping(value = "/sys/users")
     public ApiResult<Void> delete(@RequestBody @Valid IdsDTO<Long> dto) {
         sysUserService.adminDelete(dto.getIds());
+
+        // 连带踢出登录
+        dto.getIds().forEach(this::kickOut);
 
         return ApiResult.success();
     }

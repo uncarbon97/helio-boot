@@ -20,10 +20,10 @@ import java.io.Serializable;
 @Data
 public class AdminListSysRoleDTO implements Serializable {
 
-    @ApiModelProperty(value = "名称(关键词)")
+    @ApiModelProperty(value = "角色名(关键词)")
     private String title;
 
-    @ApiModelProperty(value = "值(关键词)")
+    @ApiModelProperty(value = "角色编码(关键词)")
     private String value;
 
 }

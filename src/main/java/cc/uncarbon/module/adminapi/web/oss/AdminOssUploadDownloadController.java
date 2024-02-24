@@ -68,8 +68,7 @@ public class AdminOssUploadDownloadController {
             attr
                     .setOriginalFilename(file.getOriginalFilename())
                     .setContentType(file.getContentType())
-                    .setMd5(md5)
-            ;
+                    .setMd5(md5);
             bo = ossUploadDownloadFacade.upload(file.getBytes(), attr);
         }
 

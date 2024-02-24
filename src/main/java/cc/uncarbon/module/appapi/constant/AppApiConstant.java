@@ -4,7 +4,7 @@ package cc.uncarbon.module.appapi.constant;
 /**
  * C端接口常量
  */
-public class AppApiConstant {
+public final class AppApiConstant {
     private AppApiConstant() {
     }
 
