@@ -3,7 +3,7 @@ package cc.uncarbon.module.sys.entity;
 import cc.uncarbon.framework.crud.entity.HelioBaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,15 +24,15 @@ import lombok.experimental.SuperBuilder;
 @TableName(value = "sys_param")
 public class SysParamEntity extends HelioBaseEntity<Long> {
 
-    @ApiModelProperty(value = "键名")
+    @Schema(description = "键名")
     @TableField(value = "name")
     private String name;
 
-    @ApiModelProperty(value = "键值")
+    @Schema(description = "键值")
     @TableField(value = "value")
     private String value;
 
-    @ApiModelProperty(value = "描述")
+    @Schema(description = "描述")
     @TableField(value = "description")
     private String description;
 

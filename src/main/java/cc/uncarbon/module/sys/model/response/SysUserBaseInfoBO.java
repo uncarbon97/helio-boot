@@ -2,7 +2,7 @@ package cc.uncarbon.module.sys.model.response;
 
 import cc.uncarbon.framework.core.enums.GenderEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,22 +23,22 @@ import java.io.Serializable;
 @Data
 public class SysUserBaseInfoBO implements Serializable {
 
-    @ApiModelProperty(value = "账号")
+    @Schema(description = "账号")
     private String username;
 
-    @ApiModelProperty(value = "昵称")
+    @Schema(description = "昵称")
     private String nickname;
 
-    @ApiModelProperty(value = "状态")
+    @Schema(description = "状态")
     private SysUserStatusEnum status;
 
-    @ApiModelProperty(value = "性别")
+    @Schema(description = "性别")
     private GenderEnum gender;
 
-    @ApiModelProperty(value = "邮箱")
+    @Schema(description = "邮箱")
     private String email;
 
-    @ApiModelProperty(value = "手机号")
+    @Schema(description = "手机号")
     private String phoneNo;
 
 }

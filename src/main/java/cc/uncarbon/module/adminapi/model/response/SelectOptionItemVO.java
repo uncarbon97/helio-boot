@@ -3,7 +3,7 @@ package cc.uncarbon.module.adminapi.model.response;
 import cc.uncarbon.framework.core.enums.HelioBaseEnum;
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -30,9 +29,9 @@ public class SelectOptionItemVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // ID👉名称 一对（用于关联各种实体）
-    @ApiModelProperty(value = "ID")
+    @Schema(description = "ID")
     private Number id;
-    @ApiModelProperty(value = "名称")
+    @Schema(description = "名称")
     private String name;
     public SelectOptionItemVO(Number id, String name) {
         this.id = id;
@@ -40,7 +39,7 @@ public class SelectOptionItemVO implements Serializable {
     }
 
     // 有时候额外需要上级ID
-    @ApiModelProperty(value = "上级ID")
+    @Schema(description = "上级ID")
     @Setter
     private Number parentId;
     public SelectOptionItemVO(Number id, String name, Number parentId) {
@@ -51,9 +50,9 @@ public class SelectOptionItemVO implements Serializable {
 
 
     // 值👉标签 一对（仅用于枚举）
-    @ApiModelProperty(value = "值")
+    @Schema(description = "值")
     private Number value;
-    @ApiModelProperty(value = "标签")
+    @Schema(description = "标签")
     private String label;
     public SelectOptionItemVO(HelioBaseEnum<? extends Number> helioBaseEnum) {
         this.value = helioBaseEnum.getValue();
@@ -136,7 +135,7 @@ public class SelectOptionItemVO implements Serializable {
         return stream.map(item ->
                         new SelectOptionItemVO(idGetter.apply(item), nameGetter.apply(item),
                                 parentIdGetter == null ? null : parentIdGetter.apply(item)))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -165,6 +164,6 @@ public class SelectOptionItemVO implements Serializable {
         if (enumConstantFilter != null) {
             stream = stream.filter(enumConstantFilter);
         }
-        return stream.map(SelectOptionItemVO::new).collect(Collectors.toList());
+        return stream.map(SelectOptionItemVO::new).toList();
     }
 }

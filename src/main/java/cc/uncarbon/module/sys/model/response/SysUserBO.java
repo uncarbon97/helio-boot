@@ -4,7 +4,7 @@ import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.enums.GenderEnum;
 import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,44 +26,44 @@ import java.time.LocalDateTime;
 @Data
 public class SysUserBO implements Serializable {
 
-    @ApiModelProperty(value = "主键ID")
+    @Schema(description = "主键ID")
     private Long id;
 
-    @ApiModelProperty(value = "创建时刻")
+    @Schema(description = "创建时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime createdAt;
 
-    @ApiModelProperty(value = "更新时刻")
+    @Schema(description = "更新时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime updatedAt;
 
-    @ApiModelProperty(value = "账号")
+    @Schema(description = "账号")
     private String username;
 
-    @ApiModelProperty(value = "昵称")
+    @Schema(description = "昵称")
     private String nickname;
 
-    @ApiModelProperty(value = "状态")
+    @Schema(description = "状态")
     private SysUserStatusEnum status;
 
-    @ApiModelProperty(value = "性别")
+    @Schema(description = "性别")
     private GenderEnum gender;
 
-    @ApiModelProperty(value = "邮箱")
+    @Schema(description = "邮箱")
     private String email;
 
-    @ApiModelProperty(value = "手机号")
+    @Schema(description = "手机号")
     private String phoneNo;
 
-    @ApiModelProperty(value = "最后登录时刻")
+    @Schema(description = "最后登录时刻")
     private LocalDateTime lastLoginAt;
 
-    @ApiModelProperty(value = "所属部门ID")
+    @Schema(description = "所属部门ID")
     private Long deptId;
 
-    @ApiModelProperty(value = "所属部门名称")
+    @Schema(description = "所属部门名称")
     private String deptTitle;
 
 }

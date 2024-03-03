@@ -2,7 +2,7 @@ package cc.uncarbon.module.sys.model.response;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,26 +24,26 @@ import java.time.LocalDateTime;
 @Data
 public class SysParamBO implements Serializable {
 
-    @ApiModelProperty(value = "主键ID")
+    @Schema(description = "主键ID")
     private Long id;
 
-    @ApiModelProperty(value = "创建时刻")
+    @Schema(description = "创建时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime createdAt;
 
-    @ApiModelProperty(value = "更新时刻")
+    @Schema(description = "更新时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime updatedAt;
 
-    @ApiModelProperty(value = "键名")
+    @Schema(description = "键名")
     private String name;
 
-    @ApiModelProperty(value = "键值")
+    @Schema(description = "键值")
     private String value;
 
-    @ApiModelProperty(value = "描述")
+    @Schema(description = "描述")
     private String description;
 
 }

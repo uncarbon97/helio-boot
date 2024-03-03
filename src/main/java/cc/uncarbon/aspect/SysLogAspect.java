@@ -34,7 +34,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;

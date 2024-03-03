@@ -35,7 +35,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -545,7 +545,7 @@ public class SysUserService {
         }
 
         // 目标是超级管理员时，不能删除
-        List<UserRoleContainer> specifiedUsers = ids.stream().map(sysRoleService::getSpecifiedUserRoleContainer).collect(Collectors.toList());
+        List<UserRoleContainer> specifiedUsers = ids.stream().map(sysRoleService::getSpecifiedUserRoleContainer).toList();
         if (specifiedUsers.stream().anyMatch(UserRoleContainer::isSuperAdmin)) {
             throw new BusinessException(SysErrorEnum.CANNOT_OPERATE_THIS_USER);
         }

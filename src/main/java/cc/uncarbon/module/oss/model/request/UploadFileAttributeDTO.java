@@ -1,6 +1,6 @@
 package cc.uncarbon.module.oss.model.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,19 +20,19 @@ public class UploadFileAttributeDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "文件类别", example = "id_card=身份证 driver_license=驾驶证")
+    @Schema(description = "文件类别", example = "id_card=身份证 driver_license=驾驶证")
     private String classified;
 
     /*
     以下字段为内部使用
      */
-    @ApiModelProperty(value = "原始文件名", hidden = true)
+    @Schema(description = "原始文件名", hidden = true)
     private String originalFilename;
 
-    @ApiModelProperty(value = "MIME类型", hidden = true)
+    @Schema(description = "MIME类型", hidden = true)
     private String contentType;
 
-    @ApiModelProperty(value = "MD5", hidden = true)
+    @Schema(description = "MD5", hidden = true)
     private String md5;
 
 }

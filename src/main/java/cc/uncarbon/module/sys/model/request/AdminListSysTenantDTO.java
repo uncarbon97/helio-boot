@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.model.request;
 
 import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,13 +21,13 @@ import java.io.Serializable;
 @Data
 public class AdminListSysTenantDTO implements Serializable {
 
-    @ApiModelProperty(value = "租户名(关键词)")
+    @Schema(description = "租户名(关键词)")
     private String tenantName;
 
-    @ApiModelProperty(value = "租户ID(纯数字)")
+    @Schema(description = "租户ID(纯数字)")
     private Long tenantId;
 
-    @ApiModelProperty(value = "状态")
+    @Schema(description = "状态")
     private EnabledStatusEnum status;
 
 }

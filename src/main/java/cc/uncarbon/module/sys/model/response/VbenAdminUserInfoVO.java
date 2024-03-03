@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.response;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,13 +21,13 @@ import java.time.LocalDateTime;
 @Data
 public class VbenAdminUserInfoVO implements Serializable {
 
-    @ApiModelProperty(value = "账号")
+    @Schema(description = "账号")
     private String username;
 
-    @ApiModelProperty(value = "昵称")
+    @Schema(description = "昵称")
     private String nickname;
 
-    @ApiModelProperty(value = "最后登录时刻")
+    @Schema(description = "最后登录时刻")
     private LocalDateTime lastLoginAt;
 
 }

@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,10 +21,10 @@ import java.util.Set;
 @Data
 public class AdminBindUserRoleRelationDTO implements Serializable {
 
-    @ApiModelProperty(value = "角色Ids(空=清理关联关系后不再绑定任何角色)")
+    @Schema(description = "角色Ids(空=清理关联关系后不再绑定任何角色)")
     private Set<Long> roleIds;
 
-    @ApiModelProperty(value = "用户ID", hidden = true)
+    @Schema(description = "用户ID", hidden = true)
     private Long userId;
 
 }

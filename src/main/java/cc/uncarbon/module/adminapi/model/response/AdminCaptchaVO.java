@@ -1,7 +1,7 @@
 package cc.uncarbon.module.adminapi.model.response;
 
 import cc.uncarbon.module.adminapi.model.interior.AdminCaptchaContainer;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 @Getter
 public class AdminCaptchaVO {
 
-    @ApiModelProperty(value = "验证码图片Base64")
+    @Schema(description = "验证码图片Base64")
     private final String captchaImage;
 
-    @ApiModelProperty(value = "验证码唯一标识")
+    @Schema(description = "验证码唯一标识")
     private final String captchaId;
 
-    @ApiModelProperty(value = "验证码失效时刻")
+    @Schema(description = "验证码失效时刻")
     private final LocalDateTime expiredAt;
 
 

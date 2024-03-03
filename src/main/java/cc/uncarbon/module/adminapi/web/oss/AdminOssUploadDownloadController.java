@@ -17,27 +17,23 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.Header;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URLEncoder;
 
 
-@Api(value = "后台管理-上传、下载文件接口", tags = {"后台管理-上传、下载文件接口"})
-@RequestMapping(value = {
-        // 兼容旧的API路由前缀
-        SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
-        AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
-})
+@Tag(name = "后台管理-上传、下载文件接口")
+@RequestMapping(value = AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -46,7 +42,7 @@ public class AdminOssUploadDownloadController {
     private final OssUploadDownloadFacade ossUploadDownloadFacade;
 
 
-    @ApiOperation(value = "上传文件", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "上传文件")
     @PostMapping(value = "/oss/files")
     // 约束：登录后才能上传   👇 后台管理对应的鉴权工具类
     @SaCheckLogin(type = AdminStpUtil.TYPE)
@@ -75,7 +71,7 @@ public class AdminOssUploadDownloadController {
         return ApiResult.data(this.toUploadResult(bo, request.getRequestURL().toString()));
     }
 
-    @ApiOperation(value = "下载文件(根据文件ID)", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "下载文件(根据文件ID)")
     @GetMapping(value = "/oss/files/{id}")
     // 如果需要登录后才能下载，请解禁下方注解；注意是👇 后台管理对应的鉴权工具类
     // @SaCheckLogin(type = AdminStpUtil.TYPE)

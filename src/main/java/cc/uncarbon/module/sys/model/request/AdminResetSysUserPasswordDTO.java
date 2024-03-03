@@ -1,14 +1,14 @@
 package cc.uncarbon.module.sys.model.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 
@@ -22,12 +22,12 @@ import java.io.Serializable;
 @Data
 public class AdminResetSysUserPasswordDTO implements Serializable {
 
-    @ApiModelProperty(value = "随机新密码", required = true)
+    @Schema(description = "随机新密码", requiredMode = Schema.RequiredMode.REQUIRED)
     @Size(min = 16, max = 64, message = "【随机新密码】最短16位，最长64位")
     @NotBlank(message = "随机新密码不能为空")
     private String randomPassword;
 
-    @ApiModelProperty(value = "用户ID", hidden = true)
+    @Schema(description = "用户ID", hidden = true)
     private Long userId;
 
 }

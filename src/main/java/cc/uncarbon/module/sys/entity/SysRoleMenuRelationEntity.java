@@ -3,7 +3,7 @@ package cc.uncarbon.module.sys.entity;
 import cc.uncarbon.framework.crud.entity.HelioNoTenantBaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,11 +24,11 @@ import lombok.experimental.SuperBuilder;
 @TableName(value = "sys_role_menu_relation")
 public class SysRoleMenuRelationEntity extends HelioNoTenantBaseEntity<Long> {
 
-	@ApiModelProperty(value = "角色ID")
+	@Schema(description = "角色ID")
 	@TableField(value = "role_id")
 	private Long roleId;
 
-	@ApiModelProperty(value = "菜单ID")
+	@Schema(description = "菜单ID")
 	@TableField(value = "menu_id")
 	private Long menuId;
 

@@ -6,7 +6,7 @@ import cc.uncarbon.module.sys.enums.SysUserStatusEnum;
 import cn.hutool.core.annotation.Alias;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,40 +29,40 @@ import java.time.LocalDateTime;
 @TableName(value = "sys_user")
 public class SysUserEntity extends HelioBaseEntity<Long> {
 
-	@ApiModelProperty(value = "账号")
+	@Schema(description = "账号")
 	@Alias(value = "username")
 	@TableField(value = "pin")
 	private String pin;
 
-	@ApiModelProperty(value = "密码")
+	@Schema(description = "密码")
 	@TableField(value = "pwd")
 	private String pwd;
 
-	@ApiModelProperty(value = "盐")
+	@Schema(description = "盐")
 	@TableField(value = "salt")
 	private String salt;
 
-	@ApiModelProperty(value = "昵称")
+	@Schema(description = "昵称")
 	@TableField(value = "nickname")
 	private String nickname;
 
-	@ApiModelProperty(value = "状态")
+	@Schema(description = "状态")
 	@TableField(value = "status")
 	private SysUserStatusEnum status;
 
-	@ApiModelProperty(value = "性别")
+	@Schema(description = "性别")
 	@TableField(value = "gender")
 	private GenderEnum gender;
 
-	@ApiModelProperty(value = "邮箱")
+	@Schema(description = "邮箱")
 	@TableField(value = "email")
 	private String email;
 
-	@ApiModelProperty(value = "手机号")
+	@Schema(description = "手机号")
 	@TableField(value = "phone_no")
 	private String phoneNo;
 
-	@ApiModelProperty(value = "最后登录时刻")
+	@Schema(description = "最后登录时刻")
 	@TableField(value = "last_login_at")
 	private LocalDateTime lastLoginAt;
 

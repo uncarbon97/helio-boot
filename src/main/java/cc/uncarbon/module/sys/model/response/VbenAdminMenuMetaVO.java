@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.response;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,13 +14,13 @@ import java.io.Serializable;
 @Data
 public class VbenAdminMenuMetaVO implements Serializable {
 
-    @ApiModelProperty(value = "标题")
+    @Schema(description = "标题")
     private String title;
 
-    @ApiModelProperty(value = "是否不可关闭")
+    @Schema(description = "是否不可关闭")
     private Boolean affix;
 
-    @ApiModelProperty(value = "图标")
+    @Schema(description = "图标")
     private String icon;
 
 }

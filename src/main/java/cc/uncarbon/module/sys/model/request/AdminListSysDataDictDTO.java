@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +20,7 @@ import java.io.Serializable;
 @Data
 public class AdminListSysDataDictDTO implements Serializable {
 
-    @ApiModelProperty(value = "描述(关键词)")
+    @Schema(description = "描述(关键词)")
     private String description;
 
 }

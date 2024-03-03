@@ -4,7 +4,7 @@ import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import cc.uncarbon.framework.crud.entity.HelioBaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,19 +25,19 @@ import lombok.experimental.SuperBuilder;
 @TableName(value = "sys_tenant")
 public class SysTenantEntity extends HelioBaseEntity<Long> {
 
-    @ApiModelProperty(value = "租户名")
+    @Schema(description = "租户名")
     @TableField(value = "tenant_name")
     private String tenantName;
 
-    @ApiModelProperty(value = "状态")
+    @Schema(description = "状态")
     @TableField(value = "status")
     private EnabledStatusEnum status;
 
-    @ApiModelProperty(value = "租户管理员用户ID")
+    @Schema(description = "租户管理员用户ID")
     @TableField(value = "tenant_admin_user_id")
     private Long tenantAdminUserId;
 
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注")
     @TableField(value = "remark")
     private String remark;
 

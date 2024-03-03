@@ -3,7 +3,7 @@ package cc.uncarbon.module.sys.entity;
 import cc.uncarbon.framework.crud.entity.HelioBaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,35 +24,35 @@ import lombok.experimental.SuperBuilder;
 @TableName(value = "sys_data_dict")
 public class SysDataDictEntity extends HelioBaseEntity<Long> {
 
-	@ApiModelProperty(value = "驼峰式键名")
+	@Schema(description = "驼峰式键名")
 	@TableField(value = "camel_case_key")
 	private String camelCaseKey;
 
-	@ApiModelProperty(value = "下划线式键名")
+	@Schema(description = "下划线式键名")
 	@TableField(value = "under_case_key")
 	private String underCaseKey;
 
-	@ApiModelProperty(value = "帕斯卡式键名")
+	@Schema(description = "帕斯卡式键名")
 	@TableField(value = "pascal_case_key")
 	private String pascalCaseKey;
 
-	@ApiModelProperty(value = "数据值")
+	@Schema(description = "数据值")
 	@TableField(value = "value")
 	private String value;
 
-	@ApiModelProperty(value = "描述")
+	@Schema(description = "描述")
 	@TableField(value = "description")
 	private String description;
 
-	@ApiModelProperty(value = "单位")
+	@Schema(description = "单位")
 	@TableField(value = "unit")
 	private String unit;
 
-	@ApiModelProperty(value = "取值范围")
+	@Schema(description = "取值范围")
 	@TableField(value = "value_range")
 	private String valueRange;
 
-	@ApiModelProperty(value = "别称键名")
+	@Schema(description = "别称键名")
 	@TableField(value = "alias_key")
 	private String aliasKey;
 

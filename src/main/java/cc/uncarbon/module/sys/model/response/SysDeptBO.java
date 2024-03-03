@@ -3,7 +3,7 @@ package cc.uncarbon.module.sys.model.response;
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.enums.EnabledStatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,29 +25,29 @@ import java.time.LocalDateTime;
 @Data
 public class SysDeptBO implements Serializable {
 
-    @ApiModelProperty(value = "主键ID")
+    @Schema(description = "主键ID")
     private Long id;
 
-    @ApiModelProperty(value = "创建时刻")
+    @Schema(description = "创建时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime createdAt;
 
-    @ApiModelProperty(value = "更新时刻")
+    @Schema(description = "更新时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime updatedAt;
 
-    @ApiModelProperty(value = "名称")
+    @Schema(description = "名称")
     private String title;
 
-    @ApiModelProperty(value = "上级ID(无上级节点设置为0)")
+    @Schema(description = "上级ID(无上级节点设置为0)")
     private Long parentId;
 
-    @ApiModelProperty(value = "排序")
+    @Schema(description = "排序")
     private Integer sort;
 
-    @ApiModelProperty(value = "状态")
+    @Schema(description = "状态")
     private EnabledStatusEnum status;
 
 }
