@@ -5,7 +5,6 @@ import cc.uncarbon.interceptor.AdminSaTokenParseInterceptor;
 import cc.uncarbon.interceptor.DefaultSaTokenParseInterceptor;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.appapi.constant.AppApiConstant;
-import cc.uncarbon.module.sys.constant.SysConstant;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;

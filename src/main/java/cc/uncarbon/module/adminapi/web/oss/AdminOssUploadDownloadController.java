@@ -1,35 +1,34 @@
 package cc.uncarbon.module.adminapi.web.oss;
 
-import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
+import cc.uncarbon.module.adminapi.enums.AdminApiErrorEnum;
+import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cc.uncarbon.module.oss.facade.OssUploadDownloadFacade;
 import cc.uncarbon.module.oss.model.request.UploadFileAttributeDTO;
 import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
 import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cc.uncarbon.module.oss.model.response.OssFileUploadResultVO;
-import cc.uncarbon.module.sys.constant.SysConstant;
-import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.Header;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 
 @Tag(name = "后台管理-上传、下载文件接口")
@@ -50,8 +49,10 @@ public class AdminOssUploadDownloadController {
             @RequestPart MultipartFile file, @RequestPart(required = false) @Valid UploadFileAttributeDTO attr,
             HttpServletRequest request
     ) throws IOException {
-         /*
-         1. 已存在相同 MD5 文件，直接返回 URL
+        AdminApiErrorEnum.UPLOAD_FILE_NOT_EXIST.assertNotNull(file);
+
+        /*
+        1. 已存在相同 MD5 文件，直接返回 URL
          */
         String md5 = DigestUtil.md5Hex(file.getBytes());
         OssFileInfoBO bo = ossUploadDownloadFacade.findByHash(md5);
@@ -87,7 +88,7 @@ public class AdminOssUploadDownloadController {
         // 普通下载
         response.setHeader(Header.CONTENT_TYPE.getValue(), MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        String downFileName = URLEncoder.encode(reply.getStorageFilename(), CharsetUtil.UTF_8);
+        String downFileName = URLEncoder.encode(reply.getStorageFilename(), StandardCharsets.UTF_8);
         response.setHeader(Header.CONTENT_DISPOSITION.getValue(), "attachment;filename=" + downFileName);
 
         IoUtil.write(response.getOutputStream(), false, reply.getFileBytes());

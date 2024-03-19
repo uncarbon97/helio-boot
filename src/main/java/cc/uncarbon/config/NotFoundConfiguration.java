@@ -18,12 +18,12 @@ import jakarta.servlet.http.HttpServletRequest;
 public class NotFoundConfiguration implements ErrorController {
 
     /**
-     * 屏蔽 swagger 文档生成；主动抛出异常，由全局异常处理接管
+     * 不生成接口文档
+     * 主动抛出异常，由全局异常处理接管
      */
     @Operation(hidden = true)
     @RequestMapping(value = "/error")
     public void error(HttpServletRequest request) throws NoHandlerFoundException {
         throw new NoHandlerFoundException(request.getMethod(), request.getRequestURI(), new HttpHeaders());
     }
-
 }

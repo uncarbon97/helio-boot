@@ -2,7 +2,6 @@ package cc.uncarbon.module.adminapi.web.auth;
 
 
 import cc.uncarbon.aspect.extension.SysLogAspectExtensionForSysUserLogin;
-import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.context.TenantContext;
 import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContext;
@@ -15,19 +14,17 @@ import cc.uncarbon.module.adminapi.model.interior.AdminCaptchaContainer;
 import cc.uncarbon.module.adminapi.model.response.AdminCaptchaVO;
 import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
-import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginVO;
 import cc.uncarbon.module.sys.service.SysUserService;
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 
 @Tag(name = "后台管理-鉴权接口")

@@ -181,6 +181,7 @@
         <queueSize>1024</queueSize>
         <!-- 添加附加的appender，最多只能添加一个 -->
         <appender-ref ref="ERROR_FILE"/>
+        <!-- 用于输出代码位置；实现上是从 Throwable 获取调用堆栈，没有像 Log4j2 一样考虑 Java9 后使用 StackWalker 减少需要提取的栈帧，存在性能开销 -->
         <includeCallerData>true</includeCallerData>
     </appender>
 

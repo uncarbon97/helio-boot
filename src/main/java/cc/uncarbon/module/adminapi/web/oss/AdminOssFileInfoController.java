@@ -9,7 +9,6 @@ import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.oss.model.request.AdminListOssFileInfoDTO;
 import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cc.uncarbon.module.oss.service.OssFileInfoService;
-import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;

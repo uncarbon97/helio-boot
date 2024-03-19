@@ -250,16 +250,13 @@ public class SysMenuService {
                 .setName(snowflakeIdStr)
                 .setMeta(new VbenAdminMenuMetaVO(bo.getTitle(), false, bo.getIcon()));
 
-        // 这里是兼容 JDK8 的写法，使用较高 JDK 版本可使用语法糖
         switch (bo.getType()) {
-            case DIR:
-            case BUTTON:
+            case DIR, BUTTON ->
                 bo
                         .setComponent(SysConstant.VBEN_ADMIN_BLANK_VIEW)
                         .setExternalLink(null)
                         .setPath(StrPool.SLASH + snowflakeIdStr);
-                break;
-            case MENU:
+            case MENU -> {
                 bo
                         .setExternalLink(null)
                         .setPath(bo.getComponent());
@@ -267,13 +264,11 @@ public class SysMenuService {
                 if (CharSequenceUtil.isNotBlank(bo.getPath()) && !bo.getPath().startsWith(StrPool.SLASH)) {
                     bo.setPath(StrPool.SLASH + bo.getPath());
                 }
-                break;
-            case EXTERNAL_LINK:
+            }
+            case EXTERNAL_LINK ->
                 bo
                         .setComponent(bo.getExternalLink())
                         .setPath(bo.getExternalLink());
-                break;
-            default: break;
         }
         return bo;
     }
