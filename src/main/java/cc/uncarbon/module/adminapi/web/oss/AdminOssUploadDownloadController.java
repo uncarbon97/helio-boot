@@ -3,6 +3,7 @@ package cc.uncarbon.module.adminapi.web.oss;
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
+import cc.uncarbon.module.adminapi.enums.AdminApiErrorEnum;
 import cc.uncarbon.module.oss.facade.OssUploadDownloadFacade;
 import cc.uncarbon.module.oss.model.request.UploadFileAttributeDTO;
 import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
@@ -54,8 +55,10 @@ public class AdminOssUploadDownloadController {
             @RequestPart MultipartFile file, @RequestPart(required = false) @Valid UploadFileAttributeDTO attr,
             HttpServletRequest request
     ) throws IOException {
-         /*
-         1. 已存在相同 MD5 文件，直接返回 URL
+        AdminApiErrorEnum.UPLOAD_FILE_NOT_EXIST.assertNotNull(file);
+
+        /*
+        1. 已存在相同 MD5 文件，直接返回 URL
          */
         String md5 = DigestUtil.md5Hex(file.getBytes());
         OssFileInfoBO bo = ossUploadDownloadFacade.findByHash(md5);

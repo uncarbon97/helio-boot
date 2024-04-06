@@ -8,13 +8,13 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>1.11.0</version>
+        <version>1.11.1</version>
     </parent>
 
     <artifactId>helio-boot</artifactId>
     <description>Helio 单模块版单体脚手架</description>
     <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
-    <version>1.11.0</version>
+    <version>1.11.1</version>
 
     <properties>
         <!-- 这里写其他第三方依赖 -->
