@@ -9,13 +9,6 @@ public final class SysConstant {
     }
 
     /**
-     * 后台管理接口路由前缀
-     * @deprecated since 1.9.0, because its meaning is no longer so fitting; replaced by AdminApiConstant#API_URL_PREFIX
-     */
-    @Deprecated
-    public static final String SYS_MODULE_CONTEXT_PATH = "/sys";
-
-    /**
      * 无上级节点的父级ID
      */
     public static final Long ROOT_PARENT_ID = 0L;

@@ -2,7 +2,7 @@ package cc.uncarbon.module.oss.model.response;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,47 +26,47 @@ public class OssFileInfoBO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "主键ID")
+    @Schema(description = "主键ID")
     private Long id;
 
-    @ApiModelProperty(value = "创建时刻")
+    @Schema(description = "创建时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime createdAt;
 
-    @ApiModelProperty(value = "更新时刻")
+    @Schema(description = "更新时刻")
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime updatedAt;
 
-    @ApiModelProperty(value = "存储平台")
+    @Schema(description = "存储平台")
     private String storagePlatform;
 
-    @ApiModelProperty(value = "基础存储路径")
+    @Schema(description = "基础存储路径")
     private String storageBasePath;
 
-    @ApiModelProperty(value = "存储路径")
+    @Schema(description = "存储路径")
     private String storagePath;
 
-    @ApiModelProperty(value = "存储文件名")
+    @Schema(description = "存储文件名")
     private String storageFilename;
 
-    @ApiModelProperty(value = "原始文件名")
+    @Schema(description = "原始文件名")
     private String originalFilename;
 
-    @ApiModelProperty(value = "扩展名")
+    @Schema(description = "扩展名")
     private String extendName;
 
-    @ApiModelProperty(value = "文件大小")
+    @Schema(description = "文件大小")
     private Long fileSize;
 
-    @ApiModelProperty(value = "MD5")
+    @Schema(description = "MD5")
     private String md5;
 
-    @ApiModelProperty(value = "类别编号")
+    @Schema(description = "类别编号")
     private String classified;
 
-    @ApiModelProperty(value = "对象存储直链")
+    @Schema(description = "对象存储直链")
     private String directUrl;
 
     /**

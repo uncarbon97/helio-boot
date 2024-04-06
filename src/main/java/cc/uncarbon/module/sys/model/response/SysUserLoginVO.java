@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.response;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,16 +22,16 @@ import java.util.Collection;
 @Data
 public class SysUserLoginVO implements Serializable {
 
-    @ApiModelProperty(value = "token名称")
+    @Schema(description = "token名称")
     private String tokenName;
 
-    @ApiModelProperty(value = "token值")
+    @Schema(description = "token值")
     private String tokenValue;
 
-    @ApiModelProperty(value = "对应角色")
+    @Schema(description = "对应角色")
     private Collection<String> roles;
 
-    @ApiModelProperty(value = "拥有权限")
+    @Schema(description = "拥有权限")
     private Collection<String> permissions;
 
 }

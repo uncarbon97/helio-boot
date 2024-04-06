@@ -2,7 +2,7 @@ package cc.uncarbon.module.oss.model.request;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,21 +27,21 @@ public class AdminListOssFileInfoDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    @ApiModelProperty(value = "原始文件名(关键词)")
+    @Schema(description = "原始文件名(关键词)")
     private String originalFilename;
 
-    @ApiModelProperty(value = "扩展名")
+    @Schema(description = "扩展名")
     private String extendName;
 
-    @ApiModelProperty(value = "文件类别")
+    @Schema(description = "文件类别")
     private String classified;
 
-    @ApiModelProperty(value = "时间区间起")
+    @Schema(description = "时间区间起")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime beginAt;
 
-    @ApiModelProperty(value = "时间区间止")
+    @Schema(description = "时间区间止")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime endAt;

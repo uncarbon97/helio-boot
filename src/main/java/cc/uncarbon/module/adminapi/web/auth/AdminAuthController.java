@@ -2,7 +2,6 @@ package cc.uncarbon.module.adminapi.web.auth;
 
 
 import cc.uncarbon.aspect.extension.SysLogAspectExtensionForSysUserLogin;
-import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.framework.core.context.TenantContext;
 import cc.uncarbon.framework.core.context.TenantContextHolder;
 import cc.uncarbon.framework.core.context.UserContext;
@@ -15,27 +14,21 @@ import cc.uncarbon.module.adminapi.model.interior.AdminCaptchaContainer;
 import cc.uncarbon.module.adminapi.model.response.AdminCaptchaVO;
 import cc.uncarbon.module.adminapi.util.AdminStpUtil;
 import cc.uncarbon.module.sys.annotation.SysLog;
-import cc.uncarbon.module.sys.constant.SysConstant;
 import cc.uncarbon.module.sys.model.request.SysUserLoginDTO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginBO;
 import cc.uncarbon.module.sys.model.response.SysUserLoginVO;
 import cc.uncarbon.module.sys.service.SysUserService;
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 
-
-@Api(value = "后台管理-鉴权接口", tags = {"后台管理-鉴权接口"})
-@RequestMapping(value = {
-        // 兼容旧的API路由前缀
-        SysConstant.SYS_MODULE_CONTEXT_PATH + HelioConstant.Version.HTTP_API_VERSION_V1,
-        AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1"
-})
+@Tag(name = "后台管理-鉴权接口")
+@RequestMapping(value = AdminApiConstant.HTTP_API_URL_PREFIX + "/api/v1")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -49,7 +42,7 @@ public class AdminAuthController {
 
 
     @SysLog(value = "登录后台用户", syncSave = true, extension = SysLogAspectExtensionForSysUserLogin.class, queryIPLocation = true)
-    @ApiOperation(value = "登录")
+    @Operation(summary = "登录")
     @PostMapping(value = "/auth/login")
     public ApiResult<SysUserLoginVO> login(@RequestBody @Valid SysUserLoginDTO dto) {
         // 登录验证码核验；前端项目搜索关键词「 Helio: 登录验证码」
@@ -89,7 +82,7 @@ public class AdminAuthController {
     }
 
     @SaCheckLogin(type = AdminStpUtil.TYPE)
-    @ApiOperation(value = "登出")
+    @Operation(summary = "登出")
     @PostMapping(value = "/auth/logout")
     public ApiResult<Void> logout() {
         AdminStpUtil.logout();
@@ -99,7 +92,7 @@ public class AdminAuthController {
         return ApiResult.success();
     }
 
-    @ApiOperation(value = "获取验证码")
+    @Operation(summary = "获取验证码")
     @GetMapping(value = "/auth/captcha")
     public ApiResult<AdminCaptchaVO> captcha() {
         // 核验方法：captchaHelper.validate

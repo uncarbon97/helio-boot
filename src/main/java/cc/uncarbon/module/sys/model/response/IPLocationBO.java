@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.response;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,16 +18,16 @@ import java.io.Serializable;
 @Data
 public class IPLocationBO implements Serializable {
 
-    @ApiModelProperty(value = "国家或地区名")
+    @Schema(description = "国家或地区名")
     private String regionName;
 
-    @ApiModelProperty(value = "省级行政区名")
+    @Schema(description = "省级行政区名")
     private String provinceName;
 
-    @ApiModelProperty(value = "市级行政区名")
+    @Schema(description = "市级行政区名")
     private String cityName;
 
-    @ApiModelProperty(value = "县级行政区名")
+    @Schema(description = "县级行政区名")
     private String districtName;
 
     /**

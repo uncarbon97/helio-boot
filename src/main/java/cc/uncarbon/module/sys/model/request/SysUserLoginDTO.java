@@ -1,15 +1,15 @@
 package cc.uncarbon.module.sys.model.request;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 
@@ -23,27 +23,27 @@ import java.io.Serializable;
 @Data
 public class SysUserLoginDTO implements Serializable {
 
-    @ApiModelProperty(value = "账号", required = true)
+    @Schema(description = "账号", requiredMode = Schema.RequiredMode.REQUIRED)
     @Size(min = 5, max = 16, message = "【账号】最短5位，最长16位")
     @NotBlank(message = "账号不能为空")
     private String username;
 
-    @ApiModelProperty(value = "密码", required = true)
+    @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED)
     @Size(min = 5, max = 20, message = "【密码】最短5位，最长20位")
     @NotBlank(message = "密码不能为空")
     private String password;
 
-    @ApiModelProperty(value = "记住我", required = true)
+    @Schema(description = "记住我", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "记住我不能为空")
     private Boolean rememberMe;
 
-    @ApiModelProperty(value = "租户ID(可选，启用多租户后有效)")
+    @Schema(description = "租户ID(可选，启用多租户后有效)")
     private Long tenantId;
 
-    @ApiModelProperty(value = "验证码唯一标识(可选)")
+    @Schema(description = "验证码唯一标识(可选)")
     private String captchaId;
 
-    @ApiModelProperty(value = "验证码答案(可选)")
+    @Schema(description = "验证码答案(可选)")
     private String captchaAnswer;
 
 }

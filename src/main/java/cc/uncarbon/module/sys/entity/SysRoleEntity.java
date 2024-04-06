@@ -4,7 +4,7 @@ import cc.uncarbon.framework.crud.entity.HelioBaseEntity;
 import cc.uncarbon.module.sys.constant.SysConstant;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,11 +25,11 @@ import lombok.experimental.SuperBuilder;
 @TableName(value = "sys_role")
 public class SysRoleEntity extends HelioBaseEntity<Long> {
 
-	@ApiModelProperty(value = "角色名")
+	@Schema(description = "角色名")
 	@TableField(value = "title")
 	private String title;
 
-	@ApiModelProperty(value = "角色编码")
+	@Schema(description = "角色编码")
 	@TableField(value = "value")
 	private String value;
 

@@ -16,9 +16,8 @@ public class SysLogAspectExtensionForSysUserLogin extends DefaultSysLogAspectExt
     @Override
     public void beforeSaving(AdminInsertSysLogDTO insertSysLogDTO, JoinPoint joinPoint, SysLog annotation, Throwable e, Object ret) {
         for (Object arg : joinPoint.getArgs()) {
-            if (arg instanceof SysUserLoginDTO) {
-                SysUserLoginDTO argDTO = (SysUserLoginDTO) arg;
-                insertSysLogDTO.setUsername(argDTO.getUsername());
+            if (arg instanceof SysUserLoginDTO dto) {
+                insertSysLogDTO.setUsername(dto.getUsername());
             }
         }
     }

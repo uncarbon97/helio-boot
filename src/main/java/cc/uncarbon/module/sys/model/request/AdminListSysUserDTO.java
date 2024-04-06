@@ -1,7 +1,7 @@
 package cc.uncarbon.module.sys.model.request;
 
 import cc.uncarbon.module.sys.constant.SysConstant;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,10 +22,10 @@ import java.util.Objects;
 @Data
 public class AdminListSysUserDTO implements Serializable {
 
-    @ApiModelProperty(value = "手机号(关键词)")
+    @Schema(description = "手机号(关键词)")
     private String phoneNo;
 
-    @ApiModelProperty(value = "手动选择的部门ID")
+    @Schema(description = "手动选择的部门ID")
     private Long selectedDeptId;
 
     /**

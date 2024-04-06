@@ -13,10 +13,6 @@ spring:
     type: redis
     redis:
       cache-null-values: true
-  mvc:
-    pathmatch:
-      # Boot 2.6+ 默认的路由匹配策略，Swagger 暂不兼容，使用老策略
-      matching-strategy: ant_path_matcher
   messages:
     # 国际化资源目录，一般不做修改
     basename: i18n/messages
@@ -47,9 +43,10 @@ helio:
       # 放行路由, 不进行登录校验
       # 图标
       - /favicon.ico
-      # Swagger API文档接口
-      - /v2/api-docs
+      # SpringDoc 接口
       - /v3/api-docs
+      # SpringMVC 404
+      - /error
       # C端登录接口
       - /app/api/v1/auth/login
   tenant:

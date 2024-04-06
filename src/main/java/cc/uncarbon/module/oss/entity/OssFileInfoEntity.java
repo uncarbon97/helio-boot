@@ -3,7 +3,7 @@ package cc.uncarbon.module.oss.entity;
 import cc.uncarbon.framework.crud.entity.HelioBaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,43 +27,43 @@ public class OssFileInfoEntity extends HelioBaseEntity<Long> {
     private static final long serialVersionUID = 1L;
 
 
-    @ApiModelProperty(value = "存储平台")
+    @Schema(description = "存储平台")
     @TableField(value = "storage_platform")
     private String storagePlatform;
 
-    @ApiModelProperty(value = "基础存储路径")
+    @Schema(description = "基础存储路径")
     @TableField(value = "storage_base_path")
     private String storageBasePath;
 
-    @ApiModelProperty(value = "存储路径")
+    @Schema(description = "存储路径")
     @TableField(value = "storage_path")
     private String storagePath;
 
-    @ApiModelProperty(value = "存储文件名")
+    @Schema(description = "存储文件名")
     @TableField(value = "storage_filename")
     private String storageFilename;
 
-    @ApiModelProperty(value = "原始文件名")
+    @Schema(description = "原始文件名")
     @TableField(value = "original_filename")
     private String originalFilename;
 
-    @ApiModelProperty(value = "扩展名")
+    @Schema(description = "扩展名")
     @TableField(value = "extend_name")
     private String extendName;
 
-    @ApiModelProperty(value = "文件大小")
+    @Schema(description = "文件大小")
     @TableField(value = "file_size")
     private Long fileSize;
 
-    @ApiModelProperty(value = "MD5")
+    @Schema(description = "MD5")
     @TableField(value = "md5")
     private String md5;
 
-    @ApiModelProperty(value = "类别名")
+    @Schema(description = "类别名")
     @TableField(value = "classified")
     private String classified;
 
-    @ApiModelProperty(value = "对象存储直链")
+    @Schema(description = "对象存储直链")
     @TableField(value = "direct_url")
     private String directUrl;
 

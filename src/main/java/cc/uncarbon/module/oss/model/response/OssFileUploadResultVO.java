@@ -1,6 +1,6 @@
 package cc.uncarbon.module.oss.model.response;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,13 +20,13 @@ public class OssFileUploadResultVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "文件ID")
+    @Schema(description = "文件ID")
     private Long fileId;
 
-    @ApiModelProperty(value = "存储文件名")
+    @Schema(description = "存储文件名")
     private String filename;
 
-    @ApiModelProperty(value = "完整外链")
+    @Schema(description = "完整外链")
     private String url;
 
 }

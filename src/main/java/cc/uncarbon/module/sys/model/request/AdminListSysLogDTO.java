@@ -3,7 +3,7 @@ package cc.uncarbon.module.sys.model.request;
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import cc.uncarbon.module.sys.enums.SysLogStatusEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,21 +25,21 @@ import java.time.LocalDateTime;
 @Data
 public class AdminListSysLogDTO implements Serializable {
 
-    @ApiModelProperty(value = "用户账号")
+    @Schema(description = "用户账号")
     private String username;
 
-    @ApiModelProperty(value = "操作内容")
+    @Schema(description = "操作内容")
     private String operation;
 
-    @ApiModelProperty(value = "状态")
+    @Schema(description = "状态")
     private SysLogStatusEnum status;
 
-    @ApiModelProperty(value = "时间区间起")
+    @Schema(description = "时间区间起")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime beginAt;
 
-    @ApiModelProperty(value = "时间区间止")
+    @Schema(description = "时间区间止")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     @DateTimeFormat(pattern = HelioConstant.Jackson.DATE_TIME_FORMAT)
     private LocalDateTime endAt;

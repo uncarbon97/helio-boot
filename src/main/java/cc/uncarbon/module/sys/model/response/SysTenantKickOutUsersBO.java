@@ -1,6 +1,6 @@
 package cc.uncarbon.module.sys.model.response;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.Collections;
@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 public class SysTenantKickOutUsersBO {
 
-    @ApiModelProperty(value = "后台用户IDs")
+    @Schema(description = "后台用户IDs")
     private final List<Long> sysUserIds;
 
     public SysTenantKickOutUsersBO() {

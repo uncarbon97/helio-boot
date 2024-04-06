@@ -8,19 +8,19 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>1.11.0</version>
+        <version>2.0.0</version>
     </parent>
 
     <artifactId>helio-boot</artifactId>
     <description>Helio 单模块版单体脚手架</description>
     <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
-    <version>1.11.0</version>
+    <version>2.0.0</version>
 
     <properties>
         <!-- 这里写其他第三方依赖 -->
         <!-- 文件上传 -->
         <x-file-storage.version>2.1.0</x-file-storage.version>
-        <minio.version>8.4.3</minio.version>
+        <minio.version>8.5.8</minio.version>
     </properties>
 
     <dependencies>
@@ -116,9 +116,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
-                <configuration>
-                    <fork>true</fork>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
