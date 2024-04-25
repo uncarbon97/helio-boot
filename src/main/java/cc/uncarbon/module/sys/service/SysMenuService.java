@@ -43,6 +43,9 @@ public class SysMenuService {
     private final SysMenuMapper sysMenuMapper;
     private final SysRoleMenuRelationService sysRoleMenuRelationService;
 
+    /**
+     * 仅用于输出一个，可按时间流逝而增长的纯数字，避免重复
+     */
     private static final Snowflake SNOWFLAKE = IdUtil.getSnowflake(0L, 0L);
 
 
@@ -247,7 +250,7 @@ public class SysMenuService {
 
         String snowflakeIdStr = SNOWFLAKE.nextIdStr();
         bo
-                .setName(snowflakeIdStr)
+                .setName(bo.getTitle())
                 .setMeta(new VbenAdminMenuMetaVO(bo.getTitle(), false, bo.getIcon()));
 
         switch (bo.getType()) {
