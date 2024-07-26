@@ -1,67 +1,69 @@
 -- ----------------------------
--- Table structure for sys_data_dict
+-- Table structure for sys_data_dict_classified & sys_data_dict_item
 -- ----------------------------
-DROP TABLE IF EXISTS "sys_data_dict";
-CREATE TABLE "sys_data_dict"
-(
-    "id"              int8         NOT NULL,
-    "tenant_id"       int8,
-    "revision"        int8         NOT NULL DEFAULT 1,
-    "del_flag"        int2         NOT NULL DEFAULT 0,
-    "created_at"      timestamp(6) NOT NULL,
-    "created_by"      varchar(255),
-    "updated_at"      timestamp(6) NOT NULL,
-    "updated_by"      varchar(255),
-    "camel_case_key"  varchar(100) NOT NULL,
-    "under_case_key"  varchar(100) NOT NULL,
-    "pascal_case_key" varchar(100) NOT NULL,
-    "value"           varchar(255) NOT NULL,
-    "description"     varchar(255) NOT NULL,
-    "unit"            varchar(30),
-    "value_range"     varchar(255),
-    "alias_key"       varchar(100)
-)
-;
-COMMENT
-ON COLUMN "sys_data_dict"."id" IS '主键ID';
-COMMENT
-ON COLUMN "sys_data_dict"."tenant_id" IS '租户ID';
-COMMENT
-ON COLUMN "sys_data_dict"."revision" IS '乐观锁';
-COMMENT
-ON COLUMN "sys_data_dict"."del_flag" IS '逻辑删除标识';
-COMMENT
-ON COLUMN "sys_data_dict"."created_at" IS '创建时刻';
-COMMENT
-ON COLUMN "sys_data_dict"."created_by" IS '创建者';
-COMMENT
-ON COLUMN "sys_data_dict"."updated_at" IS '更新时刻';
-COMMENT
-ON COLUMN "sys_data_dict"."updated_by" IS '更新者';
-COMMENT
-ON COLUMN "sys_data_dict"."camel_case_key" IS '驼峰式键名';
-COMMENT
-ON COLUMN "sys_data_dict"."under_case_key" IS '下划线式键名';
-COMMENT
-ON COLUMN "sys_data_dict"."pascal_case_key" IS '帕斯卡式键名';
-COMMENT
-ON COLUMN "sys_data_dict"."value" IS '键值';
-COMMENT
-ON COLUMN "sys_data_dict"."description" IS '描述';
-COMMENT
-ON COLUMN "sys_data_dict"."unit" IS '单位';
-COMMENT
-ON COLUMN "sys_data_dict"."value_range" IS '取值范围';
-COMMENT
-ON COLUMN "sys_data_dict"."alias_key" IS '别称键名';
-COMMENT
-ON TABLE "sys_data_dict" IS '数据字典';
+CREATE TABLE "sys_data_dict_classified" (
+  "id" int8 NOT NULL,
+  "tenant_id" int8,
+  "revision" int8 NOT NULL DEFAULT 1,
+  "del_flag" int2 NOT NULL DEFAULT 0,
+  "created_at" timestamp(6) NOT NULL,
+  "created_by" varchar(255) COLLATE "pg_catalog"."default",
+  "updated_at" timestamp(6) NOT NULL,
+  "updated_by" varchar(255) COLLATE "pg_catalog"."default",
+  "code" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "status" int2 NOT NULL DEFAULT 1,
+  "description" varchar(255) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
+);
+COMMENT ON COLUMN "sys_data_dict_classified"."id" IS '主键ID';
+COMMENT ON COLUMN "sys_data_dict_classified"."tenant_id" IS '租户ID';
+COMMENT ON COLUMN "sys_data_dict_classified"."revision" IS '乐观锁';
+COMMENT ON COLUMN "sys_data_dict_classified"."del_flag" IS '逻辑删除标识';
+COMMENT ON COLUMN "sys_data_dict_classified"."created_at" IS '创建时刻';
+COMMENT ON COLUMN "sys_data_dict_classified"."created_by" IS '创建者';
+COMMENT ON COLUMN "sys_data_dict_classified"."updated_at" IS '更新时刻';
+COMMENT ON COLUMN "sys_data_dict_classified"."updated_by" IS '更新者';
+COMMENT ON COLUMN "sys_data_dict_classified"."code" IS '分类编码';
+COMMENT ON COLUMN "sys_data_dict_classified"."name" IS '分类名称';
+COMMENT ON COLUMN "sys_data_dict_classified"."status" IS '状态';
+COMMENT ON COLUMN "sys_data_dict_classified"."description" IS '分类描述';
+COMMENT ON TABLE "sys_data_dict_classified" IS '数据字典分类';
+ALTER TABLE "sys_data_dict_classified" ADD PRIMARY KEY ("id");
 
--- ----------------------------
--- Records of sys_data_dict
--- ----------------------------
-BEGIN;
-COMMIT;
+CREATE TABLE "sys_data_dict_item" (
+  "id" int8 NOT NULL,
+  "tenant_id" int8,
+  "revision" int8 NOT NULL DEFAULT 1,
+  "del_flag" int2 NOT NULL DEFAULT 0,
+  "created_at" timestamp(6) NOT NULL,
+  "created_by" varchar(255) COLLATE "pg_catalog"."default",
+  "updated_at" timestamp(6) NOT NULL,
+  "updated_by" varchar(255) COLLATE "pg_catalog"."default",
+  "classified_id" int8 NOT NULL,
+  "code" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "label" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "value" varchar(4096) COLLATE "pg_catalog"."default" NOT NULL,
+  "status" int2 NOT NULL DEFAULT 1,
+  "sort" int4 NOT NULL DEFAULT 1,
+  "description" varchar(255) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
+);
+COMMENT ON COLUMN "sys_data_dict_item"."id" IS '主键ID';
+COMMENT ON COLUMN "sys_data_dict_item"."tenant_id" IS '租户ID';
+COMMENT ON COLUMN "sys_data_dict_item"."revision" IS '乐观锁';
+COMMENT ON COLUMN "sys_data_dict_item"."del_flag" IS '逻辑删除标识';
+COMMENT ON COLUMN "sys_data_dict_item"."created_at" IS '创建时刻';
+COMMENT ON COLUMN "sys_data_dict_item"."created_by" IS '创建者';
+COMMENT ON COLUMN "sys_data_dict_item"."updated_at" IS '更新时刻';
+COMMENT ON COLUMN "sys_data_dict_item"."updated_by" IS '更新者';
+COMMENT ON COLUMN "sys_data_dict_item"."classified_id" IS '所属分类ID';
+COMMENT ON COLUMN "sys_data_dict_item"."code" IS '字典项编码';
+COMMENT ON COLUMN "sys_data_dict_item"."label" IS '字典项标签';
+COMMENT ON COLUMN "sys_data_dict_item"."value" IS '字典项值';
+COMMENT ON COLUMN "sys_data_dict_item"."status" IS '状态';
+COMMENT ON COLUMN "sys_data_dict_item"."sort" IS '排序';
+COMMENT ON COLUMN "sys_data_dict_item"."description" IS '描述';
+COMMENT ON TABLE "sys_data_dict_item" IS '数据字典项';
+ALTER TABLE "sys_data_dict_item" ADD PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Table structure for sys_dept
@@ -799,12 +801,6 @@ ON TABLE "数据表模板" IS '数据表注释';
 -- ----------------------------
 BEGIN;
 COMMIT;
-
--- ----------------------------
--- Primary Key structure for table sys_data_dict
--- ----------------------------
-ALTER TABLE "sys_data_dict"
-    ADD CONSTRAINT "sys_data_dict_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table sys_dept
