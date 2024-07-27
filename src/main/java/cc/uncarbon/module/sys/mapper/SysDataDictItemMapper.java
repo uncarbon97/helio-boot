@@ -1,14 +1,14 @@
 package cc.uncarbon.module.sys.mapper;
 
-import cc.uncarbon.module.sys.entity.SysDataDictEntity;
+import cc.uncarbon.module.sys.entity.SysDataDictItemEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 
 /**
- * 数据字典
+ * 数据字典项
  */
 @Mapper
-public interface SysDataDictMapper extends BaseMapper<SysDataDictEntity> {
+public interface SysDataDictItemMapper extends BaseMapper<SysDataDictItemEntity> {
 
 }

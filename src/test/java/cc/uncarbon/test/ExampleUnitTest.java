@@ -11,7 +11,7 @@ import cc.uncarbon.module.sys.service.SysRoleService;
 import cn.hutool.core.collection.CollUtil;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,8 +29,8 @@ class ExampleUnitTest {
     private SysRoleService sysRoleService;
 
 
-    @BeforeEach
-    public void init() {
+    @BeforeAll
+    public static void init() {
         // 设置用户上下文
         UserContext userContext = new UserContext();
         userContext
