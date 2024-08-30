@@ -29,13 +29,13 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -197,7 +197,7 @@ public class SysUserService {
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台用户] >> 入参={}", ids);
         preDeleteCheck(ids);
-        sysUserMapper.deleteBatchIds(ids);
+        sysUserMapper.deleteByIds(ids);
     }
 
     /**

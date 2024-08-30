@@ -135,7 +135,7 @@ public class SysRoleService {
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台角色] >> 入参={}", ids);
         preDeleteCheck(ids);
-        sysRoleMapper.deleteBatchIds(ids);
+        sysRoleMapper.deleteByIds(ids);
     }
 
     /**

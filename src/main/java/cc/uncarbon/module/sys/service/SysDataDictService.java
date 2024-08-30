@@ -97,7 +97,7 @@ public class SysDataDictService {
     @Transactional(rollbackFor = Exception.class)
     public void adminDeleteClassified(Collection<Long> ids) {
         log.info("[后台管理-删除数据字典分类] >> 入参={}", ids);
-        sysDataDictClassifiedMapper.deleteBatchIds(ids);
+        sysDataDictClassifiedMapper.deleteByIds(ids);
     }
 
     /**

@@ -14,12 +14,9 @@ import lombok.Getter;
 public enum SysLogStatusEnum implements HelioBaseEnum<Integer> {
 
     NON_EXECUTION(0, "未执行"),
-
     SUCCESS(1, "成功"),
+    FAILED(2, "失败"),;
 
-    FAILED(2, "失败"),
-
-    ;
     @EnumValue
     private final Integer value;
     private final String label;

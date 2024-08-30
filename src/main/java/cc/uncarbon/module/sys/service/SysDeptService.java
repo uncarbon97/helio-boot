@@ -115,7 +115,7 @@ public class SysDeptService {
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除部门] >> 入参={}", ids);
-        sysDeptMapper.deleteBatchIds(ids);
+        sysDeptMapper.deleteByIds(ids);
     }
 
     /**

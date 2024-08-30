@@ -62,6 +62,14 @@ public class OssUploadDownloadFacadeImpl implements OssUploadDownloadFacade {
 
     @Override
     public OssFileDownloadReplyBO downloadById(Long fileInfoId) throws BusinessException {
+        /*
+        注：开启多租户后，因可能允许未登录下载，无法确定当前租户ID，导致查询 SQL 会错误地拼接 AND tenant_id = null 条件
+        解决方法1：Controller层方法解禁 @SaCheckLogin 注解，强制要求在 url-params 中传递 token 才可下载
+        解决方法2：后端使用 try-finally 临时设置特权租户上下文
+                TenantContextHolder.setTenantContext(new TenantContext(HelioConstant.Tenant.DEFAULT_PRIVILEGED_TENANT_ID, "临时特权租户"))
+                以绕过行级租户过滤器；数据源级租户同理，使其固定访问某个数据源来查询文件信息
+        解决方法3：改造Controller层方法参数，增加传递一个租户ID字段，并在此切换上下文
+         */
         OssFileInfoBO ossFileInfo = ossFileInfoService.getOneById(fileInfoId, true);
 
         /*
