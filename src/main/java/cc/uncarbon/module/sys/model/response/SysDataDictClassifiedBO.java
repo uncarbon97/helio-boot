@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -25,10 +24,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 public class SysDataDictClassifiedBO implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
 
     @Schema(description = "主键ID", hidden = true, title = "仅更新时使用")
     private Long id;

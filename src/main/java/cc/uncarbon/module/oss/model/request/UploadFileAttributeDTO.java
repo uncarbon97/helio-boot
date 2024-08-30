@@ -18,8 +18,6 @@ import java.io.Serializable;
 @Data
 public class UploadFileAttributeDTO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Schema(description = "文件类别", example = "id_card=身份证 driver_license=驾驶证")
     private String classified;
 

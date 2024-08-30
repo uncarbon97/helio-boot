@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -20,10 +19,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 public class AdminSysDataDictItemListDTO implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
 
     @Schema(description = "所属分类ID", hidden = true)
     private Long classifiedId;

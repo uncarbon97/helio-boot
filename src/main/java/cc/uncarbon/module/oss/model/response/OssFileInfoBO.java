@@ -24,8 +24,6 @@ import java.time.LocalDateTime;
 @Data
 public class OssFileInfoBO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Schema(description = "主键ID")
     private Long id;
 
