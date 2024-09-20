@@ -1,14 +1,17 @@
 package cc.uncarbon.module.adminapi.web.oss;
 
+import cc.uncarbon.framework.core.exception.BusinessException;
 import cc.uncarbon.framework.web.model.response.ApiResult;
 import cc.uncarbon.module.adminapi.constant.AdminApiConstant;
 import cc.uncarbon.module.adminapi.enums.AdminApiErrorEnum;
 import cc.uncarbon.module.adminapi.util.AdminStpUtil;
+import cc.uncarbon.module.oss.enums.UploadFileCheckResultEnum;
 import cc.uncarbon.module.oss.facade.OssUploadDownloadFacade;
 import cc.uncarbon.module.oss.model.request.UploadFileAttributeDTO;
 import cc.uncarbon.module.oss.model.response.OssFileDownloadReplyBO;
 import cc.uncarbon.module.oss.model.response.OssFileInfoBO;
 import cc.uncarbon.module.oss.model.response.OssFileUploadResultVO;
+import cc.uncarbon.module.oss.util.UploadFileChecker;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.text.CharSequenceUtil;
@@ -50,6 +53,13 @@ public class AdminOssUploadDownloadController {
             HttpServletRequest request
     ) throws IOException {
         AdminApiErrorEnum.UPLOAD_FILE_NOT_EXIST.assertNotNull(file);
+        UploadFileCheckResultEnum checkResult = UploadFileChecker.check(file,
+                // 默认只能上传10MB之内的文件，且约束后缀名
+                UploadFileChecker.FILE_SIZE_1MB * 10,
+                new String[]{"jpg", "png", "webp", "gif", "xlsx"});
+        if (checkResult.isNotOK()) {
+            throw new BusinessException(checkResult.getLabel());
+        }
 
         /*
         1. 已存在相同 MD5 文件，直接返回 URL
@@ -65,7 +75,10 @@ public class AdminOssUploadDownloadController {
             attr
                     .setOriginalFilename(file.getOriginalFilename())
                     .setContentType(file.getContentType())
-                    .setMd5(md5);
+                    .setMd5(md5)
+                    // 手动覆盖前端传参
+                    .setPlatform(null)
+                    .setUseOriginalFilenameAsDownloadFileName(false);
             bo = ossUploadDownloadFacade.upload(file.getBytes(), attr);
         }
 
