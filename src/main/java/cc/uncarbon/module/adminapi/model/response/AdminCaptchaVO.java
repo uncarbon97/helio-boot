@@ -23,8 +23,8 @@ public class AdminCaptchaVO {
 
 
     public AdminCaptchaVO(AdminCaptchaContainer source) {
-        this.captchaImage = source.getImage().getImageBase64Data();
-        this.captchaId = source.getUuid();
-        this.expiredAt = source.getExpiredAt();
+        this.captchaImage = source.image().getImageBase64Data();
+        this.captchaId = source.uuid();
+        this.expiredAt = source.expiredAt();
     }
 }

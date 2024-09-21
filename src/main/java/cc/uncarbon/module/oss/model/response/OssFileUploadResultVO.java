@@ -18,8 +18,6 @@ import java.io.Serializable;
 @Data
 public class OssFileUploadResultVO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Schema(description = "文件ID")
     private Long fileId;
 

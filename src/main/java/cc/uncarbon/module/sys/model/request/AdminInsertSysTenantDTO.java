@@ -2,13 +2,12 @@ package cc.uncarbon.module.sys.model.request;
 
 import cc.uncarbon.framework.core.constant.HelioConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import jakarta.validation.constraints.*;
 
 
 /**

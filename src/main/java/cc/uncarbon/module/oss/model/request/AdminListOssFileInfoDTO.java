@@ -24,9 +24,6 @@ import java.time.LocalDateTime;
 @Data
 public class AdminListOssFileInfoDTO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-
     @Schema(description = "原始文件名(关键词)")
     private String originalFilename;
 

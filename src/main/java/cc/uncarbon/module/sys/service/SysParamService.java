@@ -119,7 +119,7 @@ public class SysParamService {
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除系统参数] >> 入参={}", ids);
-        sysParamMapper.deleteBatchIds(ids);
+        sysParamMapper.deleteByIds(ids);
     }
 
     /**

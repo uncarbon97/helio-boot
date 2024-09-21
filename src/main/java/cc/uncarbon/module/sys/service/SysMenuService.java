@@ -137,7 +137,7 @@ public class SysMenuService {
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除后台菜单] >> 入参={}", ids);
-        sysMenuMapper.deleteBatchIds(ids);
+        sysMenuMapper.deleteByIds(ids);
     }
 
     /**

@@ -9,7 +9,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,9 +25,6 @@ import java.util.stream.Stream;
 @Accessors(chain = true)
 @Getter
 public class SelectOptionItemVO implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     // ID👉名称 一对（用于关联各种实体）
     @Schema(description = "ID")

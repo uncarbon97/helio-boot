@@ -132,7 +132,7 @@ public class SysTenantService {
     @Transactional(rollbackFor = Exception.class)
     public void adminDelete(Collection<Long> ids) {
         log.info("[后台管理-删除系统租户] >> 入参={}", ids);
-        sysTenantMapper.deleteBatchIds(ids);
+        sysTenantMapper.deleteByIds(ids);
     }
 
     /**

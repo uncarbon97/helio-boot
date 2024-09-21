@@ -20,8 +20,6 @@ import java.io.Serializable;
 @Data
 public class OssFileDownloadReplyBO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Schema(description = "是否直接重定向到对象存储直链", title = "如果允许客户端直接从“对象存储直链”下载，则本字段可以置 true")
     private boolean redirect2DirectUrl;
 

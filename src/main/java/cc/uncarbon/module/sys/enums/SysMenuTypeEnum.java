@@ -34,9 +34,8 @@ public enum SysMenuTypeEnum implements HelioBaseEnum<Integer> {
     /**
      * 外链
      */
-    EXTERNAL_LINK(3, "外链"),
+    EXTERNAL_LINK(3, "外链"),;
 
-    ;
     @EnumValue
     private final Integer value;
     private final String label;

@@ -18,8 +18,6 @@ import java.io.Serializable;
 @Data
 public class UploadFileAttributeDTO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Schema(description = "文件类别", example = "id_card=身份证 driver_license=驾驶证")
     private String classified;
 
@@ -34,5 +32,11 @@ public class UploadFileAttributeDTO implements Serializable {
 
     @Schema(description = "MD5", hidden = true)
     private String md5;
+
+    @Schema(description = "指定要上传到的平台名（null则取值默认平台）", hidden = true)
+    private String platform;
+
+    @Schema(description = "从对象存储服务器中下载时，以原始文件名命名（通过指定 metadata 实现）", hidden = true)
+    private boolean useOriginalFilenameAsDownloadFileName;
 
 }
