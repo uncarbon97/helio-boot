@@ -18,7 +18,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RolePermissionCacheHelper {
 
-    private final RedisTemplate<String, Set<String>> stringSetRedisTemplate;
+    private final RedisTemplate<String, Collection<String>> stringSetRedisTemplate;
 
     private static final String CACHE_KEY_ROLE_PERMISSIONS = "Authorization:rolePermissions:roleId_%s";
 
@@ -30,17 +30,20 @@ public class RolePermissionCacheHelper {
      */
     public List<String> getUserPermissions() {
         Set<Long> rolesIds = UserContextHolder.getUserContext().getRolesIds();
-        // aka * 64
-        List<String> ret = new ArrayList<>(rolesIds.size() << 6);
+        if (CollUtil.isEmpty(rolesIds)) {
+            return Collections.emptyList();
+        }
 
-        rolesIds.forEach(
-                roleId -> {
-                    String cacheKey = String.format(CACHE_KEY_ROLE_PERMISSIONS, roleId);
-                    ret.addAll(CollUtil.emptyIfNull(stringSetRedisTemplate.opsForValue().get(cacheKey)));
-                }
-        );
+        // 批量查询缓存
+        List<String> cacheKeys = rolesIds.stream()
+                .map(roleId -> String.format(CACHE_KEY_ROLE_PERMISSIONS, roleId))
+                .toList();
+        List<Collection<String>> cacheValues = stringSetRedisTemplate.opsForValue().multiGet(cacheKeys);
+        if (CollUtil.isEmpty(cacheValues)) {
+            return Collections.emptyList();
+        }
 
-        return ret;
+        return cacheValues.stream().flatMap(Collection::stream).toList();
     }
 
     /**
@@ -61,7 +64,7 @@ public class RolePermissionCacheHelper {
      * @param roleId 角色ID
      * @param newPermissions 新权限名集合
      */
-    public void putCache(Long roleId, Set<String> newPermissions) {
+    public void putCache(Long roleId, Collection<String> newPermissions) {
         String cacheKey = String.format(CACHE_KEY_ROLE_PERMISSIONS, roleId);
         stringSetRedisTemplate.opsForValue().set(cacheKey, newPermissions);
     }
@@ -72,11 +75,10 @@ public class RolePermissionCacheHelper {
      * @param roleIds 角色ID集合
      */
     public void deleteCache(Collection<Long> roleIds) {
-        roleIds.forEach(
-                roleId -> {
-                    String cacheKey = String.format(CACHE_KEY_ROLE_PERMISSIONS, roleId);
-                    stringSetRedisTemplate.delete(cacheKey);
-                }
-        );
+        if (CollUtil.isNotEmpty(roleIds)) {
+            // 批量删除缓存
+            List<String> cacheKeys = roleIds.stream().map(roleId -> String.format(CACHE_KEY_ROLE_PERMISSIONS, roleId)).toList();
+            stringSetRedisTemplate.delete(cacheKeys);
+        }
     }
 }

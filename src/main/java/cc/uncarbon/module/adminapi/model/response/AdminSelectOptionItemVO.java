@@ -10,10 +10,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -24,14 +22,20 @@ import java.util.stream.Stream;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Accessors(chain = true)
 @Getter
-public class SelectOptionItemVO implements Serializable {
+public class AdminSelectOptionItemVO implements Serializable {
+    /**
+     * Jackson等序列化框架，可利用此无参构造器反射生成对象
+     */
+    private AdminSelectOptionItemVO() {
+    }
 
     // ID👉名称 一对（用于关联各种实体）
     @Schema(description = "ID")
     private Number id;
     @Schema(description = "名称")
     private String name;
-    public SelectOptionItemVO(Number id, String name) {
+
+    public AdminSelectOptionItemVO(Number id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -40,7 +44,8 @@ public class SelectOptionItemVO implements Serializable {
     @Schema(description = "上级ID")
     @Setter
     private Number parentId;
-    public SelectOptionItemVO(Number id, String name, Number parentId) {
+
+    public AdminSelectOptionItemVO(Number id, String name, Number parentId) {
         this.id = id;
         this.name = name;
         this.parentId = parentId;
@@ -52,7 +57,8 @@ public class SelectOptionItemVO implements Serializable {
     private Number value;
     @Schema(description = "标签")
     private String label;
-    public SelectOptionItemVO(HelioBaseEnum<? extends Number> helioBaseEnum) {
+
+    public AdminSelectOptionItemVO(HelioBaseEnum<? extends Number> helioBaseEnum) {
         this.value = helioBaseEnum.getValue();
         this.label = helioBaseEnum.getLabel();
     }
@@ -74,54 +80,79 @@ public class SelectOptionItemVO implements Serializable {
      */
 
     /**
-     * 构造List<SelectOptionItemVO>
+     * 构造List<AdminSelectOptionItemVO>
      * 将转换源集合中所有集合项
      * 无需上级ID
-     * @param source 源集合
-     * @param idGetter id getter
+     *
+     * @param source     源集合
+     * @param idGetter   id getter
      * @param nameGetter name getter
      */
-    public static <T> List<SelectOptionItemVO> listOf(
+    public static <T> List<AdminSelectOptionItemVO> listOf(
             Collection<T> source,
             @NonNull Function<T, Number> idGetter,
             @NonNull Function<T, String> nameGetter
     ) {
-        return listOf(source, idGetter, nameGetter, null, null);
+        return listOf(source, idGetter, nameGetter, null, null, null);
     }
 
     /**
-     * 构造List<SelectOptionItemVO>
+     * 构造List<AdminSelectOptionItemVO>
      * 将转换源集合中所有集合项
      * 支持上级ID
-     * @param source 源集合
-     * @param idGetter id getter
-     * @param nameGetter name getter
+     *
+     * @param source         源集合
+     * @param idGetter       id getter
+     * @param nameGetter     name getter
+     * @param parentIdGetter 上级ID getter
      */
-    public static <T> List<SelectOptionItemVO> listOf(
+    public static <T> List<AdminSelectOptionItemVO> listOf(
             Collection<T> source,
             @NonNull Function<T, Number> idGetter,
             @NonNull Function<T, String> nameGetter,
             Function<T, Number> parentIdGetter
     ) {
-        return listOf(source, idGetter, nameGetter, parentIdGetter, null);
+        return listOf(source, idGetter, nameGetter, parentIdGetter, null, null);
     }
 
     /**
-     * 构造List<SelectOptionItemVO>
+     * 构造List<AdminSelectOptionItemVO>
+     * 将转换源集合中所有集合项
+     * 无需上级ID
+     *
+     * @param source                   源集合
+     * @param idGetter                 id getter
+     * @param nameGetter               name getter
+     * @param postConversionProcessing （可选）转换后置处理过程，方便加入一些自定义字段，如 code、quantity 等
+     */
+    public static <T> List<AdminSelectOptionItemVO> listOf(
+            Collection<T> source,
+            @NonNull Function<T, Number> idGetter,
+            @NonNull Function<T, String> nameGetter,
+            BiConsumer<T, AdminSelectOptionItemVO> postConversionProcessing
+    ) {
+        return listOf(source, idGetter, nameGetter, null, null, postConversionProcessing);
+    }
+
+    /**
+     * 构造List<AdminSelectOptionItemVO>
      * 支持自定义过滤器，仅转换需要的集合项
      * 支持上级ID
-     * @param source 源集合
-     * @param idGetter id getter
-     * @param nameGetter name getter
-     * @param parentIdGetter （可选）parentId getter
-     * @param sourceItemFilter （可选）集合项过滤器
+     *
+     * @param source                   源集合
+     * @param idGetter                 id getter
+     * @param nameGetter               name getter
+     * @param parentIdGetter           （可选）parentId getter
+     * @param sourceItemFilter         （可选）集合项过滤器
+     * @param postConversionProcessing （可选）转换后置处理过程，方便加入一些自定义字段，如 code、quantity 等
      */
-    public static <T> List<SelectOptionItemVO> listOf(
+    public static <T> List<AdminSelectOptionItemVO> listOf(
             Collection<T> source,
             @NonNull Function<T, Number> idGetter,
             @NonNull Function<T, String> nameGetter,
             Function<T, Number> parentIdGetter,
-            Predicate<T> sourceItemFilter
+            Predicate<T> sourceItemFilter,
+            BiConsumer<T, AdminSelectOptionItemVO> postConversionProcessing
     ) {
         if (CollUtil.isEmpty(source)) {
             return Collections.emptyList();
@@ -130,28 +161,37 @@ public class SelectOptionItemVO implements Serializable {
         if (sourceItemFilter != null) {
             stream = stream.filter(sourceItemFilter);
         }
-        return stream.map(item ->
-                        new SelectOptionItemVO(idGetter.apply(item), nameGetter.apply(item),
-                                parentIdGetter == null ? null : parentIdGetter.apply(item)))
-                .toList();
+
+        return stream.map(sourceItem -> {
+                    AdminSelectOptionItemVO optionItem = new AdminSelectOptionItemVO(idGetter.apply(sourceItem), nameGetter.apply(sourceItem));
+                    if (Objects.nonNull(parentIdGetter)) {
+                        optionItem.setParentId(parentIdGetter.apply(sourceItem));
+                    }
+                    if (Objects.nonNull(postConversionProcessing)) {
+                        postConversionProcessing.accept(sourceItem, optionItem);
+                    }
+                    return optionItem;
+                }).toList();
     }
 
     /**
-     * 构造List<SelectOptionItemVO>
+     * 构造List<AdminSelectOptionItemVO>
      * 将转换枚举类中所有枚举常量
+     *
      * @param helioBaseEnum 实现了HelioBaseEnum的枚举类
      */
-    public static <E extends Enum<?> & HelioBaseEnum<? extends Number>> List<SelectOptionItemVO> listOf(Class<E> helioBaseEnum) {
+    public static <E extends Enum<?> & HelioBaseEnum<? extends Number>> List<AdminSelectOptionItemVO> listOf(Class<E> helioBaseEnum) {
         return listOf(helioBaseEnum, null);
     }
 
     /**
-     * 构造List<SelectOptionItemVO>
+     * 构造List<AdminSelectOptionItemVO>
      * 支持自定义过滤器，仅转换需要的枚举常量
-     * @param helioBaseEnum 实现了HelioBaseEnum的枚举类
+     *
+     * @param helioBaseEnum      实现了HelioBaseEnum的枚举类
      * @param enumConstantFilter （可选）枚举类中枚举常量过滤器
      */
-    public static <E extends Enum<?> & HelioBaseEnum<? extends Number>> List<SelectOptionItemVO> listOf(
+    public static <E extends Enum<?> & HelioBaseEnum<? extends Number>> List<AdminSelectOptionItemVO> listOf(
             Class<E> helioBaseEnum,
             Predicate<E> enumConstantFilter
     ) {
@@ -162,6 +202,6 @@ public class SelectOptionItemVO implements Serializable {
         if (enumConstantFilter != null) {
             stream = stream.filter(enumConstantFilter);
         }
-        return stream.map(SelectOptionItemVO::new).toList();
+        return stream.map(AdminSelectOptionItemVO::new).toList();
     }
 }

@@ -25,6 +25,11 @@ spring:
     execution:
       pool:
         core-size: 8
+  servlet:
+    multipart:
+      # 文件上传大小限制（两个一起配）
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 helio:
   crud:
