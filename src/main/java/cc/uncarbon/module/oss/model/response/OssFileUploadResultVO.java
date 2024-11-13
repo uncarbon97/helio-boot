@@ -27,4 +27,7 @@ public class OssFileUploadResultVO implements Serializable {
     @Schema(description = "完整外链")
     private String url;
 
+    @Schema(description = "原始文件名")
+    private String originalFilename;
+
 }

@@ -82,7 +82,7 @@ public class AdminOssUploadDownloadController {
             bo = ossUploadDownloadFacade.upload(file.getBytes(), attr);
         }
 
-        return ApiResult.data(this.toUploadResult(bo, request.getRequestURL().toString()));
+        return ApiResult.data(this.toUploadResult(bo, request.getRequestURL().toString(), file.getOriginalFilename()));
     }
 
     @Operation(summary = "下载文件(根据文件ID)")
@@ -110,10 +110,12 @@ public class AdminOssUploadDownloadController {
     /**
      * 将 OssFileInfoBO 转换为 OssFileUploadResultVO
      */
-    private OssFileUploadResultVO toUploadResult(OssFileInfoBO ossFileInfo, String requestUrl) {
+    private OssFileUploadResultVO toUploadResult(OssFileInfoBO ossFileInfo, String requestUrl, String originalFilename) {
         OssFileUploadResultVO ret = new OssFileUploadResultVO()
                 .setFileId(ossFileInfo.getId())
-                .setFilename(ossFileInfo.getStorageFilenameFull());
+                .setFilename(ossFileInfo.getStorageFilenameFull())
+                // 返回本次上传文件的原始文件名
+                .setOriginalFilename(originalFilename);
 
         /*
         这里请根据实际业务性质调整
