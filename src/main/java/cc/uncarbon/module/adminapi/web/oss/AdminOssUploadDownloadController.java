@@ -54,8 +54,8 @@ public class AdminOssUploadDownloadController {
     ) throws IOException {
         AdminApiErrorEnum.UPLOAD_FILE_NOT_EXIST.assertNotNull(file);
         UploadFileCheckResultEnum checkResult = UploadFileChecker.check(file,
-                // 默认只能上传100MB之内的文件，且约束后缀名
-                UploadFileChecker.FILE_SIZE_1MB * 100,
+                // 默认只能上传1024MB之内的文件，且约束后缀名
+                UploadFileChecker.FILE_SIZE_1MB * 1024,
                 new String[]{"jpg", "png", "webp", "gif", "xlsx"});
         if (checkResult.isNotOK()) {
             throw new BusinessException(checkResult.getLabel());
