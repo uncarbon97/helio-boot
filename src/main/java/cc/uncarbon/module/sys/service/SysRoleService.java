@@ -418,7 +418,7 @@ public class SysRoleService {
      */
     private void preBindRoleMenuRelationCheck(AdminBindRoleMenuRelationDTO dto) {
         UserRoleContainer currentUser = getCurrentUserRoleContainer();
-        if (currentUser.isSuperAdmin()) {
+        if (SysConstant.SUPER_ADMIN_ROLE_ID.equals(dto.getRoleId())) {
             throw new BusinessException(SysErrorEnum.CANNOT_BIND_MENUS_FOR_SUPER_ADMIN_ROLE);
         }
 
