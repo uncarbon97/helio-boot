@@ -30,3 +30,9 @@ hs_err_pid*
 *.iws
 *.iml
 *.ipr
+
+# VSCode
+.vscode
+
+# VSCode 不会自动忽略 **/target 目录
+target/
