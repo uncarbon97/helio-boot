@@ -10,6 +10,7 @@ import cc.uncarbon.framework.core.context.TenantContext;
  *     TenantContext originContext = TenantContextHolder.getTenantContext();
  *     try {
  *         TenantContextHolder.setTenantContext(PrivilegedTenantContext.SINGLETON);
+ *         // 业务代码...
  *     } finally {
  *         TenantContextHolder.setTenantContext(originContext);
  *     }
