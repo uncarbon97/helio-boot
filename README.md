@@ -55,6 +55,7 @@ JDK compatibility: 17 - 21
     │  │              ├─appapi       app-api，用于C端的HTTP-API【只是一个骨架，并没有业务实现】
     │  │              │  ├─constant  常量
     │  │              │  └─web       即：Controller
+    │  │              ├─bizcommon       biz-common，业务开发公共包
     │  │              ├─oss          对象存储服务
     │  │              │  ├─config    配置类
     │  │              │  ├─constant  常量

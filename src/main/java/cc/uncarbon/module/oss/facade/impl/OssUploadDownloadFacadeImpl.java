@@ -92,6 +92,7 @@ public class OssUploadDownloadFacadeImpl implements OssUploadDownloadFacade {
         这里请根据实际业务性质调整
         有的业务出于安全目的，不能暴露直链，只能通过服务端代理下载后，返回 byte[]
         有的业务没有限制，上传后文件完全可以直接通过对象存储直链下载，如此还能节约服务端上传带宽
+        有的业务有安全要求，只能通过预签名地址下载
         但本地存储又没有直链，只能通过文件ID；
         默认地，此处按【本地存储or对象存储直链为空：通过服务端代理下载；对象存储：通过对象存储直链下载】返回
          */
@@ -109,6 +110,12 @@ public class OssUploadDownloadFacadeImpl implements OssUploadDownloadFacade {
                 throw new BusinessException(OssErrorEnum.FILE_DOWNLOAD_FAILED);
             }
         } else {
+            /*if (fileStorageService.isSupportPresignedUrl(ossFileInfo.getStoragePlatform())) {
+                // 采用预签名地址下载
+                FileInfo fileInfo = OssFileInfoService.toFileInfo(ossFileInfo);
+                DateTime oneHourLater = DateUtil.offsetHour(DateUtil.date(), 1);
+                String preSignedUrl = fileStorageService.generatePresignedUrl(fileInfo, oneHourLater);
+                ossFileInfo.setDirectUrl(preSignedUrl);*/
             redirect2DirectUrl = true;
         }
         return OssFileDownloadReplyBO.builder()

@@ -227,12 +227,15 @@ public class SysRoleService {
      * 仅内部使用
      */
     protected UserRoleContainer getSpecifiedUserRoleContainer(Long specifiedUserId) {
-        Set<Long> currentUserRoleIds = sysUserRoleRelationService.listRoleIdsByUserId(specifiedUserId);
-        List<SysRoleEntity> currentUserRoles = Collections.emptyList();
-        if (CollUtil.isNotEmpty(currentUserRoleIds)) {
-            currentUserRoles = sysRoleMapper.selectBatchIds(currentUserRoleIds);
+        Set<Long> userRoleIds = sysUserRoleRelationService.listRoleIdsByUserId(specifiedUserId);
+        List<SysRoleEntity> userRoles = null;
+        if (CollUtil.isNotEmpty(userRoleIds)) {
+            userRoles = sysRoleMapper.selectBatchIds(userRoleIds);
         }
-        return new UserRoleContainer(currentUserRoleIds, currentUserRoles);
+        if (CollUtil.isEmpty(userRoles)) {
+            userRoles = Collections.emptyList();
+        }
+        return new UserRoleContainer(userRoleIds, userRoles);
     }
 
     /**

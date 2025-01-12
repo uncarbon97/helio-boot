@@ -477,9 +477,9 @@ ON COLUMN "sys_role"."updated_at" IS '更新时刻';
 COMMENT
 ON COLUMN "sys_role"."updated_by" IS '更新者';
 COMMENT
-ON COLUMN "sys_role"."title" IS '名称';
+ON COLUMN "sys_role"."title" IS '角色名';
 COMMENT
-ON COLUMN "sys_role"."value" IS '值';
+ON COLUMN "sys_role"."value" IS '角色编码';
 COMMENT
 ON TABLE "sys_role" IS '后台角色';
 

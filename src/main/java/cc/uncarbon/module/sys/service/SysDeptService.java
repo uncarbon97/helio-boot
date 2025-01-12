@@ -150,12 +150,15 @@ public class SysDeptService {
      * @param queryVisibleDept 是否要进一步查询可见部门
      */
     protected UserDeptContainer getSpecifiedUserDeptContainer(Long specifiedUserId, boolean queryVisibleDept) {
-        List<Long> currentUserDeptIds = sysUserDeptRelationService.getUserDeptIds(specifiedUserId);
-        List<SysDeptEntity> currentUserDepts = Collections.emptyList();
-        if (CollUtil.isNotEmpty(currentUserDeptIds)) {
-            currentUserDepts = sysDeptMapper.selectBatchIds(currentUserDeptIds);
+        List<Long> userDeptIds = sysUserDeptRelationService.getUserDeptIds(specifiedUserId);
+        List<SysDeptEntity> userDepts = null;
+        if (CollUtil.isNotEmpty(userDeptIds)) {
+            userDepts = sysDeptMapper.selectBatchIds(userDeptIds);
         }
-        UserDeptContainer container = new UserDeptContainer(currentUserDeptIds, currentUserDepts);
+        if (CollUtil.isEmpty(userDepts)) {
+            userDepts = Collections.emptyList();
+        }
+        UserDeptContainer container = new UserDeptContainer(userDeptIds, userDepts);
 
         if (queryVisibleDept && container.hasRelatedDepts()) {
             List<SysDeptEntity> allDepts = sysDeptMapper.sortedList();

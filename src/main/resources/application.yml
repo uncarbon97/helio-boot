@@ -25,6 +25,12 @@ spring:
     execution:
       pool:
         core-size: 8
+  servlet:
+    multipart:
+      # 文件上传大小限制（两个一起配）
+      # 如果还用了 Nginx 等反向代理，需要在反向代理的配置中也放宽请求体大小限制
+      max-file-size: 1024MB
+      max-request-size: 1024MB
 
 helio:
   crud:

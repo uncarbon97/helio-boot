@@ -23,6 +23,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -268,7 +271,16 @@ public class SysLogAspect {
         Map<Object, Object> afterMasked = new LinkedHashMap<>(32, 1);
         String params = Arrays.stream(joinPoint.getArgs()).map(
                 item -> {
-                    if (ClassUtil.isBasicType(item.getClass())) {
+                    if (Objects.isNull(item)) {
+                        return CharSequenceUtil.EMPTY;
+                    } else if (item instanceof MultipartRequest multipartRequest) {
+                        return String.format("上传文件(%s)",
+                                CharSequenceUtil.join(StrPool.COMMA,
+                                        multipartRequest.getFileMap().values().stream().map(MultipartFile::getOriginalFilename).toList()
+                                ));
+                    } else if (item instanceof MultipartFile multipartFile) {
+                        return String.format("上传文件(%s)", multipartFile.getOriginalFilename());
+                    } else if (ClassUtil.isBasicType(item.getClass())) {
                         // 基元类型 OR 其包装类型，且拿不到参数名，保存在DB时保持原样
                         return StrUtil.toStringOrNull(item);
                     }

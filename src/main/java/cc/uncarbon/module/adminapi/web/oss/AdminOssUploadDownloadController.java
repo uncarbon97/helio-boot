@@ -54,8 +54,8 @@ public class AdminOssUploadDownloadController {
     ) throws IOException {
         AdminApiErrorEnum.UPLOAD_FILE_NOT_EXIST.assertNotNull(file);
         UploadFileCheckResultEnum checkResult = UploadFileChecker.check(file,
-                // 默认只能上传10MB之内的文件，且约束后缀名
-                UploadFileChecker.FILE_SIZE_1MB * 10,
+                // 默认只能上传1024MB之内的文件，且约束后缀名
+                UploadFileChecker.FILE_SIZE_1MB * 1024,
                 new String[]{"jpg", "png", "webp", "gif", "xlsx"});
         if (checkResult.isNotOK()) {
             throw new BusinessException(checkResult.getLabel());
@@ -82,7 +82,7 @@ public class AdminOssUploadDownloadController {
             bo = ossUploadDownloadFacade.upload(file.getBytes(), attr);
         }
 
-        return ApiResult.data(this.toUploadResult(bo, request.getRequestURL().toString()));
+        return ApiResult.data(this.toUploadResult(bo, request.getRequestURL().toString(), file.getOriginalFilename()));
     }
 
     @Operation(summary = "下载文件(根据文件ID)")
@@ -110,15 +110,18 @@ public class AdminOssUploadDownloadController {
     /**
      * 将 OssFileInfoBO 转换为 OssFileUploadResultVO
      */
-    private OssFileUploadResultVO toUploadResult(OssFileInfoBO ossFileInfo, String requestUrl) {
+    private OssFileUploadResultVO toUploadResult(OssFileInfoBO ossFileInfo, String requestUrl, String originalFilename) {
         OssFileUploadResultVO ret = new OssFileUploadResultVO()
                 .setFileId(ossFileInfo.getId())
-                .setFilename(ossFileInfo.getStorageFilenameFull());
+                .setFilename(ossFileInfo.getStorageFilenameFull())
+                // 返回本次上传文件的原始文件名
+                .setOriginalFilename(originalFilename);
 
         /*
         这里请根据实际业务性质调整
-        有的业务出于安全目的，上传后文件只能通过文件ID才能下载
-        有的业务没有限制，上传后文件完全可以直接通过对象存储直链下载
+        有的业务出于安全目的，不能暴露直链，只能通过服务端代理下载后，返回 byte[]
+        有的业务没有限制，上传后文件完全可以直接通过对象存储直链下载，如此还能节约服务端上传带宽
+        有的业务有安全要求，只能通过预签名地址下载
         但本地存储又没有直链，只能通过文件ID；
         默认地，此处按【本地存储or对象存储直链为空：通过文件ID下载；对象存储：通过对象存储直链下载】返回 url
          */
@@ -131,6 +134,7 @@ public class AdminOssUploadDownloadController {
                     String.format("%s/%s", requestUrl, ossFileInfo.getId())
             );
         } else {
+            // 获取预签名地址可参考 OssUploadDownloadFacadeImpl 的 downloadById 方法
             ret.setUrl(ossFileInfo.getDirectUrl());
         }
 
