@@ -31,6 +31,10 @@ spring:
       # 如果还用了 Nginx 等反向代理，需要在反向代理的配置中也放宽请求体大小限制
       max-file-size: 1024MB
       max-request-size: 1024MB
+  # 不为工程中的资源文件建立映射
+  web:
+    resources:
+      add-mappings: false
 
 helio:
   crud:
@@ -85,6 +89,9 @@ server:
 mybatis-plus:
   # XML扫描，支持统配符 * 或者 , 分割
   mapper-locations: classpath*:/mapper/**/*.xml, classpath*:/**/mapper/xml/*.xml
+  global-config:
+    # 启动时不打印字符画
+    banner: false
 
 logging:
   level:
