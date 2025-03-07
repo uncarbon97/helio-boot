@@ -75,6 +75,8 @@ helio:
     # 是否对返回消息启用国际化翻译
     enabled: false
 
+# 因 Knife4j 未完整适配 Spring Boot 3.4，WebUI 对文档的显示开始有问题了，可见issue：https://gitee.com/uncarbon97/helio-starters/issues/IBPT0R
+# 为保证显示效果，建议改用 ApiFox 等第三方 API 管理工具，导入：http://127.0.0.1:<端口号>/v3/api-docs
 knife4j:
   # 保持true
   enable: true
