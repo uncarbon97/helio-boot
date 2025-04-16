@@ -46,12 +46,6 @@
         <dependency>
             <groupId>cc.uncarbon.framework</groupId>
             <artifactId>helio-starter-knife4j</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.xiaoymin</groupId>
-                    <artifactId>knife4j-micro-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
