@@ -1,5 +1,6 @@
 package cc.uncarbon.module.sys.model.response;
 
+import cc.uncarbon.framework.core.enums.GenderEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +30,17 @@ public class VbenAdminUserInfoVO implements Serializable {
 
     @Schema(description = "最后登录时刻")
     private LocalDateTime lastLoginAt;
+
+    @Schema(description = "性别")
+    private GenderEnum gender;
+
+    @Schema(description = "邮箱")
+    private String email;
+
+    @Schema(description = "手机号")
+    private String phoneNo;
+
+    @Schema(description = "头像URL")
+    private String avatar;
 
 }
