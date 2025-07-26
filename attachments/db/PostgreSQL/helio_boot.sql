@@ -982,3 +982,8 @@ COMMENT ON TABLE sys_log IS '系统日志';
 -- v1.8.0 - Uncarbon - 订正系统菜单-权限串缺少默认值问题
 ALTER TABLE "sys_menu"
     ALTER COLUMN "permission" SET DEFAULT '';
+
+-- 新增'头像URL'字段
+ALTER TABLE sys_user ADD COLUMN avatar_url varchar(255);
+
+COMMENT ON COLUMN sys_user.avatar_url IS '头像URL';

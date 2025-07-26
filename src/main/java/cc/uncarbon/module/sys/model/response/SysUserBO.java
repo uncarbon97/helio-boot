@@ -66,4 +66,7 @@ public class SysUserBO implements Serializable {
     @Schema(description = "所属部门名称")
     private String deptTitle;
 
+    @Schema(description = "头像URL")
+    private String avatarUrl;
+
 }
