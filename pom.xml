@@ -8,14 +8,14 @@
     <parent>
         <groupId>cc.uncarbon.framework</groupId>
         <artifactId>helio-starters</artifactId>
-        <version>2.4.1</version>
+        <version>2.5.0</version>
     </parent>
 
     <groupId>cc.uncarbon.module</groupId>
     <artifactId>helio-boot</artifactId>
     <description>Helio 单模块版单体脚手架</description>
     <!-- 制品版本号，建议每次打包发布时都调整以作区分 -->
-    <version>2.4.1</version>
+    <version>2.5.0</version>
 
     <properties>
         <!-- 如果实际开发使用的是JDK 21，则下面改成'21' -->
